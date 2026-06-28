@@ -12,6 +12,7 @@ import {
 import { Card, Button, Loader } from "@/components/ui";
 import { api } from "@/api/client";
 import { SearchResult } from "@/types";
+import { usePageRefresh } from "@/hooks";
 
 export function SearchPage() {
   const [query, setQuery] = useState("");
@@ -34,6 +35,14 @@ export function SearchPage() {
     }
   }, []);
 
+  const refresh = useCallback(async () => {
+    if (query.trim().length >= 2) {
+      await search(query);
+    }
+  }, [query, search]);
+
+  usePageRefresh(refresh);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (query.trim().length >= 2) {
@@ -49,7 +58,7 @@ export function SearchPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-cr-text tracking-tight">Поиск игроков</h1>
+      <h1 className="page-title">Поиск игроков</h1>
 
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cr-muted" />

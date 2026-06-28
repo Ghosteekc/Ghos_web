@@ -63,7 +63,7 @@ export function Analytics({ stats, loading }: AnalyticsProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-cr-text tracking-tight">Аналитика</h1>
+        <h1 className="page-title">Аналитика</h1>
         <p className="text-sm text-cr-muted mt-1">Подробная статистика по вашим боям</p>
       </div>
 

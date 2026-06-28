@@ -1,31 +1,35 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Star, Copy, Trash2 } from "lucide-react";
 import { Card, Button, Loader, SkeletonGroup } from "@/components/ui";
 import { api } from "@/api/client";
+import { usePageRefresh } from "@/hooks";
 
 export function FavoritesPage() {
   const [favorites, setFavorites] = useState<{ cards: any[]; decks: string[][] } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await api.getFavorites();
-        setFavorites(res);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void load();
+  const load = useCallback(async () => {
+    try {
+      const res = await api.getFavorites();
+      setFavorites(res);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  usePageRefresh(load);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   if (loading) return <Loader />;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-cr-text tracking-tight">Любимые колоды</h1>
+      <h1 className="page-title">Любимые колоды</h1>
 
       {favorites && favorites.decks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

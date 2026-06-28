@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Trophy,
@@ -11,6 +11,7 @@ import { Card, Button, Loader, SkeletonGroup } from "@/components/ui";
 import { BattleCardSimple } from "@/components/battles/BattleCard";
 import { api } from "@/api/client";
 import { BattleSummary } from "@/types";
+import { usePageRefresh } from "@/hooks";
 
 export function BattlesPage() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export function BattlesPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<"all" | "wins" | "losses">("all");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const res = await api.getBattles();
       setBattles(res.battles);
@@ -29,11 +30,13 @@ export function BattlesPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
+
+  usePageRefresh(load);
 
   useEffect(() => {
     void load();
-  }, []);
+  }, [load]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -49,7 +52,7 @@ export function BattlesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-cr-text tracking-tight">История боёв</h1>
+        <h1 className="page-title">История боёв</h1>
         <Button variant="ghost" onClick={onRefresh} className="!p-2" disabled={refreshing}>
           <RefreshCw className={"w-5 h-5 " + (refreshing ? "animate-spin" : "")} />
         </Button>

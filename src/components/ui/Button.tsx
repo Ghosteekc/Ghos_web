@@ -29,7 +29,6 @@ export function Button({
   return (
     <motion.button
       whileTap={{ scale: 0.96 }}
-      whileHover={{ y: -1 }}
       type={type}
       disabled={disabled}
       onClick={onClick}

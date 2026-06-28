@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   User,
@@ -18,7 +18,7 @@ import {
 import { Card, Button, Loader } from "@/components/ui";
 import { api } from "@/api/client";
 import { Settings } from "@/types";
-import { useTelegram } from "@/hooks";
+import { useTelegram, usePageRefresh } from "@/hooks";
 
 export function SettingsPage() {
   const { tg } = useTelegram();
@@ -30,19 +30,22 @@ export function SettingsPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const s = await api.getSettings();
-        setSettings(s);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void load();
+  const load = useCallback(async () => {
+    try {
+      const s = await api.getSettings();
+      setSettings(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  usePageRefresh(load);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   const update = async (patch: Partial<Settings>) => {
     setSettings((prev) => ({ ...prev, ...patch }));
@@ -59,7 +62,7 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-cr-text tracking-tight">Настройки</h1>
+      <h1 className="page-title">Настройки</h1>
 
       <div className="space-y-4">
         <section>
@@ -167,15 +170,17 @@ export function SettingsPage() {
 
         <section>
           <h3 className="text-sm font-semibold text-cr-muted mb-3 uppercase tracking-wider">Данные</h3>
-          <Card className="space-y-3">
-            <Button variant="ghost" className="w-full justify-start">
-              <Trash2 className="w-5 h-5 text-cr-loss mr-3" />
-              Очистить кеш
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <Trophy className="w-5 h-5 text-cr-gold mr-3" />
-              Эмблема арены
-            </Button>
+          <Card className="!p-2">
+            <div className="flex flex-col gap-1">
+              <Button variant="ghost" className="settings-action-row">
+                <Trash2 className="w-5 h-5 text-cr-loss mr-3 shrink-0" />
+                Очистить кеш
+              </Button>
+              <Button variant="ghost" className="settings-action-row">
+                <Trophy className="w-5 h-5 text-cr-gold mr-3 shrink-0" />
+                Эмблема арены
+              </Button>
+            </div>
           </Card>
         </section>
       </div>
@@ -193,17 +198,13 @@ export { SettingsPage as default };
     return (
       <button
         type="button"
+        role="switch"
+        aria-checked={checked}
+        data-checked={checked}
         onClick={() => onChange(!checked)}
-        className={
-          "relative w-12 h-7 rounded-full transition-colors duration-200 flex-shrink-0 " +
-          (checked ? "bg-cr-gold" : "bg-cr-border")
-        }
+        className="toggle-switch"
       >
-        <motion.span
-          animate={{ x: checked ? 20 : 2 }}
-          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-md"
-        />
+        <span className="toggle-switch-thumb" />
       </button>
     );
   }

@@ -1,31 +1,115 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { User, Crown, Trophy, Flame, Settings } from "lucide-react";
-import { Card, Button } from "@/components/ui";
-import { useTelegram } from "@/hooks";
+import {
+  User,
+  Crown,
+  Trophy,
+  Flame,
+  Settings,
+  TrendingUp,
+} from "lucide-react";
+import { Card, Button, Loader } from "@/components/ui";
+import { useTelegram, usePageRefresh } from "@/hooks";
+import { api } from "@/api/client";
+import { Profile } from "@/types";
+import { formatNumber, getWinColor } from "@/utils";
+
+function formatSubscription(subscription: Profile["subscription"]) {
+  if (!subscription.active) {
+    return { label: "Не активна", hint: subscription.trial_used ? "Пробный период использован" : "Оформите подписку" };
+  }
+  const expires = subscription.expires_at
+    ? `до ${new Date(subscription.expires_at).toLocaleDateString("ru")}`
+    : "";
+  return { label: "Premium", hint: expires ? `Активна ${expires}` : "Активна" };
+}
 
 export function ProfilePage() {
-  const { tg, user } = useTelegram();
+  const navigate = useNavigate();
+  const { user } = useTelegram();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    try {
+      setError(null);
+      const p = await api.getProfile();
+      setProfile(p);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка загрузки профиля");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  usePageRefresh(load);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  const subscription = profile ? formatSubscription(profile.subscription) : null;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-cr-text tracking-tight">Профиль</h1>
+      <h1 className="page-title">Профиль</h1>
+
+      {error && (
+        <Card className="text-center">
+          <p className="text-cr-loss mb-4">{error}</p>
+          <Button onClick={() => void load()}>Повторить</Button>
+        </Card>
+      )}
+
+      {profile && (
+        <Card>
+          <div className="flex items-center gap-5">
+            <div className="w-20 h-20 shrink-0 rounded-full bg-gradient-to-br from-cr-blue to-cr-gold p-[3px] shadow-glow">
+              {profile.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt={profile.player_name ?? "Player"}
+                  className="w-full h-full rounded-full object-cover bg-cr-surface"
+                />
+              ) : (
+                <div className="w-full h-full rounded-full bg-cr-surface flex items-center justify-center">
+                  <User className="w-8 h-8 text-cr-muted" />
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-xl font-bold text-cr-text truncate">
+                {profile.player_name ?? "Игрок"}
+              </h2>
+              <p className="text-cr-muted text-sm font-mono mt-1">
+                #{profile.player_tag ?? "—"}
+              </p>
+              <p className="text-xs text-cr-muted mt-2 truncate">
+                {profile.arena_name ?? "Арена не указана"}
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
 
       <Card>
         <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cr-blue to-cr-gold p-[3px] shadow-glow">
-            <div className="w-full h-full rounded-full bg-cr-surface flex items-center justify-center">
-              <User className="w-8 h-8 text-cr-muted" />
-            </div>
+          <div className="w-14 h-14 shrink-0 rounded-full bg-cr-surface border border-cr-border flex items-center justify-center">
+            <User className="w-7 h-7 text-cr-muted" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-cr-text">
-              {user?.first_name ?? user?.username ?? "Игрок"}
+          <div className="min-w-0">
+            <p className="text-xs text-cr-muted uppercase tracking-wider mb-1">Telegram</p>
+            <h2 className="text-base font-semibold text-cr-text truncate">
+              {user?.first_name ?? user?.username ?? "—"}
             </h2>
-            <p className="text-cr-muted text-sm font-mono mt-1">
-              @{user?.username ?? "—"}
-            </p>
-            <p className="text-xs text-cr-muted mt-2">ID: {user?.id ?? "—"}</p>
+            <p className="text-cr-muted text-sm mt-0.5 truncate">@{user?.username ?? "—"}</p>
+            <p className="text-xs text-cr-muted mt-1">ID: {user?.id ?? "—"}</p>
           </div>
         </div>
       </Card>
@@ -33,20 +117,42 @@ export function ProfilePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <div className="flex items-center gap-3 mb-3">
-            <Crown className="w-5 h-5 text-cr-gold" />
-            <h3 className="text-sm font-semibold text-cr-text">Уровень аккаунта</h3>
+            <Crown className="w-5 h-5 text-cr-gold shrink-0" />
+            <h3 className="text-sm font-semibold text-cr-text">King Level</h3>
           </div>
-          <p className="text-2xl font-bold text-cr-text">Shop Level {user?.id ?? "—"}</p>
-          <p className="text-xs text-cr-muted mt-1">Клиент Telegram</p>
+          <p className="text-2xl font-bold text-cr-text">{profile?.exp_level ?? "—"}</p>
+          <p className="text-xs text-cr-muted mt-1">Уровень аккаунта Clash Royale</p>
         </Card>
 
         <Card>
           <div className="flex items-center gap-3 mb-3">
-            <Trophy className="w-5 h-5 text-cr-blue" />
+            <Trophy className="w-5 h-5 text-cr-blue shrink-0" />
+            <h3 className="text-sm font-semibold text-cr-text">Трофеи</h3>
+          </div>
+          <p className="text-2xl font-bold text-cr-text">
+            {profile?.trophies != null ? formatNumber(profile.trophies) : "—"}
+          </p>
+          <p className="text-xs text-cr-muted mt-1">Текущий рейтинг</p>
+        </Card>
+
+        <Card>
+          <div className="flex items-center gap-3 mb-3">
+            <TrendingUp className="w-5 h-5 text-cr-win shrink-0" />
+            <h3 className="text-sm font-semibold text-cr-text">Winrate</h3>
+          </div>
+          <p className={"text-2xl font-bold " + getWinColor(profile?.winrate ?? 50)}>
+            {profile?.winrate != null ? `${profile.winrate.toFixed(1)}%` : "—"}
+          </p>
+          <p className="text-xs text-cr-muted mt-1">Процент побед</p>
+        </Card>
+
+        <Card>
+          <div className="flex items-center gap-3 mb-3">
+            <Trophy className="w-5 h-5 text-cr-gold shrink-0" />
             <h3 className="text-sm font-semibold text-cr-text">Подписка</h3>
           </div>
-          <p className="text-lg font-bold text-cr-text">Premium</p>
-          <p className="text-xs text-cr-muted mt-1">Активна до конца месяца</p>
+          <p className="text-lg font-bold text-cr-text">{subscription?.label ?? "—"}</p>
+          <p className="text-xs text-cr-muted mt-1">{subscription?.hint ?? "—"}</p>
         </Card>
       </div>
 
@@ -70,7 +176,7 @@ export function ProfilePage() {
         </div>
       </Card>
 
-      <Button variant="secondary" className="w-full">
+      <Button variant="secondary" className="w-full" onClick={() => navigate("/settings")}>
         <Settings className="w-4 h-4 mr-2" />
         Открыть настройки
       </Button>

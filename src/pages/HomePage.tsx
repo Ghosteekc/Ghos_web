@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { ChevronRight, ArrowUpRight } from "lucide-react";
 import { api } from "@/api/client";
 import { Profile, BattleSummary, StatsOverview } from "@/types";
-import { useTelegram } from "@/hooks";
+import { usePageRefresh } from "@/hooks";
 import { PlayerCard, StatsGrid } from "@/components/home";
 import { Card, Button, Loader, SkeletonGroup } from "@/components/ui";
 import { BattleCardSimple } from "@/components/battles/BattleCard";
 
 export function HomePage() {
-  const { tg } = useTelegram();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [battles, setBattles] = useState<BattleSummary[]>([]);
@@ -18,25 +16,29 @@ export function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const [p, b, s] = await Promise.all([
-          api.getProfile(),
-          api.getBattles(),
-          api.getStats(),
-        ]);
-        setProfile(p);
-        setBattles(b.battles);
-        setStats(s);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Ошибка загрузки");
-      } finally {
-        setLoading(false);
-      }
-    };
-    void load();
+  const load = useCallback(async () => {
+    try {
+      setError(null);
+      const [p, b, s] = await Promise.all([
+        api.getProfile(),
+        api.getBattles(),
+        api.getStats(),
+      ]);
+      setProfile(p);
+      setBattles(b.battles);
+      setStats(s);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка загрузки");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  usePageRefresh(load);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   if (loading) {
     return (

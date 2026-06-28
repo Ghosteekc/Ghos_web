@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -10,6 +10,7 @@ import {
 import { Card, Button, Loader, Skeleton } from "@/components/ui";
 import { api } from "@/api/client";
 import { Deck } from "@/types";
+import { usePageRefresh } from "@/hooks";
 
 export function DecksPage() {
   const navigate = useNavigate();
@@ -19,24 +20,28 @@ export function DecksPage() {
 
   const deckTypes = ["all", "rated", "classic", "2v2", "tournament", "legend_path"];
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await api.getDecks(filter);
-        setDecks(res.decks);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void load();
+  const load = useCallback(async () => {
+    try {
+      const res = await api.getDecks(filter === "all" ? undefined : filter);
+      setDecks(res.decks);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [filter]);
+
+  usePageRefresh(load);
+
+  useEffect(() => {
+    setLoading(true);
+    void load();
+  }, [load]);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-cr-text tracking-tight">Колоды</h1>
+        <h1 className="page-title">Колоды</h1>
         <span className="text-sm text-cr-muted">{decks.length} колод</span>
       </div>
 

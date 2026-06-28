@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   BarChart3,
@@ -12,24 +12,28 @@ import { Card, Loader, Skeleton } from "@/components/ui";
 import { api } from "@/api/client";
 import { StatsOverview } from "@/types";
 import { formatNumber } from "@/utils";
+import { usePageRefresh } from "@/hooks";
 
 export function StatsPage() {
   const [stats, setStats] = useState<StatsOverview | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const s = await api.getStats();
-        setStats(s);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void load();
+  const load = useCallback(async () => {
+    try {
+      const s = await api.getStats();
+      setStats(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  usePageRefresh(load);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   if (loading) return <Loader />;
   if (!stats) return <Card className="text-center">Нет данных</Card>;
@@ -38,7 +42,7 @@ export function StatsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-cr-text tracking-tight">Статистика</h1>
+      <h1 className="page-title">Статистика</h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[

@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   Home,
   User,
@@ -27,53 +27,51 @@ const navItems = [
 ];
 
 export function Sidebar({ isOpen = true, onClose }: { isOpen?: boolean; onClose?: () => void }) {
-  const location = useLocation();
-
   return (
     <nav
-      className={cn(
-        "fixed top-0 left-0 h-full w-64 z-50 glass-panel border-r border-cr-border flex flex-col transition-transform duration-300",
-        "lg:translate-x-0",
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      )}
+      className={cn("sidebar-nav", isOpen && "open")}
+      aria-hidden={!isOpen}
     >
-      <div className="flex items-center justify-between p-5">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cr-gold to-yellow-600 flex items-center justify-center shadow-glow">
+      <div className="flex items-center justify-between px-4 py-4 shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-cr-gold to-yellow-600 flex items-center justify-center shadow-glow">
             <Trophy className="w-6 h-6 text-cr-bg" />
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-cr-text tracking-tight">Ghosteek</h1>
-            <p className="text-xs text-cr-muted -mt-1">CR Assistant</p>
+          <div className="min-w-0">
+            <h1 className="text-lg font-bold text-cr-text tracking-tight truncate">Ghosteek</h1>
+            <p className="text-xs text-cr-muted -mt-1 truncate">CR Assistant</p>
           </div>
         </div>
-        <button onClick={onClose} className="lg:hidden p-2 rounded-lg hover:bg-white/10">
+        <button
+          type="button"
+          onClick={onClose}
+          className="lg:hidden p-2 rounded-lg hover:bg-white/10 shrink-0"
+          aria-label="Закрыть меню"
+        >
           <X className="w-5 h-5 text-cr-muted" />
         </button>
       </div>
 
-      <div className="flex-1 px-3 space-y-1 overflow-y-auto">
+      <div className="flex-1 px-3 pb-3 space-y-1 overflow-y-auto overflow-x-hidden">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
+            end={item.to === "/"}
             onClick={onClose}
             className={({ isActive }) =>
-              cn(
-                "sidebar-item group",
-                isActive && "active"
-              )
+              cn("sidebar-item group", isActive && "active")
             }
           >
             {({ isActive }) => (
               <>
                 <item.icon
                   className={cn(
-                    "w-5 h-5 flex-shrink-0 transition-colors",
+                    "sidebar-icon",
                     isActive ? "text-cr-gold" : "text-cr-muted group-hover:text-cr-text"
                   )}
                 />
-                <span className="text-sm font-medium tracking-wide">{item.label}</span>
+                <span className="text-sm font-medium tracking-wide truncate">{item.label}</span>
               </>
             )}
           </NavLink>

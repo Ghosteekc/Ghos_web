@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -17,6 +17,7 @@ import { Card, Button, Loader, LinearProgress } from "@/components/ui";
 import { api } from "@/api/client";
 import { BattleDetail } from "@/types";
 import { formatTime, getTrophyChangeColor } from "@/utils";
+import { usePageRefresh } from "@/hooks";
 
 export function BattleDetailPage() {
   const { index } = useParams();
@@ -24,19 +25,23 @@ export function BattleDetailPage() {
   const [battle, setBattle] = useState<BattleDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const b = await api.getBattle(Number(index));
-        setBattle(b);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void load();
+  const load = useCallback(async () => {
+    try {
+      const b = await api.getBattle(Number(index));
+      setBattle(b);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [index]);
+
+  usePageRefresh(load);
+
+  useEffect(() => {
+    setLoading(true);
+    void load();
+  }, [load]);
 
   if (loading) return <Loader />;
   if (!battle) return <Card className="text-center">Бой не найден</Card>;
