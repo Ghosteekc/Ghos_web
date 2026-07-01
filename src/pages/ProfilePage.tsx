@@ -177,8 +177,12 @@ export function ProfilePage() {
         </div>
       </Card>
 
-      <Button variant="secondary" className="w-full" onClick={() => navigate("/settings")}>
-        <Settings className="w-4 h-4 mr-2" />
+      <Button
+        variant="secondary"
+        className="w-full max-w-md mx-auto flex items-center justify-center gap-2"
+        onClick={() => navigate("/settings")}
+      >
+        <Settings className="w-4 h-4" />
         Открыть настройки
       </Button>
     </div>

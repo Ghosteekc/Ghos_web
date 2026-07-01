@@ -59,6 +59,10 @@ export const api = {
   getBattle: (index: number) => request<BattleDetail>(`/api/battles/${index}`),
   getDecks: (type?: string) =>
     request<{ decks: Deck[] }>(type ? `/api/decks?type=${type}` : "/api/decks"),
+  getCardCatalog: () =>
+    request<{ cards: { name: string; name_ru: string; icon: string; id?: number; elixir?: number }[] }>(
+      "/api/cards/catalog",
+    ),
   getDeckCards: (cards: string[]) =>
     request<{ cards: CardInfo[] }>(`/api/cards?ids=${cards.join(",")}`),
   getStats: () => request<StatsOverview>("/api/stats"),

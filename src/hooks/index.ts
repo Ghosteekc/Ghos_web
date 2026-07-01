@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { TelegramWebApp } from "@/vite-env";
 
 export { PageRefreshProvider, usePageRefresh } from "./PageRefreshProvider";
+export { CardCatalogProvider, useCardCatalog } from "./CardCatalogProvider";
 export { usePullToRefresh } from "./usePullToRefresh";
 export function useTelegram() {
   const [tg, setTg] = useState<TelegramWebApp | null>(null);

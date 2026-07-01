@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import {
-  BarChart3,
   TrendingUp,
   Flame,
   Target,
   Swords,
   Clock,
 } from "lucide-react";
-import { Card, Loader, Skeleton } from "@/components/ui";
+import { Card, Loader } from "@/components/ui";
+import { CardUsageList } from "@/components/cards";
 import { api } from "@/api/client";
 import { StatsOverview } from "@/types";
 import { formatNumber } from "@/utils";
@@ -61,28 +60,17 @@ export function StatsPage() {
 
       <Card>
         <h3 className="text-sm font-semibold text-cr-text mb-4">Самые используемые карты</h3>
-        <div className="space-y-3">
-          {topCards.map((card, i) => (
-            <div key={card.name} className="flex items-center gap-3">
-              <span className="text-xs text-cr-muted w-4">#{i + 1}</span>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-cr-text">{card.name}</span>
-                  <span className="text-xs text-cr-muted">{card.count} игр · {card.winrate.toFixed(1)}%</span>
-                </div>
-                <div className="h-1.5 bg-cr-border rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ duration: 0.8, delay: i * 0.1 }}
-                    className="h-full rounded-full bg-gradient-to-r from-cr-blue to-cr-gold origin-left"
-                    style={{ width: `${Math.min((card.count / (topCards[0].count || 1)) * 100, 100)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {topCards.length > 0 ? (
+          <CardUsageList
+            items={topCards.map((c) => ({
+              name: c.name,
+              count: c.count,
+              winrate: c.winrate,
+            }))}
+          />
+        ) : (
+          <p className="text-sm text-cr-muted text-center py-6">Нет данных по картам</p>
+        )}
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -92,7 +80,7 @@ export function StatsPage() {
             <h3 className="text-sm font-semibold text-cr-text">Winrate по времени суток</h3>
           </div>
           <div className="space-y-2">
-            {stats.winrate_by_hour.slice(0, 10).map((hour, i) => (
+            {stats.winrate_by_hour.slice(0, 10).map((hour) => (
               <div key={hour.hour} className="flex items-center gap-3">
                 <span className="text-xs text-cr-muted w-8">{hour.hour}:00</span>
                 <div className="flex-1 h-2 bg-cr-border rounded-full overflow-hidden">

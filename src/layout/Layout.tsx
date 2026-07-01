@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/utils";
-import { PageRefreshProvider } from "@/hooks";
+import { PageRefreshProvider, CardCatalogProvider } from "@/hooks";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 function getTelegramChromeTop(webApp: NonNullable<typeof window.Telegram>["WebApp"]) {
@@ -109,11 +109,13 @@ export function Layout() {
 
       <main className="app-main">
         <PageRefreshProvider>
-          <div className="page-shell">
-            <ErrorBoundary>
-              <Outlet />
-            </ErrorBoundary>
-          </div>
+          <CardCatalogProvider>
+            <div className="page-shell">
+              <ErrorBoundary>
+                <Outlet />
+              </ErrorBoundary>
+            </div>
+          </CardCatalogProvider>
         </PageRefreshProvider>
       </main>
     </div>

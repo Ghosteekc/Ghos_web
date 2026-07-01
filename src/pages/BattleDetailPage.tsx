@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card, Button, Loader, LinearProgress } from "@/components/ui";
+import { CardTile } from "@/components/cards";
 import { api } from "@/api/client";
 import { BattleDetail } from "@/types";
 import { formatTime, getTrophyChangeColor } from "@/utils";
@@ -113,10 +114,8 @@ export function BattleDetailPage() {
         <Card>
           <h3 className="font-semibold text-cr-text mb-4">Ваша колода</h3>
           <div className="grid grid-cols-4 gap-2 mb-4">
-            {battle.user_deck.map((card, i) => (
-              <div key={i} className="aspect-square rounded-xl bg-cr-bg/60 border border-cr-border flex items-center justify-center text-2xl">
-                🃏
-              </div>
+            {battle.user_deck.map((name, i) => (
+              <CardTile key={i} name={name} size="lg" showLabel />
             ))}
           </div>
           <div className="space-y-2">
@@ -131,10 +130,8 @@ export function BattleDetailPage() {
         <Card>
           <h3 className="font-semibold text-cr-text mb-4">Колода противника</h3>
           <div className="grid grid-cols-4 gap-2 mb-4">
-            {battle.opponent_deck.map((card, i) => (
-              <div key={i} className="aspect-square rounded-xl bg-cr-bg/60 border border-cr-border flex items-center justify-center text-2xl">
-                🃏
-              </div>
+            {battle.opponent_deck.map((name, i) => (
+              <CardTile key={i} name={name} size="lg" showLabel />
             ))}
           </div>
           <div className="space-y-2">

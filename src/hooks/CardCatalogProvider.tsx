@@ -1,0 +1,79 @@
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { api } from "@/api/client";
+
+export interface CardCatalogItem {
+  name: string;
+  name_ru: string;
+  icon: string;
+  id?: number | null;
+  elixir?: number | null;
+}
+
+interface CardCatalogContextValue {
+  ready: boolean;
+  getCard: (name: string) => CardCatalogItem | undefined;
+  nameRu: (name: string) => string;
+  iconUrl: (name: string) => string | undefined;
+}
+
+const CardCatalogContext = createContext<CardCatalogContextValue | null>(null);
+
+function normalize(name: string) {
+  return name.trim().toLowerCase();
+}
+
+export function CardCatalogProvider({ children }: { children: ReactNode }) {
+  const [byName, setByName] = useState<Map<string, CardCatalogItem>>(new Map());
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await api.getCardCatalog();
+        const map = new Map<string, CardCatalogItem>();
+        for (const card of res.cards) {
+          map.set(normalize(card.name), card);
+        }
+        if (!cancelled) setByName(map);
+      } catch {
+        /* catalog optional — UI falls back to initials */
+      } finally {
+        if (!cancelled) setReady(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const getCard = useCallback(
+    (name: string) => byName.get(normalize(name)),
+    [byName],
+  );
+
+  const nameRu = useCallback(
+    (name: string) => getCard(name)?.name_ru ?? name,
+    [getCard],
+  );
+
+  const iconUrl = useCallback(
+    (name: string) => getCard(name)?.icon || undefined,
+    [getCard],
+  );
+
+  const value = useMemo(
+    () => ({ ready, getCard, nameRu, iconUrl }),
+    [ready, getCard, nameRu, iconUrl],
+  );
+
+  return <CardCatalogContext.Provider value={value}>{children}</CardCatalogContext.Provider>;
+}
+
+export function useCardCatalog() {
+  const ctx = useContext(CardCatalogContext);
+  if (!ctx) {
+    throw new Error("useCardCatalog must be used within CardCatalogProvider");
+  }
+  return ctx;
+}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Star, ExternalLink } from "lucide-react";
 import { Card, Button, Loader } from "@/components/ui";
+import { CardDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { usePageRefresh, useTelegram } from "@/hooks";
 
@@ -34,10 +35,6 @@ export function FavoritesPage() {
     void load();
   }, [load]);
 
-  const importDeck = (link: string) => {
-    openLink(link);
-  };
-
   if (loading) return <Loader />;
 
   return (
@@ -50,26 +47,22 @@ export function FavoritesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {entries.map((entry, i) => (
             <Card key={i}>
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2 rounded-lg bg-cr-gold/10 shrink-0">
-                    <Star className="w-5 h-5 text-cr-gold" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-cr-text">Колода #{i + 1}</p>
-                    <p className="text-xs text-cr-muted truncate">{entry.cards.join(", ")}</p>
-                  </div>
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-cr-gold shrink-0" />
+                  <p className="text-sm font-medium text-cr-text">Колода #{i + 1}</p>
                 </div>
                 {entry.deck_link && (
                   <Button
                     variant="ghost"
                     className="!p-2 shrink-0"
-                    onClick={() => importDeck(entry.deck_link!)}
+                    onClick={() => openLink(entry.deck_link!)}
                   >
                     <ExternalLink className="w-4 h-4" />
                   </Button>
                 )}
               </div>
+              <CardDeckGrid cards={entry.cards} size="sm" showLabels maxVisible={8} />
             </Card>
           ))}
         </div>

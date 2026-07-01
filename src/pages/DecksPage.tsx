@@ -7,6 +7,7 @@ import {
   Star,
 } from "lucide-react";
 import { Card, Button, SkeletonGroup } from "@/components/ui";
+import { CardTile } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { Deck } from "@/types";
 import { usePageRefresh, useTelegram } from "@/hooks";
@@ -195,17 +196,13 @@ function DeckCard({
 
         <div className="grid grid-cols-4 gap-2 mb-4">
           {cards.map((card) => (
-            <div
+            <CardTile
               key={card.id}
-              title={card.name}
-              className="aspect-square rounded-xl bg-cr-bg/60 border border-cr-border flex items-center justify-center text-2xl hover:scale-105 transition-transform"
-            >
-              {card.icon ? (
-                <img src={card.icon} alt={card.name} className="w-8 h-8 object-contain" loading="lazy" />
-              ) : (
-                "🃏"
-              )}
-            </div>
+              name={card.name}
+              icon={card.icon}
+              size="lg"
+              showLabel
+            />
           ))}
         </div>
 
@@ -226,8 +223,8 @@ function DeckCard({
 
         {canImport ? (
           <div className="flex gap-2">
-            <Button variant="secondary" className="flex-1 !py-2 text-sm" onClick={() => void importDeck()}>
-              <ExternalLink className="w-4 h-4 mr-2" />
+            <Button variant="secondary" className="flex-1 !py-2 text-sm flex items-center justify-center gap-2" onClick={() => void importDeck()}>
+              <ExternalLink className="w-4 h-4" />
               Импорт в игру
             </Button>
             <Button variant="ghost" className="!px-3" onClick={() => void saveFavorite()} aria-label="В избранное">

@@ -7,9 +7,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
   BarChart,
   Bar,
   RadarChart,
@@ -21,10 +18,9 @@ import {
 import { TrendingUp, Flame, Target, Clock } from "lucide-react";
 import { StatsOverview } from "@/types";
 import { Card, Loader, Skeleton } from "@/components/ui";
+import { CardUsageGrid } from "@/components/cards";
 import { api } from "@/api/client";
 import { usePageRefresh } from "@/hooks";
-
-const COLORS = ["#fbbf24", "#60a5fa", "#22c55e", "#ef4444", "#8b5cf6", "#ec4899"];
 
 export function AnalyticsPage() {
   const [stats, setStats] = useState<StatsOverview | null>(null);
@@ -156,31 +152,17 @@ export function AnalyticsPage() {
 
         <Card>
           <h3 className="text-sm font-semibold text-cr-text mb-4">Любимые карты</h3>
-          <div className="h-[280px]">
-            {mostUsedCards.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={mostUsedCards.slice(0, 6)}
-                    dataKey="count"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                  >
-                    {mostUsedCards.slice(0, 6).map((_, index) => (
-                      <Cell key={index} fill={COLORS[index % COLORS.length]} stroke="none" />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#181830", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-cr-muted text-sm text-center pt-24">Нет данных по картам</p>
-            )}
-          </div>
+          {mostUsedCards.length > 0 ? (
+            <CardUsageGrid
+              items={mostUsedCards.slice(0, 6).map((c) => ({
+                name: c.name,
+                count: c.count,
+                winrate: c.winrate,
+              }))}
+            />
+          ) : (
+            <p className="text-cr-muted text-sm text-center py-12">Нет данных по картам</p>
+          )}
         </Card>
 
         <Card>
