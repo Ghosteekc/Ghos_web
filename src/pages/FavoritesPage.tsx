@@ -1,19 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { Star, Copy, Trash2 } from "lucide-react";
-import { Card, Button, Loader, SkeletonGroup } from "@/components/ui";
-import { api } from "@/api/client";
+import { Card, Button, Loader } from "@/components/ui";
+import { api, ApiError } from "@/api/client";
 import { usePageRefresh } from "@/hooks";
 
 export function FavoritesPage() {
   const [favorites, setFavorites] = useState<{ cards: any[]; decks: string[][] } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
+      setError(null);
       const res = await api.getFavorites();
       setFavorites(res);
     } catch (e) {
-      console.error(e);
+      setFavorites({ cards: [], decks: [] });
+      setError(e instanceof ApiError ? e.message : "Ошибка загрузки");
     } finally {
       setLoading(false);
     }
@@ -30,6 +33,8 @@ export function FavoritesPage() {
   return (
     <div className="space-y-6">
       <h1 className="page-title">Любимые колоды</h1>
+
+      {error && <Card className="text-center text-cr-loss text-sm">{error}</Card>}
 
       {favorites && favorites.decks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -60,9 +60,11 @@ export function StatsGrid({ stats, loading }: StatsGridProps) {
               item.key === "winrate" && getWinColor(stats?.[item.key as keyof typeof stats] as number)
             )}
           >
-            {stats?.[item.key as keyof typeof stats] !== undefined
+            {stats?.[item.key as keyof typeof stats] != null
               ? item.format(stats[item.key as keyof typeof stats] as number)
-              : "—"}
+              : item.key === "total_battles" && stats && stats.wins + stats.losses > 0
+                ? item.format(stats.wins + stats.losses)
+                : "—"}
           </p>
         </motion.div>
       ))}

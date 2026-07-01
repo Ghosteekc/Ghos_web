@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   User,
-  Crown,
   Trophy,
   Flame,
   Settings,
@@ -117,11 +116,13 @@ export function ProfilePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <div className="flex items-center gap-3 mb-3">
-            <Crown className="w-5 h-5 text-cr-gold shrink-0" />
-            <h3 className="text-sm font-semibold text-cr-text">King Level</h3>
+            <Trophy className="w-5 h-5 text-cr-gold shrink-0" />
+            <h3 className="text-sm font-semibold text-cr-text">Макс. кубки</h3>
           </div>
-          <p className="text-2xl font-bold text-cr-text">{profile?.exp_level ?? "—"}</p>
-          <p className="text-xs text-cr-muted mt-1">Уровень аккаунта Clash Royale</p>
+          <p className="text-2xl font-bold text-cr-text">
+            {profile?.max_trophies != null ? formatNumber(profile.max_trophies) : "—"}
+          </p>
+          <p className="text-xs text-cr-muted mt-1">Лучший результат</p>
         </Card>
 
         <Card>

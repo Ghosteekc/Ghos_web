@@ -33,11 +33,9 @@ export function PlayerCard({ profile, loading }: PlayerCardProps) {
         <div className="flex items-center gap-5">
           <div className="relative">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cr-blue to-cr-gold p-[3px] shadow-glow">
-              <img
-                src={profile.avatar_url ?? "/default-avatar.png"}
-                alt={profile.player_name ?? "Player"}
-                className="w-full h-full rounded-full object-cover bg-cr-surface"
-              />
+              <div className="w-full h-full rounded-full bg-cr-surface flex items-center justify-center text-2xl font-bold text-cr-gold">
+                {(profile.player_name ?? "?").charAt(0).toUpperCase()}
+              </div>
             </div>
             <div className="absolute -bottom-1 -right-1 bg-cr-bg rounded-full p-1 border-2 border-cr-card">
               <Crown className="w-4 h-4 text-cr-gold" />
@@ -68,9 +66,9 @@ export function PlayerCard({ profile, loading }: PlayerCardProps) {
             </div>
           </div>
           <div className="text-center">
-            <p className="text-xs text-cr-muted mb-1">King Level</p>
+            <p className="text-xs text-cr-muted mb-1">Макс. кубки</p>
             <span className="text-2xl font-bold text-cr-text">
-              {profile.exp_level ?? "—"}
+              {profile.max_trophies != null ? formatNumber(profile.max_trophies) : "—"}
             </span>
           </div>
           <div className="text-center">
@@ -99,7 +97,7 @@ export function PlayerCard({ profile, loading }: PlayerCardProps) {
             <div>
               <p className="text-xs text-cr-muted">Рост</p>
               <p className={cn("text-sm font-semibold", getTrophyChangeColor(profile.last_rating_change ?? 0))}>
-                {profile.last_rating_change ?? 0 > 0 ? "+" : ""}{profile.last_rating_change ?? 0}
+                {(profile.last_rating_change ?? 0) > 0 ? "+" : ""}{profile.last_rating_change ?? 0}
               </p>
             </div>
           </div>

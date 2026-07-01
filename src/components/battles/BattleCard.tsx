@@ -49,20 +49,20 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
           <div className="flex items-center justify-between mb-2">
             <div>
               <p className="text-sm font-medium text-cr-text">vs {summary.opponent_name}</p>
-              <p className="text-xs text-cr-muted">#{summary.opponent_tag}</p>
+              <p className="text-xs text-cr-muted">#{summary.opponent_tag || "—"}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-cr-muted">{formatTime(summary.duration)}</p>
+              <p className="text-xs text-cr-muted">{formatTime(summary.duration ?? 0)}</p>
               <p className="text-xs text-cr-muted flex items-center gap-1 justify-end">
                 <Zap className="w-3 h-3" />
-                {summary.avg_elixir.toFixed(1)}
+                {(summary.avg_elixir ?? 0).toFixed(1)}
               </p>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
             <div className="flex -space-x-2">
-              {summary.user_deck.slice(0, 4).map((_, i) => (
+              {(summary.user_deck ?? []).slice(0, 4).map((_, i) => (
                 <div
                   key={i}
                   className="w-8 h-8 rounded-lg bg-cr-surface border border-cr-border flex items-center justify-center text-xs"
@@ -70,9 +70,9 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
                   🃏
                 </div>
               ))}
-              {summary.user_deck.length > 4 && (
+              {(summary.user_deck ?? []).length > 4 && (
                 <div className="w-8 h-8 rounded-lg bg-cr-surface border border-cr-border flex items-center justify-center text-xs text-cr-muted">
-                  +{summary.user_deck.length - 4}
+                  +{(summary.user_deck ?? []).length - 4}
                 </div>
               )}
             </div>

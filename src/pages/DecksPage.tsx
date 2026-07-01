@@ -1,31 +1,30 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Copy,
-  Search,
   SlidersHorizontal,
   TrendingUp,
 } from "lucide-react";
-import { Card, Button, Loader, Skeleton } from "@/components/ui";
-import { api } from "@/api/client";
+import { Card, Loader, SkeletonGroup } from "@/components/ui";
+import { api, ApiError } from "@/api/client";
 import { Deck } from "@/types";
 import { usePageRefresh } from "@/hooks";
 
 export function DecksPage() {
-  const navigate = useNavigate();
   const [decks, setDecks] = useState<Deck[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
 
   const deckTypes = ["all", "rated", "classic", "2v2", "tournament", "legend_path"];
 
   const load = useCallback(async () => {
     try {
+      setError(null);
       const res = await api.getDecks(filter === "all" ? undefined : filter);
-      setDecks(res.decks);
+      setDecks(res.decks ?? []);
     } catch (e) {
-      console.error(e);
+      setDecks([]);
+      setError(e instanceof ApiError ? e.message : "Ошибка загрузки колод");
     } finally {
       setLoading(false);
     }
@@ -62,19 +61,24 @@ export function DecksPage() {
         ))}
       </div>
 
+      {error && (
+        <Card className="text-center text-cr-loss text-sm">{error}</Card>
+      )}
+
       {loading ? (
         <SkeletonGroup count={4} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full overflow-x-hidden">
           {decks.map((deck, i) => (
             <div key={deck.id} className="w-full">
-              <DeckCard deck={deck} index={i} onOpen={() => navigate(`/decks/${deck.id}`)} />
+              <DeckCard deck={deck} index={i} />
             </div>
           ))}
-          {decks.length === 0 && (
+          {!error && decks.length === 0 && (
             <Card className="col-span-full text-center">
               <SlidersHorizontal className="w-12 h-12 text-cr-muted mx-auto mb-3 opacity-50" />
               <p className="text-cr-muted">Колоды не найдены</p>
+              <p className="text-xs text-cr-muted mt-1">Сыграйте несколько боёв — колоды появятся автоматически</p>
             </Card>
           )}
         </div>
@@ -85,15 +89,17 @@ export function DecksPage() {
 
 export { DecksPage as default };
 
-function DeckCard({ deck, index, onOpen }: { deck: Deck; index: number; onOpen: () => void }) {
+function DeckCard({ deck, index }: { deck: Deck; index: number }) {
+  const cards = deck.cards ?? [];
+  const avgElixir = deck.avg_elixir ?? 0;
+  const winrate = deck.winrate ?? 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.5 }}
-      whileHover={{ y: -6 }}
-      onClick={onOpen}
-      className="group cursor-pointer"
+      className="group"
     >
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between mb-4">
@@ -102,12 +108,12 @@ function DeckCard({ deck, index, onOpen }: { deck: Deck; index: number; onOpen: 
           </span>
           <div className="flex items-center gap-1 text-xs">
             <TrendingUp className="w-3.5 h-3.5 text-cr-gold" />
-            <span className="font-semibold text-cr-text">{deck.avg_elixir.toFixed(1)}</span>
+            <span className="font-semibold text-cr-text">{avgElixir.toFixed(1)}</span>
           </div>
         </div>
 
         <div className="grid grid-cols-4 gap-2 mb-4">
-          {deck.cards.map((card) => (
+          {cards.map((card) => (
             <div
               key={card.id}
               className="aspect-square rounded-xl bg-cr-bg/60 border border-cr-border flex items-center justify-center text-2xl hover:scale-105 transition-transform"
@@ -123,17 +129,15 @@ function DeckCard({ deck, index, onOpen }: { deck: Deck; index: number; onOpen: 
 
         <div className="flex items-center justify-between text-sm">
           <span className="text-cr-muted">Winrate</span>
-          <span className={"font-bold " + (deck.winrate >= 50 ? "text-cr-win" : "text-cr-loss")}>
-            {deck.winrate.toFixed(1)}%
+          <span className={"font-bold " + (winrate >= 50 ? "text-cr-win" : "text-cr-loss")}>
+            {winrate.toFixed(1)}%
           </span>
         </div>
         <div className="flex items-center justify-between text-sm mt-1">
           <span className="text-cr-muted">Игр</span>
-          <span className="font-semibold text-cr-text">{deck.total_games}</span>
+          <span className="font-semibold text-cr-text">{deck.total_games ?? 0}</span>
         </div>
       </Card>
     </motion.div>
   );
 }
-
-import { SkeletonGroup } from "@/components/ui";

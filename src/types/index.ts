@@ -12,6 +12,8 @@ export interface Profile {
   skill_rating: number | null;
   winrate: number | null;
   last_rating_change: number | null;
+  max_trophies: number | null;
+  clan_name: string | null;
 }
 
 export interface BattleSummary {
@@ -93,6 +95,7 @@ export interface StatsOverview {
   archetypes: { name: string; value: number }[];
   last_results: { won: boolean; trophy_change: number }[];
   activity_heatmap: number[][];
+  avg_time?: number;
 }
 
 export interface SearchResult {

@@ -4,6 +4,7 @@ import { Sidebar } from "./Sidebar";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/utils";
 import { PageRefreshProvider } from "@/hooks";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 function getTelegramChromeTop(webApp: NonNullable<typeof window.Telegram>["WebApp"]) {
   if (webApp.platform === "ios") return 56;
@@ -109,7 +110,9 @@ export function Layout() {
       <main className="app-main">
         <PageRefreshProvider>
           <div className="page-shell">
-            <Outlet />
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
           </div>
         </PageRefreshProvider>
       </main>

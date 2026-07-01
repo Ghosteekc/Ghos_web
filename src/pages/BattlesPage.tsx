@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Card, Button, Loader, SkeletonGroup } from "@/components/ui";
 import { BattleCardSimple } from "@/components/battles/BattleCard";
-import { api } from "@/api/client";
+import { api, ApiError } from "@/api/client";
 import { BattleSummary } from "@/types";
 import { usePageRefresh } from "@/hooks";
 
@@ -19,13 +19,16 @@ export function BattlesPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<"all" | "wins" | "losses">("all");
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
+      setError(null);
       const res = await api.getBattles();
-      setBattles(res.battles);
+      setBattles(res.battles ?? []);
     } catch (e) {
-      console.error(e);
+      setBattles([]);
+      setError(e instanceof ApiError ? e.message : "Ошибка загрузки боёв");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -74,6 +77,10 @@ export function BattlesPage() {
           </button>
         ))}
       </div>
+
+      {error && (
+        <Card className="text-center text-cr-loss text-sm">{error}</Card>
+      )}
 
       {loading ? (
         <SkeletonGroup count={5} />

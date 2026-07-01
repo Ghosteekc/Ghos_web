@@ -4,13 +4,11 @@ import {
   Search,
   X,
   User,
-  Crown,
   Trophy,
-  Star,
   Loader2,
 } from "lucide-react";
-import { Card, Button, Loader } from "@/components/ui";
-import { api } from "@/api/client";
+import { Card, Button } from "@/components/ui";
+import { api, ApiError } from "@/api/client";
 import { SearchResult } from "@/types";
 import { usePageRefresh } from "@/hooks";
 
@@ -18,18 +16,26 @@ export function SearchPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const search = useCallback(async (q: string) => {
-    if (!q.trim()) return;
+    const trimmed = q.trim();
+    if (!trimmed) return;
     setLoading(true);
+    setError(null);
     try {
-      const res = await api.searchPlayer(q);
+      const res = await api.searchPlayer(trimmed);
       setResults(res);
-      setHistory((prev) => [q, ...prev.filter((h) => h !== q)].slice(0, 8));
+      setHistory((prev) => [trimmed, ...prev.filter((h) => h !== trimmed)].slice(0, 8));
     } catch (e) {
-      console.error(e);
+      setResults([]);
+      if (e instanceof ApiError) {
+        setError(e.message);
+      } else {
+        setError("Не удалось найти игрока");
+      }
     } finally {
       setLoading(false);
     }
@@ -44,10 +50,13 @@ export function SearchPage() {
   usePageRefresh(refresh);
 
   useEffect(() => {
+    if (query.trim().length < 2) {
+      setResults([]);
+      setError(null);
+      return;
+    }
     const timeout = setTimeout(() => {
-      if (query.trim().length >= 2) {
-        void search(query);
-      }
+      void search(query);
     }, 400);
     return () => clearTimeout(timeout);
   }, [query, search]);
@@ -67,7 +76,7 @@ export function SearchPage() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Введите тег или никнейм..."
+          placeholder="Введите тег игрока, например #ABC123"
           className="w-full pl-12 pr-12 py-4 bg-cr-card border border-cr-border rounded-cr text-cr-text placeholder:text-cr-muted focus:outline-none focus:border-cr-gold/50 focus:ring-2 focus:ring-cr-gold/20 transition-all"
         />
         {query && (
@@ -78,15 +87,24 @@ export function SearchPage() {
             <X className="w-5 h-5" />
           </button>
         )}
-        {query && (
+        {loading && (
           <div className="absolute right-12 top-1/2 -translate-y-1/2">
             <Loader2 className="w-5 h-5 animate-spin text-cr-gold" />
           </div>
         )}
       </div>
 
+      <p className="text-xs text-cr-muted -mt-2">
+        Поиск работает только по тегу игрока (Clash Royale API не поддерживает поиск по нику).
+      </p>
+
       <AnimatePresence>
-        {!loading && results.length > 0 && (
+        {!loading && error && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <Card className="text-center text-cr-loss text-sm">{error}</Card>
+          </motion.div>
+        )}
+        {!loading && !error && results.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -117,9 +135,12 @@ export function SearchPage() {
             ))}
           </motion.div>
         )}
+        {!loading && !error && query.trim().length >= 2 && results.length === 0 && (
+          <Card className="text-center text-cr-muted text-sm">Игрок не найден</Card>
+        )}
       </AnimatePresence>
 
-      {history.length > 0 && !loading && results.length === 0 && (
+      {history.length > 0 && !loading && results.length === 0 && !query.trim() && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm text-cr-muted">История</h3>

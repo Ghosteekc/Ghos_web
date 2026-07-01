@@ -19,14 +19,48 @@ export function HomePage() {
   const load = useCallback(async () => {
     try {
       setError(null);
-      const [p, b, s] = await Promise.all([
+      const [profileRes, battlesRes, statsRes] = await Promise.allSettled([
         api.getProfile(),
         api.getBattles(),
         api.getStats(),
       ]);
-      setProfile(p);
-      setBattles(b.battles);
-      setStats(s);
+
+      if (profileRes.status === "fulfilled") {
+        setProfile(profileRes.value);
+      } else {
+        throw profileRes.reason;
+      }
+
+      if (battlesRes.status === "fulfilled") {
+        setBattles(battlesRes.value.battles ?? []);
+      }
+
+      if (statsRes.status === "fulfilled") {
+        const s = statsRes.value;
+        setStats({
+          ...s,
+          total_battles: s.total_battles ?? s.wins + s.losses,
+        });
+      } else if (profileRes.status === "fulfilled" && profileRes.value.winrate != null) {
+        setStats((prev) =>
+          prev ?? {
+            total_battles: 0,
+            wins: 0,
+            losses: 0,
+            draws: 0,
+            winrate: profileRes.value.winrate ?? 0,
+            avg_elixir: 0,
+            max_trophies: profileRes.value.max_trophies ?? 0,
+            winrate_by_day: [],
+            winrate_by_hour: [],
+            best_cards: [],
+            most_used_cards: [],
+            archetypes: [],
+            last_results: [],
+            activity_heatmap: [],
+          },
+        );
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка загрузки");
     } finally {
@@ -92,7 +126,9 @@ export function HomePage() {
             <div>
               <p className="text-xs text-cr-muted mb-1">Аналитика</p>
               <p className="text-sm font-semibold text-cr-text">
-                {stats ? `${stats.winrate.toFixed(1)}% за ${stats.total_battles} боёв` : "—"}
+                {stats
+                  ? `${stats.winrate.toFixed(1)}% за ${stats.total_battles ?? stats.wins + stats.losses} боёв`
+                  : "—"}
               </p>
               <p className="text-xs text-cr-muted mt-1">Откройте подробный дашборд</p>
             </div>
@@ -113,14 +149,20 @@ export function HomePage() {
           </Button>
         </div>
         <div className="space-y-3">
-          {battles.slice(0, 3).map((battle, i) => (
-            <BattleCardSimple
-              key={battle.index}
-              summary={battle}
-              index={i}
-              onOpen={() => navigate(`/battles/${battle.index}`)}
-            />
-          ))}
+          {battles.length > 0 ? (
+            battles.slice(0, 3).map((battle, i) => (
+              <BattleCardSimple
+                key={battle.index}
+                summary={battle}
+                index={i}
+                onOpen={() => navigate(`/battles/${battle.index}`)}
+              />
+            ))
+          ) : (
+            <Card className="text-center text-cr-muted text-sm">
+              История боёв пуста. Убедитесь, что подписка активна и тег привязан.
+            </Card>
+          )}
         </div>
       </div>
     </div>
