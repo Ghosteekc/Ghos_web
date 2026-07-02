@@ -3,11 +3,10 @@ import {
   Trophy,
   ChevronRight,
   Flame,
-  Zap,
 } from "lucide-react";
 import { formatTime, getTrophyChangeColor, cn } from "@/utils";
 import { BattleSummary } from "@/types";
-import { Card } from "@/components/ui";
+import { Card, ElixirIcon } from "@/components/ui";
 import { CardTile } from "@/components/cards";
 
 interface BattleCardSimpleProps {
@@ -55,7 +54,7 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
             <div className="text-right">
               <p className="text-xs text-cr-muted">{formatTime(summary.duration ?? 0)}</p>
               <p className="text-xs text-cr-muted flex items-center gap-1 justify-end">
-                <Zap className="w-3 h-3" />
+                <ElixirIcon size={12} />
                 {(summary.avg_elixir ?? 0).toFixed(1)}
               </p>
             </div>

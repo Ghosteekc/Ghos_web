@@ -2,14 +2,15 @@ import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   SlidersHorizontal,
-  TrendingUp,
   ExternalLink,
   Star,
+  Shuffle,
+  RefreshCw,
 } from "lucide-react";
-import { Card, Button, SkeletonGroup } from "@/components/ui";
+import { Card, Button, SkeletonGroup, ElixirIcon } from "@/components/ui";
 import { CardTile } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
-import { Deck } from "@/types";
+import { Deck, RandomDeck } from "@/types";
 import { usePageRefresh, useTelegram } from "@/hooks";
 
 const DECK_FILTERS = [
@@ -20,6 +21,7 @@ const DECK_FILTERS = [
   { id: "beatdown", label: "Битдаун" },
   { id: "control", label: "Контроль" },
   { id: "bait", label: "Bait" },
+  { id: "random", label: "Рандом" },
 ] as const;
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -29,6 +31,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   beatdown: "Битдаун",
   control: "Контроль",
   bait: "Bait",
+  random: "Рандом",
 };
 
 export function DecksPage() {
@@ -39,6 +42,12 @@ export function DecksPage() {
   const [copyHint, setCopyHint] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    if (filter === "random") {
+      setLoading(false);
+      setDecks([]);
+      setError(null);
+      return;
+    }
     try {
       setError(null);
       const res = await api.getDecks(filter === "all" ? undefined : filter);
@@ -62,7 +71,9 @@ export function DecksPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="page-title">Колоды</h1>
-        <span className="text-sm text-cr-muted">{decks.length} колод</span>
+        <span className="text-sm text-cr-muted">
+          {filter === "random" ? "Генератор" : `${decks.length} колод`}
+        </span>
       </div>
 
       <p className="text-xs text-cr-muted -mt-2">
@@ -94,8 +105,13 @@ export function DecksPage() {
         <Card className="text-center text-cr-loss text-sm">{error}</Card>
       )}
 
-      {loading ? (
+      {loading && filter !== "random" ? (
         <SkeletonGroup count={4} />
+      ) : filter === "random" ? (
+        <RandomDeckPanel onCopied={(msg) => {
+          setCopyHint(msg);
+          setTimeout(() => setCopyHint(null), 3000);
+        }} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full overflow-x-hidden">
           {decks.map((deck, i) => (
@@ -126,6 +142,123 @@ export function DecksPage() {
 }
 
 export { DecksPage as default };
+
+function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
+  const { openLink } = useTelegram();
+  const [deck, setDeck] = useState<RandomDeck | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const roll = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api.getRandomDeck();
+      setDeck(data);
+    } catch (e) {
+      setDeck(null);
+      setError(e instanceof ApiError ? e.message : "Не удалось сгенерировать колоду");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void roll();
+  }, [roll]);
+
+  const importDeck = async () => {
+    if (!deck?.deck_link) return;
+    if (openLink) {
+      openLink(deck.deck_link);
+      onCopied("Открываем Clash Royale для импорта колоды…");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(deck.deck_link);
+      onCopied("Ссылка на колоду скопирована");
+    } catch {
+      onCopied("Откройте приложение из Telegram для импорта колоды");
+    }
+  };
+
+  const saveFavorite = async () => {
+    if (!deck || deck.cards.length !== 8) return;
+    try {
+      await api.addFavoriteDeck(deck.cards);
+      onCopied("Колода добавлена в избранное");
+    } catch {
+      onCopied("Не удалось сохранить колоду");
+    }
+  };
+
+  if (loading && !deck) {
+    return <SkeletonGroup count={1} />;
+  }
+
+  if (error || !deck) {
+    return (
+      <Card className="text-center space-y-3">
+        <p className="text-cr-loss text-sm">{error ?? "Ошибка"}</p>
+        <Button onClick={() => void roll()}>Попробовать снова</Button>
+      </Card>
+    );
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+      <Card className="overflow-hidden">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-cr-gold bg-cr-gold/10 px-2.5 py-1 rounded-full border border-cr-gold/20 flex items-center gap-1">
+            <Shuffle className="w-3 h-3" />
+            Случайная колода
+          </span>
+          <div className="flex items-center gap-1 text-xs">
+            <ElixirIcon size={14} />
+            <span className="font-semibold text-cr-text">{deck.avg_elixir.toFixed(1)}</span>
+          </div>
+        </div>
+
+        <p className="text-xs text-cr-muted mb-4">
+          8 случайных карт, как в игре. Нажмите «Перегенерировать», если колода не нравится.
+        </p>
+
+        <div className="grid grid-cols-4 gap-2 mb-4">
+          {deck.card_infos.map((card) => (
+            <CardTile key={card.id} name={card.name} icon={card.icon} size="lg" showLabel />
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            className="flex-1 !py-2 text-sm flex items-center justify-center gap-2"
+            onClick={() => void roll()}
+            disabled={loading}
+          >
+            <RefreshCw className={"w-4 h-4 " + (loading ? "animate-spin" : "")} />
+            Перегенерировать
+          </Button>
+          {deck.deck_link ? (
+            <>
+              <Button
+                variant="secondary"
+                className="flex-1 !py-2 text-sm flex items-center justify-center gap-2"
+                onClick={() => void importDeck()}
+              >
+                <ExternalLink className="w-4 h-4" />
+                В игру
+              </Button>
+              <Button variant="ghost" className="!px-3" onClick={() => void saveFavorite()} aria-label="В избранное">
+                <Star className="w-4 h-4" />
+              </Button>
+            </>
+          ) : null}
+        </div>
+      </Card>
+    </motion.div>
+  );
+}
 
 function DeckCard({
   deck,
@@ -182,7 +315,7 @@ function DeckCard({
             {CATEGORY_LABELS[category] ?? category}
           </span>
           <div className="flex items-center gap-1 text-xs">
-            <TrendingUp className="w-3.5 h-3.5 text-cr-gold" />
+            <ElixirIcon size={14} />
             <span className="font-semibold text-cr-text">{avgElixir.toFixed(1)}</span>
           </div>
         </div>

@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { Copy, BarChart3, ChevronRight, Zap } from "lucide-react";
+import { Copy, BarChart3, ChevronRight } from "lucide-react";
 import { Deck } from "@/types";
 import { formatNumber, getWinColor } from "@/utils";
-import { Card, Button, LinearProgress } from "@/components/ui";
-import { cn } from "@/utils";
+import { Card, Button, LinearProgress, ElixirIcon } from "@/components/ui";
+import { CardTile } from "@/components/cards";
 
 interface DeckCardProps {
   deck: Deck;
@@ -33,7 +33,7 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
             {deck.type === "rated" ? "Рейтинговые" : deck.type === "classic" ? "Обычные" : deck.type === "2v2" ? "2v2" : deck.type === "tournament" ? "Турнир" : "Путь Легенд"}
           </span>
           <div className="flex items-center gap-1 text-xs">
-            <Zap className="w-3.5 h-3.5 text-cr-muted" />
+            <ElixirIcon size={14} />
             <span
               className={
                 "font-semibold " +
@@ -46,17 +46,8 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
         </div>
 
         <div className="grid grid-cols-4 gap-2 mb-4">
-          {deck.cards.map((card, i) => (
-            <div
-              key={card.id}
-              className="aspect-square rounded-xl bg-cr-bg/60 border border-cr-border flex items-center justify-center text-2xl hover:scale-105 hover:border-cr-gold/30 transition-all duration-200"
-            >
-              {card.icon ? (
-                <img src={card.icon} alt={card.name} className="w-8 h-8 object-contain" loading="lazy" />
-              ) : (
-                "🃏"
-              )}
-            </div>
+          {deck.cards.map((card) => (
+            <CardTile key={card.id} name={card.name} icon={card.icon} size="lg" showLabel />
           ))}
         </div>
 

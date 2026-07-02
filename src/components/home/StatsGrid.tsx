@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Trophy, Swords, CircleDot, FlaskConical, Timer, Flame, Target } from "lucide-react";
+import { Trophy, Swords, CircleDot, Timer, Flame, Target } from "lucide-react";
+import { ElixirIcon } from "@/components/ui";
 import { formatNumber, getWinColor, cn } from "@/utils";
 import { Skeleton } from "@/components/ui";
 
@@ -21,7 +22,7 @@ const statItems = [
   { key: "wins", icon: Trophy, label: "Победы", format: (v: number) => v },
   { key: "losses", icon: Flame, label: "Поражения", format: (v: number) => v },
   { key: "draws", icon: CircleDot, label: "Ничьи", format: (v: number) => v },
-  { key: "avg_elixir", icon: FlaskConical, label: "Ср. эликсир", format: (v: number) => v.toFixed(1) },
+  { key: "avg_elixir", label: "Ср. эликсир", format: (v: number) => v.toFixed(1), elixir: true },
   { key: "max_trophies", icon: Target, label: "Макс. кубки", format: (v: number) => formatNumber(v) },
   { key: "winrate", icon: Timer, label: "Винрейт", format: (v: number) => `${v.toFixed(1)}%` },
   { key: "avg_time", icon: Timer, label: "Ср. время", format: (v: number) => `${Math.floor(v / 60)}:${(v % 60).toString().padStart(2, "0")}` },
@@ -52,7 +53,11 @@ export function StatsGrid({ stats, loading }: StatsGridProps) {
           transition={{ delay: i * 0.05, duration: 0.4 }}
           className="glass-card p-4 hover:shadow-glow transition-all duration-300"
         >
-          <item.icon className="w-6 h-6 text-cr-blue mb-3" />
+          {"elixir" in item && item.elixir ? (
+            <ElixirIcon className="mb-3" size={24} />
+          ) : "icon" in item && item.icon ? (
+            <item.icon className="w-6 h-6 text-cr-blue mb-3" />
+          ) : null}
           <p className="text-xs text-cr-muted mb-1">{item.label}</p>
           <p
             className={cn(

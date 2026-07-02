@@ -60,7 +60,7 @@ export interface Deck {
   avg_elixir: number;
   best_matchups: BattleSummary[];
   worst_matchups: BattleSummary[];
-  type: "meta" | "mine" | "rated" | "classic" | "2v2" | "tournament" | "legend_path";
+  type: "meta" | "mine" | "rated" | "classic" | "2v2" | "tournament" | "legend_path" | "random";
   category?: string;
   deck_link?: string | null;
   description?: string;
@@ -100,6 +100,31 @@ export interface StatsOverview {
   last_results: { won: boolean; trophy_change: number }[];
   activity_heatmap: number[][];
   avg_time?: number;
+}
+
+export interface RandomDeck {
+  cards: string[];
+  card_infos: { id: string; name: string; icon: string; cost: number }[];
+  avg_elixir: number;
+  deck_link?: string | null;
+}
+
+export interface BattleInsight {
+  battle_index: number;
+  won: boolean;
+  opponent_name: string;
+  summary: string;
+  matchup_score: number;
+  details: string[];
+  timestamp: string;
+}
+
+export interface InsightsData {
+  insights: BattleInsight[];
+  patterns: string[];
+  sample_size: number;
+  wins: number;
+  losses: number;
 }
 
 export interface SearchResult {

@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   User,
-  Trophy,
   Palette,
   LogOut,
   Trash2,
@@ -11,10 +10,11 @@ import {
   Smartphone,
   Bell,
   BellOff,
-  X,
+  RefreshCw,
 } from "lucide-react";
 import { Card, Loader } from "@/components/ui";
 import { api } from "@/api/client";
+import { cacheInvalidate } from "@/api/cache";
 import { Profile, Settings } from "@/types";
 import { useTelegram, usePageRefresh } from "@/hooks";
 import { applyTheme, loadStoredTheme, type AppTheme } from "@/hooks/useTheme";
@@ -31,7 +31,7 @@ export function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [clearing, setClearing] = useState(false);
-  const [arenaOpen, setArenaOpen] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -91,13 +91,27 @@ export function SettingsPage() {
     }
   };
 
-  const handleArenaEmblem = () => {
+  const handleSyncData = async () => {
     if (!profile?.player_tag) {
       void showAlert?.("Сначала привяжите аккаунт Clash Royale в боте: /link #ТЕГ");
       return;
     }
-    hapticImpact("medium");
-    setArenaOpen(true);
+
+    setSyncing(true);
+    try {
+      const res = await api.syncData();
+      cacheInvalidate();
+      hapticNotify("success");
+      await showAlert?.(
+        res.battles_loaded > 0
+          ? `Данные обновлены: загружено ${res.battles_loaded} боёв.`
+          : "Синхронизация завершена.",
+      );
+    } catch (e) {
+      await showAlert?.(e instanceof Error ? e.message : "Не удалось синхронизировать данные");
+    } finally {
+      setSyncing(false);
+    }
   };
 
   if (loading) {
@@ -224,9 +238,14 @@ export function SettingsPage() {
               </button>
             </Card>
             <Card className="!p-0 overflow-hidden">
-              <button type="button" className="settings-data-btn !rounded-none !border-0 h-full" onClick={handleArenaEmblem}>
-                <Trophy className="w-6 h-6 text-cr-gold" />
-                <span>Эмблема арены</span>
+              <button
+                type="button"
+                className="settings-data-btn !rounded-none !border-0 h-full"
+                onClick={() => void handleSyncData()}
+                disabled={syncing}
+              >
+                <RefreshCw className={"w-6 h-6 text-cr-blue " + (syncing ? "animate-spin" : "")} />
+                <span>{syncing ? "Синхронизация…" : "Синхронизировать"}</span>
               </button>
             </Card>
           </div>
@@ -236,12 +255,6 @@ export function SettingsPage() {
       <p className="text-center text-xs text-cr-muted pt-4 font-medium">
         Ghosteek CR Assistant v1.0
       </p>
-
-      <AnimatePresence>
-        {arenaOpen && (
-          <ArenaModal profile={profile} onClose={() => setArenaOpen(false)} />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
@@ -273,59 +286,6 @@ function ThemeButton({
     >
       {children}
     </button>
-  );
-}
-
-function ArenaModal({ profile, onClose }: { profile: Profile | null; onClose: () => void }) {
-  const arenaName = profile?.arena_name ?? "Арена";
-  const iconUrl = profile?.arena_icon;
-  const trophies = profile?.trophies;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-      onClick={() => {
-        hapticImpact("soft");
-        onClose();
-      }}
-    >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="glass-card w-full max-w-xs p-6 text-center relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            hapticImpact("light");
-            onClose();
-          }}
-          className="absolute top-3 right-3 p-1.5 rounded-lg text-cr-muted hover:text-cr-text hover:bg-cr-bg/60"
-          aria-label="Закрыть"
-        >
-          <X className="w-5 h-5" />
-        </button>
-        <div className="mx-auto w-24 h-24 mb-4 flex items-center justify-center">
-          {iconUrl ? (
-            <img src={iconUrl} alt={arenaName} className="w-full h-full object-contain drop-shadow-glow" />
-          ) : (
-            <div className="w-full h-full rounded-2xl bg-cr-gold/15 border border-cr-gold/30 flex items-center justify-center">
-              <Trophy className="w-12 h-12 text-cr-gold" />
-            </div>
-          )}
-        </div>
-        <h3 className="text-lg font-bold text-cr-text mb-1">{arenaName}</h3>
-        {trophies != null && (
-          <p className="text-sm text-cr-muted font-medium">{trophies.toLocaleString("ru-RU")} 🏆</p>
-        )}
-        <p className="text-xs text-cr-muted mt-3">{profile?.player_name ?? "Игрок"}</p>
-      </motion.div>
-    </motion.div>
   );
 }
 

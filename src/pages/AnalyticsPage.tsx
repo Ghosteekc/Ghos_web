@@ -15,23 +15,33 @@ import {
   PolarRadiusAxis,
   Radar,
 } from "recharts";
-import { TrendingUp, Flame, Target, Clock } from "lucide-react";
-import { StatsOverview } from "@/types";
+import { TrendingUp, Flame, Target, Clock, Brain, Trophy, Swords } from "lucide-react";
+import { StatsOverview, InsightsData } from "@/types";
 import { Card, Loader, Skeleton } from "@/components/ui";
 import { CardUsageGrid } from "@/components/cards";
-import { api } from "@/api/client";
+import { api, ApiError } from "@/api/client";
 import { usePageRefresh } from "@/hooks";
 
 export function AnalyticsPage() {
   const [stats, setStats] = useState<StatsOverview | null>(null);
+  const [insights, setInsights] = useState<InsightsData | null>(null);
+  const [insightsError, setInsightsError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
       setError(null);
-      const data = await api.getStats();
+      setInsightsError(null);
+      const [data, insightData] = await Promise.all([
+        api.getStats(),
+        api.getInsights().catch((e) => {
+          setInsightsError(e instanceof ApiError ? e.message : "Анализ боёв недоступен");
+          return null;
+        }),
+      ]);
       setStats(data);
+      setInsights(insightData);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка загрузки");
     } finally {
@@ -89,6 +99,60 @@ export function AnalyticsPage() {
         <h1 className="page-title">Аналитика</h1>
         <p className="text-sm text-cr-muted mt-1">Подробная статистика по вашим боям</p>
       </div>
+
+      {(insights?.patterns.length || insights?.insights.length) ? (
+        <Card>
+          <div className="flex items-center gap-2 mb-4">
+            <Brain className="w-5 h-5 text-cr-blue" />
+            <h3 className="text-sm font-semibold text-cr-text">Разбор боёв</h3>
+          </div>
+
+          {insights.patterns.length > 0 && (
+            <div className="space-y-2 mb-4">
+              {insights.patterns.map((p, i) => (
+                <p key={i} className="text-xs text-cr-gold bg-cr-gold/10 border border-cr-gold/20 rounded-lg px-3 py-2">
+                  {p}
+                </p>
+              ))}
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {insights.insights.map((item) => (
+              <div
+                key={item.battle_index}
+                className={
+                  "rounded-xl border p-3 " +
+                  (item.won ? "border-cr-win/25 bg-cr-win/5" : "border-cr-loss/25 bg-cr-loss/5")
+                }
+              >
+                <div className="flex items-start gap-2 mb-1.5">
+                  {item.won ? (
+                    <Trophy className="w-4 h-4 text-cr-win shrink-0 mt-0.5" />
+                  ) : (
+                    <Swords className="w-4 h-4 text-cr-loss shrink-0 mt-0.5" />
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-xs text-cr-muted mb-0.5">vs {item.opponent_name}</p>
+                    <p className="text-sm text-cr-text leading-snug">{item.summary}</p>
+                  </div>
+                </div>
+                {item.details.length > 0 && (
+                  <ul className="mt-2 space-y-1 pl-6">
+                    {item.details.slice(0, 2).map((d, i) => (
+                      <li key={i} className="text-[11px] text-cr-muted leading-snug">
+                        {d.replace(/^[^\w\u0400-\u04FF]+/, "")}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      ) : insightsError ? (
+        <Card className="text-center text-sm text-cr-muted">{insightsError}</Card>
+      ) : null}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[

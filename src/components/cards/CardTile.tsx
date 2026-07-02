@@ -38,27 +38,22 @@ export function CardTile({
 
   return (
     <div className={cn("flex flex-col items-center gap-1 min-w-0 shrink-0", className)}>
-      <div
-        className={cn(
-          "relative rounded-lg overflow-hidden border border-cr-border/80 bg-cr-bg shadow-sm shrink-0",
-          sizeClasses[size],
-        )}
-        title={label}
-      >
+      <div className={cn("relative shrink-0 card-tile-wrap", sizeClasses[size])} title={label}>
+        <div className="card-tile-glow" aria-hidden />
         {src ? (
           <img
             src={src}
             alt={label}
-            className="w-full h-full object-cover object-center scale-105"
+            className="relative z-10 w-full h-full object-contain object-center drop-shadow-md"
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cr-blue/30 to-cr-gold/20 text-xs font-bold text-cr-text">
+          <div className="relative z-10 w-full h-full flex items-center justify-center text-xs font-bold text-cr-text">
             {name.charAt(0)}
           </div>
         )}
         {badge != null && (
-          <span className="absolute bottom-0.5 right-0.5 px-1 py-0.5 rounded text-[10px] font-bold bg-cr-bg/90 text-cr-gold border border-cr-gold/30">
+          <span className="absolute bottom-0.5 right-0.5 z-20 px-1 py-0.5 rounded text-[10px] font-bold bg-cr-bg/90 text-cr-gold border border-cr-gold/30">
             {badge}
           </span>
         )}
@@ -111,7 +106,7 @@ export function CardDeckGrid({
       {hidden > 0 && (
         <div
           className={cn(
-            "rounded-lg border border-cr-border bg-cr-surface flex items-center justify-center text-xs font-semibold text-cr-muted shrink-0",
+            "flex items-center justify-center text-xs font-semibold text-cr-muted shrink-0",
             sizeClasses[size],
           )}
         >
@@ -137,22 +132,16 @@ export function CardUsageCompactGrid({ items }: { items: CardUsageItem[] }) {
   const maxCount = Math.max(...items.map((i) => i.count), 1);
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {items.map((item, i) => (
-        <div
-          key={item.name}
-          className="relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-cr-bg/50 border border-cr-border"
-        >
-          <span className="absolute top-2 left-2 text-[10px] font-semibold text-cr-muted">
-            #{i + 1}
-          </span>
-          <CardTile name={item.name} size="grid" className="mt-3" />
+    <div className="grid grid-cols-2 gap-4">
+      {items.map((item) => (
+        <div key={item.name} className="flex flex-col items-center gap-1.5 py-1">
+          <CardTile name={item.name} size="grid" />
           <p className="card-name-glow text-xs text-center line-clamp-2 px-1">{nameRu(item.name)}</p>
           <p className="text-[10px] text-cr-muted">
             {item.count} игр
             {item.winrate != null ? ` · ${item.winrate.toFixed(0)}%` : ""}
           </p>
-          <div className="w-full h-1 bg-cr-border rounded-full overflow-hidden">
+          <div className="w-full h-1 bg-cr-border/40 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full bg-gradient-to-r from-cr-blue to-cr-gold"
               style={{ width: `${Math.min((item.count / maxCount) * 100, 100)}%` }}
