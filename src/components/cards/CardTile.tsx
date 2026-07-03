@@ -9,7 +9,7 @@ const sizeClasses: Record<CardTileSize, string> = {
   md: "w-14 h-16",
   grid: "w-14 h-[4.25rem] max-w-[4.5rem]",
   lg: "w-full max-w-[5rem] aspect-[4/5]",
-  deck: "w-full max-w-[3.5rem] aspect-[4/5]",
+  deck: "w-full max-w-[2.85rem] aspect-[4/5] mx-auto",
 };
 
 const labelSizeClasses: Record<CardTileSize, string> = {
@@ -18,7 +18,7 @@ const labelSizeClasses: Record<CardTileSize, string> = {
   md: "max-w-[3.5rem] text-[8px]",
   grid: "max-w-[3.5rem] text-[8px]",
   lg: "max-w-[4rem] text-[8px]",
-  deck: "max-w-[3.25rem] text-[7px]",
+  deck: "card-name-deck",
 };
 
 interface CardTileProps {
@@ -49,7 +49,13 @@ export function CardTile({
   const label = labelOverride ?? (compactLabel && showLabel ? nameShort(name) : nameRu(name));
 
   return (
-    <div className={cn("flex flex-col items-center gap-0.5 min-w-0 shrink-0", className)}>
+    <div
+      className={cn(
+        "flex flex-col items-center gap-0.5 min-w-0",
+        size === "deck" && "w-full overflow-hidden",
+        className,
+      )}
+    >
       <div className={cn("relative shrink-0 card-tile-wrap", sizeClasses[size])} title={label}>
         <div className="card-tile-glow" aria-hidden />
         {src ? (
@@ -73,8 +79,10 @@ export function CardTile({
       {showLabel && (
         <span
           className={cn(
-            "card-name-glow leading-none text-center truncate px-0.5 font-extrabold",
-            labelSizeClasses[size],
+            "card-name-glow text-center px-0 font-extrabold",
+            size === "deck"
+              ? "card-name-deck block w-full overflow-hidden text-ellipsis whitespace-nowrap"
+              : cn("leading-none truncate", labelSizeClasses[size]),
             labelClassName,
           )}
           title={nameRu(name)}
