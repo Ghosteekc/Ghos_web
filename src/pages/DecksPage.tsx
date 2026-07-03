@@ -478,12 +478,13 @@ function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
   const [deck, setDeck] = useState<RandomDeck | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [rofl, setRofl] = useState(false);
 
   const roll = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.getRandomDeck();
+      const data = await api.getRandomDeck(rofl);
       setDeck(data);
     } catch (e) {
       setDeck(null);
@@ -491,7 +492,7 @@ function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [rofl]);
 
   useEffect(() => {
     void roll();
@@ -538,19 +539,41 @@ function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="overflow-hidden">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-cr-gold bg-cr-gold/10 px-2.5 py-1 rounded-full border border-cr-gold/20 flex items-center gap-1">
+        <div className="flex items-center justify-between mb-2 gap-2">
+          <span className="text-xs font-medium text-cr-gold bg-cr-gold/10 px-2.5 py-1 rounded-full border border-cr-gold/20 flex items-center gap-1 shrink-0">
             <Shuffle className="w-3 h-3" />
-            Случайная колода
+            {deck.rofl ? (deck.rofl_name ?? "Рофл") : "Случайная колода"}
           </span>
-          <div className="flex items-center gap-1 text-xs">
+          <label className="flex items-center gap-2 text-xs text-cr-text cursor-pointer select-none">
+            <span className="text-cr-muted">Рофл</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={rofl}
+              onClick={() => setRofl((v) => !v)}
+              className={
+                "relative w-10 h-5 rounded-full transition-colors " +
+                (rofl ? "bg-cr-gold" : "bg-cr-border")
+              }
+            >
+              <span
+                className={
+                  "absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform " +
+                  (rofl ? "translate-x-5" : "")
+                }
+              />
+            </button>
+          </label>
+          <div className="flex items-center gap-1 text-xs shrink-0">
             <ElixirIcon size={14} />
             <span className="font-semibold text-cr-text">{deck.avg_elixir.toFixed(1)}</span>
           </div>
         </div>
 
         <p className="text-xs text-cr-muted mb-4">
-          8 случайных карт, как в игре. Нажмите «Перегенерировать», если колода не нравится.
+          {deck.rofl
+            ? (deck.rofl_tagline ?? "Угарная колода ради смеха. В ranked не играйте.")
+            : "8 случайных карт, как в игре. Нажмите «Перегенерировать», если колода не нравится."}
         </p>
 
         <div className="grid grid-cols-4 gap-x-2 gap-y-1 mb-4">

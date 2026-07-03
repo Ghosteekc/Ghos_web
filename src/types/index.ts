@@ -203,6 +203,9 @@ export interface RandomDeck {
   card_infos: { id: string; name: string; icon: string; cost: number }[];
   avg_elixir: number;
   deck_link?: string | null;
+  rofl?: boolean;
+  rofl_name?: string | null;
+  rofl_tagline?: string | null;
 }
 
 export interface BattleInsight {

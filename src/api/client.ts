@@ -292,9 +292,7 @@ export const api = {
 
 
 
-  getTopPlayers: () =>
-
-    cachedGet<TopPlayersData>("top-players", "/api/decks/top-players", TTL.stats),
+  getTopPlayers: () => request<TopPlayersData>("/api/decks/top-players?refresh=true"),
 
 
 
@@ -382,7 +380,7 @@ export const api = {
 
 
 
-  getRandomDeck: () => request<RandomDeck>("/api/decks/random"),
+  getRandomDeck: (rofl = false) => request<RandomDeck>(`/api/decks/random${rofl ? "?rofl=true" : ""}`),
 
 
 
