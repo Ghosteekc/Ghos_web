@@ -8,7 +8,7 @@ const sizeClasses: Record<CardTileSize, string> = {
   sm: "w-11 h-[3.25rem] min-w-[2.75rem]",
   md: "w-14 h-16",
   grid: "w-14 h-[4.25rem] max-w-[4.5rem]",
-  lg: "w-full max-w-[5rem] aspect-[4/5]",
+  lg: "w-full max-w-[4.25rem] aspect-[4/5] mx-auto",
   deck: "w-full max-w-[3rem] aspect-[4/5] mx-auto",
 };
 
@@ -31,6 +31,8 @@ interface CardTileProps {
   labelClassName?: string;
   className?: string;
   badge?: string | number;
+  evolutionLevel?: number;
+  isHero?: boolean;
 }
 
 export function CardTile({
@@ -43,12 +45,15 @@ export function CardTile({
   labelClassName,
   className,
   badge,
+  evolutionLevel = 0,
+  isHero = false,
 }: CardTileProps) {
   const { nameRu, nameShort, iconUrl } = useCardCatalog();
   const src = icon || iconUrl(name);
+  const overlayLabel = showLabel && (size === "deck" || size === "lg");
   const label =
     labelOverride ??
-    ((compactLabel || size === "deck") && showLabel ? nameShort(name) : nameRu(name));
+    ((compactLabel || size === "deck" || size === "lg") && showLabel ? nameShort(name) : nameRu(name));
 
   return (
     <div
@@ -72,8 +77,11 @@ export function CardTile({
             {name.charAt(0)}
           </div>
         )}
-        {showLabel && size === "deck" && (
-          <span className="card-name-deck-overlay" title={nameRu(name)}>
+        {overlayLabel && (
+          <span
+            className={cn("card-name-deck-overlay", size === "lg" && "card-name-lg-overlay")}
+            title={nameRu(name)}
+          >
             {label}
           </span>
         )}
@@ -82,8 +90,18 @@ export function CardTile({
             {badge}
           </span>
         )}
+        {evolutionLevel > 0 && (
+          <span className="card-evo-badge" title="Эволюция">
+            E
+          </span>
+        )}
+        {isHero && (
+          <span className="card-hero-badge" title="Героизм">
+            ★
+          </span>
+        )}
       </div>
-      {showLabel && size !== "deck" && (
+      {showLabel && !overlayLabel && (
         <span
           className={cn(
             "card-name-glow leading-none text-center truncate px-0.5 font-extrabold",

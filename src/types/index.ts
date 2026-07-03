@@ -51,10 +51,21 @@ export interface BattleDetail {
   opponent_threats: string[];
 }
 
+export interface DeckCard {
+  id: string;
+  name: string;
+  icon: string;
+  rarity?: string;
+  cost: number;
+  evolution_level?: number;
+  is_hero?: boolean;
+  slot?: number;
+}
+
 export interface Deck {
   id: number;
   name: string;
-  cards: { id: string; name: string; icon: string; rarity: string; cost: number }[];
+  cards: DeckCard[];
   winrate: number;
   total_games: number;
   avg_elixir: number;
@@ -100,6 +111,30 @@ export interface StatsOverview {
   last_results: { won: boolean; trophy_change: number }[];
   activity_heatmap: number[][];
   avg_time?: number;
+}
+
+export interface TopPlayer {
+  rank: number;
+  player_tag: string;
+  player_name: string;
+  trophies: number;
+  clan_name: string;
+  winrate: number;
+  total_games: number;
+  avg_elixir: number;
+  cards: DeckCard[];
+  deck_link?: string | null;
+}
+
+export interface TopPlayersData {
+  players: TopPlayer[];
+  updated_at: string | null;
+}
+
+export interface DecksListData {
+  decks: Deck[];
+  meta_updated_at?: string | null;
+  meta_source?: string | null;
 }
 
 export interface RandomDeck {

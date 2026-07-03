@@ -20,6 +20,10 @@ import {
 
   RandomDeck,
 
+  TopPlayersData,
+
+  DecksListData,
+
   InsightsData,
 
 } from "@/types";
@@ -262,7 +266,7 @@ export const api = {
 
     const key = `decks:${type ?? "all"}`;
 
-    return cachedGet<{ decks: Deck[] }>(
+    return cachedGet<DecksListData>(
 
       key,
 
@@ -273,6 +277,12 @@ export const api = {
     );
 
   },
+
+
+
+  getTopPlayers: () =>
+
+    cachedGet<TopPlayersData>("top-players", "/api/decks/top-players", TTL.stats),
 
 
 

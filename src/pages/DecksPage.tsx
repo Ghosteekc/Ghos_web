@@ -6,16 +6,19 @@ import {
   Star,
   Shuffle,
   RefreshCw,
+  Trophy,
+  Users,
 } from "lucide-react";
 import { Card, Button, SkeletonGroup, ElixirIcon } from "@/components/ui";
 import { CardTile } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
-import { Deck, RandomDeck } from "@/types";
+import type { Deck, DeckCard, RandomDeck, TopPlayer } from "@/types";
 import { usePageRefresh, useTelegram } from "@/hooks";
 
 const DECK_FILTERS = [
   { id: "all", label: "Все" },
   { id: "meta", label: "Мета" },
+  { id: "top", label: "Топ игроки" },
   { id: "mine", label: "Мои" },
   { id: "cycle", label: "Цикл" },
   { id: "beatdown", label: "Битдаун" },
@@ -32,28 +35,68 @@ const CATEGORY_LABELS: Record<string, string> = {
   control: "Контроль",
   bait: "Bait",
   random: "Рандом",
+  top: "Топ",
 };
+
+function formatUpdatedAt(iso: string | null | undefined) {
+  if (!iso) return null;
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString("ru-RU", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return null;
+  }
+}
+
+function DeckCardsGrid({ cards }: { cards: DeckCard[] }) {
+  const sorted = [...cards].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
+  return (
+    <div className="grid grid-cols-4 gap-x-2 gap-y-1 mb-4">
+      {sorted.map((card, i) => (
+        <div key={`${card.id}-${i}`} className="min-w-0 overflow-hidden">
+          <CardTile
+            name={card.name}
+            icon={card.icon}
+            size="deck"
+            showLabel
+            evolutionLevel={card.evolution_level ?? 0}
+            isHero={card.is_hero ?? false}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function DecksPage() {
   const [decks, setDecks] = useState<Deck[]>([]);
+  const [metaUpdatedAt, setMetaUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
   const [copyHint, setCopyHint] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (filter === "random") {
+    if (filter === "random" || filter === "top") {
       setLoading(false);
       setDecks([]);
       setError(null);
+      setMetaUpdatedAt(null);
       return;
     }
     try {
       setError(null);
       const res = await api.getDecks(filter === "all" ? undefined : filter);
       setDecks(res.decks ?? []);
+      setMetaUpdatedAt(res.meta_updated_at ?? null);
     } catch (e) {
       setDecks([]);
+      setMetaUpdatedAt(null);
       setError(e instanceof ApiError ? e.message : "Ошибка загрузки колод");
     } finally {
       setLoading(false);
@@ -67,17 +110,32 @@ export function DecksPage() {
     void load();
   }, [load]);
 
+  const metaHint = formatUpdatedAt(metaUpdatedAt);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="page-title">Колоды</h1>
         <span className="text-sm text-cr-muted">
-          {filter === "random" ? "Генератор" : `${decks.length} колод`}
+          {filter === "random"
+            ? "Генератор"
+            : filter === "top"
+              ? "Рейтинг"
+              : `${decks.length} колод`}
         </span>
       </div>
 
       <p className="text-xs text-cr-muted -mt-2">
-        Мета-колоды — популярные архетипы. «Мои» — из вашей истории боёв.
+        {filter === "meta" ? (
+          <>
+            Мета строится по колодам топов Path of Legend и обновляется каждые несколько часов.
+            {metaHint ? ` Обновлено: ${metaHint}.` : ""}
+          </>
+        ) : filter === "top" ? (
+          "Актуальные колоды и винрейт игроков из глобального рейтинга."
+        ) : (
+          "Мета-колоды — популярные архетипы. «Мои» — из вашей истории боёв."
+        )}
       </p>
 
       <div className="flex gap-2 overflow-x-auto pb-2">
@@ -105,13 +163,22 @@ export function DecksPage() {
         <Card className="text-center text-cr-loss text-sm">{error}</Card>
       )}
 
-      {loading && filter !== "random" ? (
+      {loading && filter !== "random" && filter !== "top" ? (
         <SkeletonGroup count={4} />
       ) : filter === "random" ? (
-        <RandomDeckPanel onCopied={(msg) => {
-          setCopyHint(msg);
-          setTimeout(() => setCopyHint(null), 3000);
-        }} />
+        <RandomDeckPanel
+          onCopied={(msg) => {
+            setCopyHint(msg);
+            setTimeout(() => setCopyHint(null), 3000);
+          }}
+        />
+      ) : filter === "top" ? (
+        <TopPlayersPanel
+          onCopied={(msg) => {
+            setCopyHint(msg);
+            setTimeout(() => setCopyHint(null), 3000);
+          }}
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full overflow-x-hidden">
           {decks.map((deck, i) => (
@@ -142,6 +209,132 @@ export function DecksPage() {
 }
 
 export { DecksPage as default };
+
+function TopPlayersPanel({ onCopied }: { onCopied: (msg: string) => void }) {
+  const { openLink } = useTelegram();
+  const [players, setPlayers] = useState<TopPlayer[]>([]);
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api.getTopPlayers();
+      setPlayers(data.players ?? []);
+      setUpdatedAt(data.updated_at ?? null);
+    } catch (e) {
+      setPlayers([]);
+      setError(e instanceof ApiError ? e.message : "Не удалось загрузить топ игроков");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const importDeck = async (deckLink?: string | null) => {
+    if (!deckLink) return;
+    if (openLink) {
+      openLink(deckLink);
+      onCopied("Открываем Clash Royale для импорта колоды…");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(deckLink);
+      onCopied("Ссылка на колоду скопирована");
+    } catch {
+      onCopied("Откройте приложение из Telegram для импорта колоды");
+    }
+  };
+
+  if (loading) return <SkeletonGroup count={3} />;
+
+  if (error) {
+    return (
+      <Card className="text-center space-y-3">
+        <p className="text-cr-loss text-sm">{error}</p>
+        <Button onClick={() => void load()}>Попробовать снова</Button>
+      </Card>
+    );
+  }
+
+  if (!players.length) {
+    return (
+      <Card className="text-center">
+        <Users className="w-12 h-12 text-cr-muted mx-auto mb-3 opacity-50" />
+        <p className="text-cr-muted">Рейтинг временно недоступен</p>
+        <p className="text-xs text-cr-muted mt-1">Попробуйте позже</p>
+      </Card>
+    );
+  }
+
+  const updatedLabel = formatUpdatedAt(updatedAt);
+
+  return (
+    <div className="space-y-4">
+      {updatedLabel && (
+        <p className="text-xs text-cr-muted text-center">Обновлено: {updatedLabel}</p>
+      )}
+      {players.map((player, i) => (
+        <motion.div
+          key={player.player_tag}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.04 }}
+        >
+          <Card>
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-bold text-cr-gold bg-cr-gold/10 px-2 py-0.5 rounded-full border border-cr-gold/20">
+                    #{player.rank}
+                  </span>
+                  <h3 className="text-sm font-semibold text-cr-text truncate">{player.player_name}</h3>
+                </div>
+                <p className="text-xs text-cr-muted truncate">
+                  #{player.player_tag}
+                  {player.clan_name ? ` · ${player.clan_name}` : ""}
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <div className="flex items-center justify-end gap-1 text-xs text-cr-muted">
+                  <Trophy className="w-3.5 h-3.5 text-cr-gold" />
+                  <span className="font-semibold text-cr-text">{player.trophies}</span>
+                </div>
+                <p className={"text-xs font-bold mt-0.5 " + (player.winrate >= 50 ? "text-cr-win" : "text-cr-loss")}>
+                  WR {player.winrate.toFixed(0)}%
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 text-xs mb-3">
+              <ElixirIcon size={14} />
+              <span className="font-semibold text-cr-text">{player.avg_elixir.toFixed(1)}</span>
+              <span className="text-cr-muted ml-2">{player.total_games} боёв</span>
+            </div>
+
+            <DeckCardsGrid cards={player.cards} />
+
+            {player.deck_link ? (
+              <Button
+                variant="secondary"
+                className="w-full !py-2 text-sm flex items-center justify-center gap-2"
+                onClick={() => void importDeck(player.deck_link)}
+              >
+                <ExternalLink className="w-4 h-4" />
+                Импорт колоды
+              </Button>
+            ) : null}
+          </Card>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
   const { openLink } = useTelegram();
@@ -224,7 +417,7 @@ function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
         </p>
 
         <div className="grid grid-cols-4 gap-x-2 gap-y-1 mb-4">
-          {deck.card_infos.map((card) => (
+          {deck.card_infos.map((card, i) => (
             <div key={card.id} className="min-w-0 overflow-hidden">
               <CardTile name={card.name} icon={card.icon} size="deck" showLabel />
             </div>
@@ -329,13 +522,16 @@ function DeckCard({
           <p className="text-xs text-cr-muted mb-3">{deck.description}</p>
         )}
 
-        <div className="grid grid-cols-4 gap-x-2 gap-y-1 mb-4">
-          {cards.map((card) => (
-            <div key={card.id} className="min-w-0 overflow-hidden">
-              <CardTile name={card.name} icon={card.icon} size="deck" showLabel />
-            </div>
-          ))}
-        </div>
+        <DeckCardsGrid cards={cards} />
+
+        {deck.type === "meta" && deck.total_games > 0 && (
+          <div className="flex items-center justify-between text-sm mb-3">
+            <span className="text-cr-muted">Winrate топов</span>
+            <span className={"font-bold " + (winrate >= 50 ? "text-cr-win" : "text-cr-loss")}>
+              {winrate.toFixed(1)}%
+            </span>
+          </div>
+        )}
 
         {deck.type === "mine" && (
           <>

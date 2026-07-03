@@ -244,6 +244,40 @@
     background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 55%, transparent);
   }
 
+  .card-name-lg-overlay {
+    font-size: 6px;
+    padding-bottom: 3px;
+  }
+
+  .card-evo-badge,
+  .card-hero-badge {
+    position: absolute;
+    top: 1px;
+    z-index: 25;
+    width: 10px;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    font-size: 7px;
+    font-weight: 800;
+    line-height: 1;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+  }
+
+  .card-evo-badge {
+    left: 1px;
+    color: #e9d5ff;
+    background: linear-gradient(135deg, #7c3aed, #4c1d95);
+  }
+
+  .card-hero-badge {
+    right: 1px;
+    color: #fef3c7;
+    background: linear-gradient(135deg, #d97706, #92400e);
+  }
+
   [data-theme="light"] .card-name-deck {
     text-shadow: 0 0 3px rgba(217, 119, 6, 0.15);
   }
