@@ -12,7 +12,7 @@ import {
   Trophy,
   X,
 } from "lucide-react";
-import { cn, hapticImpact, hapticSelection } from "@/utils";
+import { cn } from "@/utils";
 
 const navItems = [
   { to: "/", icon: Home, label: "Главная" },
@@ -44,10 +44,7 @@ export function Sidebar({ isOpen = true, onClose }: { isOpen?: boolean; onClose?
         </div>
         <button
           type="button"
-          onClick={() => {
-            hapticImpact("light");
-            onClose?.();
-          }}
+          onClick={() => onClose?.()}
           className="lg:hidden p-2 rounded-lg hover:bg-white/10 shrink-0"
           aria-label="Закрыть меню"
         >
@@ -61,10 +58,7 @@ export function Sidebar({ isOpen = true, onClose }: { isOpen?: boolean; onClose?
             key={item.to}
             to={item.to}
             end={item.to === "/"}
-            onClick={() => {
-              hapticSelection();
-              onClose?.();
-            }}
+            onClick={() => onClose?.()}
             className={({ isActive }) =>
               cn("sidebar-item group", isActive && "active")
             }

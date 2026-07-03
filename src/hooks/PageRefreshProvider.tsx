@@ -23,6 +23,14 @@ export function PageRefreshProvider({ children }: { children: ReactNode }) {
 
   const { refreshing, pullDistance } = usePullToRefresh(handleRefresh);
 
+  useEffect(() => {
+    const onSync = () => {
+      void handleRefresh();
+    };
+    window.addEventListener("app:sync", onSync);
+    return () => window.removeEventListener("app:sync", onSync);
+  }, [handleRefresh]);
+
   const registerRefresh = useCallback<PageRefreshRegister>((fn) => {
     refreshRef.current = fn;
   }, []);

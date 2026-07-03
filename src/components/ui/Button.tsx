@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import React from "react";
-import { cn, hapticImpact } from "@/utils";
+import { cn } from "@/utils";
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -28,7 +28,6 @@ export function Button({
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     if (disabled) return;
-    hapticImpact(variant === "primary" ? "medium" : "light");
     onClick?.(e);
   };
 

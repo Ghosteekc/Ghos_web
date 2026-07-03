@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Menu, X } from "lucide-react";
-import { cn, hapticImpact } from "@/utils";
-import { PageRefreshProvider, CardCatalogProvider } from "@/hooks";
+import { cn } from "@/utils";
+import { PageRefreshProvider, CardCatalogProvider, useGlobalButtonHaptics } from "@/hooks";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 function getTelegramChromeTop(webApp: NonNullable<typeof window.Telegram>["WebApp"]) {
@@ -44,6 +44,8 @@ export function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const location = useLocation();
+
+  useGlobalButtonHaptics();
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -87,23 +89,13 @@ export function Layout() {
     <div className="min-h-screen flex overflow-x-hidden">
       <div
         className={cn("sidebar-overlay", mobileOpen && !isDesktop && "open")}
-        onClick={() => {
-          hapticImpact("soft");
-          setMobileOpen(false);
-        }}
+        onClick={() => setMobileOpen(false)}
         aria-hidden={!mobileOpen || isDesktop}
       />
 
       <button
         type="button"
-        onClick={() => {
-          if (mobileOpen) {
-            hapticImpact("light");
-          } else {
-            hapticImpact("medium");
-          }
-          setMobileOpen(!mobileOpen);
-        }}
+        onClick={() => setMobileOpen(!mobileOpen)}
         className="mobile-burger lg:hidden"
         aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню"}
         aria-expanded={mobileOpen}

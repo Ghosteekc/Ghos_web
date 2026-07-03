@@ -14,11 +14,10 @@ import {
 } from "lucide-react";
 import { Card, Loader } from "@/components/ui";
 import { api } from "@/api/client";
-import { cacheInvalidate } from "@/api/cache";
 import { Profile, Settings } from "@/types";
 import { useTelegram, usePageRefresh } from "@/hooks";
 import { applyTheme, loadStoredTheme, type AppTheme } from "@/hooks/useTheme";
-import { hapticImpact, hapticNotify, hapticSelection } from "@/utils";
+import { hapticNotify } from "@/utils";
 
 export function SettingsPage() {
   const { tg, showAlert, showConfirm } = useTelegram();
@@ -100,12 +99,12 @@ export function SettingsPage() {
     setSyncing(true);
     try {
       const res = await api.syncData();
-      cacheInvalidate();
+      window.dispatchEvent(new Event("app:sync"));
       hapticNotify("success");
       await showAlert?.(
         res.battles_loaded > 0
-          ? `Данные обновлены: загружено ${res.battles_loaded} боёв.`
-          : "Синхронизация завершена.",
+          ? `Данные обновлены: ${res.battles_loaded} боёв в журнале, статистика и списки актуализированы.`
+          : "Синхронизация завершена. Списки боёв и статистика обновлены.",
       );
     } catch (e) {
       await showAlert?.(e instanceof Error ? e.message : "Не удалось синхронизировать данные");
@@ -183,10 +182,7 @@ export function SettingsPage() {
                 whileTap={{ scale: 0.95 }}
                 className="p-3 rounded-xl bg-cr-loss/10 hover:bg-cr-loss/20 transition-colors shrink-0"
                 aria-label="Выход"
-                onClick={() => {
-                  hapticImpact("light");
-                  tg?.close?.();
-                }}
+                onClick={() => tg?.close?.()}
               >
                 <LogOut className="w-5 h-5 text-cr-loss" />
               </motion.button>
@@ -275,10 +271,7 @@ function ThemeButton({
       type="button"
       aria-label={label}
       aria-pressed={active}
-      onClick={() => {
-        hapticSelection();
-        onClick();
-      }}
+      onClick={onClick}
       className={"segment-tab " + (active ? "segment-tab--active" : "")}
     >
       {children}
@@ -293,10 +286,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       role="switch"
       aria-checked={checked}
       data-checked={checked}
-      onClick={() => {
-        hapticSelection();
-        onChange(!checked);
-      }}
+      onClick={() => onChange(!checked)}
       className="toggle-switch"
     >
       <span className="toggle-switch-thumb" />

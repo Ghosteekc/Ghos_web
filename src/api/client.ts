@@ -380,7 +380,14 @@ export const api = {
 
 
 
-  getRandomDeck: (rofl = false) => request<RandomDeck>(`/api/decks/random${rofl ? "?rofl=true" : ""}`),
+  getRandomDeck: (rofl = false, excludeKey?: string) => {
+    const params = new URLSearchParams();
+    if (rofl) params.set("rofl", "true");
+    if (excludeKey) params.set("exclude_key", excludeKey);
+    params.set("_", String(Date.now()));
+    const qs = params.toString();
+    return request<RandomDeck>(`/api/decks/random${qs ? `?${qs}` : ""}`);
+  },
 
 
 

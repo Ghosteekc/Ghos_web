@@ -27,6 +27,26 @@ export const formatTime = (seconds: number): string => {
   return `${m}:${s.toString().padStart(2, "0")}`;
 };
 
+export const formatBattlePlayedAt = (timestamp: string, playedAt?: string): string => {
+  if (playedAt) return playedAt;
+  if (!timestamp || timestamp.length < 15) return "";
+  try {
+    const y = Number(timestamp.slice(0, 4));
+    const mo = Number(timestamp.slice(4, 6)) - 1;
+    const d = Number(timestamp.slice(6, 8));
+    const h = Number(timestamp.slice(9, 11));
+    const mi = Number(timestamp.slice(11, 13));
+    const utc = Date.UTC(y, mo, d, h, mi);
+    return new Date(utc).toLocaleTimeString("ru-RU", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Europe/Moscow",
+    });
+  } catch {
+    return "";
+  }
+};
+
 export const formatPlayerTag = (tag: string | null | undefined): string => {
   if (!tag) return "—";
   const clean = tag.replace(/^#+/, "").trim();

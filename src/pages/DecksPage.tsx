@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   SlidersHorizontal,
@@ -534,12 +534,25 @@ function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rofl, setRofl] = useState(false);
+  const lastRoflKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    lastRoflKeyRef.current = null;
+  }, [rofl]);
 
   const roll = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.getRandomDeck(rofl);
+      const data = await api.getRandomDeck(
+        rofl,
+        rofl ? lastRoflKeyRef.current ?? undefined : undefined,
+      );
+      if (data.rofl_key) {
+        lastRoflKeyRef.current = data.rofl_key;
+      } else {
+        lastRoflKeyRef.current = null;
+      }
       setDeck(data);
     } catch (e) {
       setDeck(null);

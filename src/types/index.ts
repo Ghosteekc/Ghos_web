@@ -72,6 +72,7 @@ export interface BattleSummary {
   opponent_deck: string[];
   top_reason: string | null;
   timestamp: string;
+  played_at?: string;
 }
 
 export interface BattleDetail {
@@ -83,6 +84,7 @@ export interface BattleDetail {
   trophy_change: number;
   matchup_score: number;
   duration: number;
+  played_at?: string;
   avg_elixir: number;
   best_moment: string | null;
   user_deck: string[];
@@ -206,6 +208,7 @@ export interface RandomDeck {
   rofl?: boolean;
   rofl_name?: string | null;
   rofl_tagline?: string | null;
+  rofl_key?: string | null;
 }
 
 export interface BattleInsight {

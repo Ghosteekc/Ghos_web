@@ -6,6 +6,7 @@ import { hapticImpact } from "@/utils/haptics";
 export { PageRefreshProvider, usePageRefresh } from "./PageRefreshProvider";
 export { CardCatalogProvider, useCardCatalog } from "./CardCatalogProvider";
 export { usePullToRefresh } from "./usePullToRefresh";
+export { useGlobalButtonHaptics } from "./useGlobalButtonHaptics";
 export { applyTheme, loadStoredTheme, resolveTheme, initTheme } from "./useTheme";
 export type { AppTheme } from "./useTheme";
 export function useTelegram() {

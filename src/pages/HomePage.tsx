@@ -270,7 +270,7 @@ export function HomePage() {
 
           {battles.length > 0 ? (
 
-            battles.slice(0, 3).map((battle, i) => (
+            battles.slice(0, 8).map((battle, i) => (
 
               <BattleCardSimple
 

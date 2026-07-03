@@ -4,7 +4,7 @@ import {
   ChevronRight,
   Flame,
 } from "lucide-react";
-import { formatTime, getTrophyChangeColor, cn } from "@/utils";
+import { formatTime, getTrophyChangeColor, cn, formatBattlePlayedAt } from "@/utils";
 import { BattleSummary } from "@/types";
 import { Card, ElixirIcon } from "@/components/ui";
 import { CardTile } from "@/components/cards";
@@ -52,6 +52,11 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
               <p className="text-xs text-cr-muted">#{summary.opponent_tag || "—"}</p>
             </div>
             <div className="text-right">
+              {formatBattlePlayedAt(summary.timestamp, summary.played_at) ? (
+                <p className="text-xs font-semibold text-cr-accent">
+                  {formatBattlePlayedAt(summary.timestamp, summary.played_at)}
+                </p>
+              ) : null}
               <p className="text-xs text-cr-muted">{formatTime(summary.duration ?? 0)}</p>
               <p className="text-xs text-cr-muted flex items-center gap-1 justify-end">
                 <ElixirIcon size={12} />

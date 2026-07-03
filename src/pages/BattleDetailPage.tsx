@@ -17,7 +17,7 @@ import { Card, Button, Loader, LinearProgress } from "@/components/ui";
 import { CardTile } from "@/components/cards";
 import { api } from "@/api/client";
 import { BattleDetail } from "@/types";
-import { formatTime, getTrophyChangeColor } from "@/utils";
+import { formatTime, getTrophyChangeColor, formatBattlePlayedAt } from "@/utils";
 import { usePageRefresh } from "@/hooks";
 
 export function BattleDetailPage() {
@@ -72,7 +72,8 @@ export function BattleDetailPage() {
         </div>
         <div className="text-cr-muted text-sm flex items-center gap-1">
           <Clock className="w-4 h-4" />
-          {formatTime(battle.duration)}
+          {battle.played_at ? `${battle.played_at} · ` : ""}
+          {formatTime(battle.duration ?? 0)}
         </div>
       </div>
 
