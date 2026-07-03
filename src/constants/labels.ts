@@ -6,7 +6,7 @@ export const DECK_CATEGORY_LABELS: Record<string, string> = {
   cycle: "Цикл",
   beatdown: "Битдаун",
   control: "Контроль",
-  bait: "Приманка",
+  bait: "Бейт",
   random: "Рандом",
   top: "Топ",
 };
@@ -19,7 +19,7 @@ export const DECK_FILTER_LABELS: Record<string, string> = {
   cycle: "Цикл",
   beatdown: "Битдаун",
   control: "Контроль",
-  bait: "Приманка",
+  bait: "Бейт",
   random: "Рандом",
 };
 
