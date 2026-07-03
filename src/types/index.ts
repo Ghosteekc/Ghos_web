@@ -2,15 +2,10 @@ export interface PlayerCollectionData {
   cards: CollectionCardEntry[];
   cards_owned: number;
   cards_total: number;
-  emotes: CollectionEmoteEntry[];
-  emotes_owned: number;
-  emotes_total: number;
-  emote_collection_level: number;
-  emote_collection_progress: number;
-  emote_collection_target: number | null;
-  emotes_api_note: string | null;
   masteries: CollectionMasteryEntry[];
 }
+
+export type CardDisplayMode = "base" | "evo" | "hero" | "split";
 
 export interface CollectionCardEntry {
   name: string;
@@ -22,24 +17,21 @@ export interface CollectionCardEntry {
   rarity: string;
   evolution_level: number;
   max_evolution_level: number;
-  has_evo: boolean;
-  has_hero: boolean;
-  has_evo_and_hero: boolean;
+  display_mode: CardDisplayMode;
   icon: string;
-}
-
-export interface CollectionEmoteEntry {
-  id: string;
-  name: string;
-  owned: boolean;
-  exclusive: boolean;
-  icon: string;
+  icon_base: string;
+  icon_evo: string;
+  icon_hero: string;
 }
 
 export interface CollectionMasteryEntry {
   card_name: string;
   card_name_ru: string;
   icon: string;
+  icon_base: string;
+  icon_evo: string;
+  icon_hero: string;
+  display_mode: CardDisplayMode;
   level: number;
   max_level: number;
   progress: number;

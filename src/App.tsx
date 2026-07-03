@@ -5,6 +5,8 @@ import { Loader } from "@/components/ui";
 
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
+const ProfileCardsPage = lazy(() => import("@/pages/ProfileCardsPage"));
+const ProfileMasteryPage = lazy(() => import("@/pages/ProfileMasteryPage"));
 const Analytics = lazy(() => import("@/pages/AnalyticsPage"));
 const DecksPage = lazy(() => import("@/pages/DecksPage"));
 const BattlesPage = lazy(() => import("@/pages/BattlesPage"));
@@ -40,6 +42,22 @@ export default function App() {
             element={
               <Suspense fallback={<PageLoader />}>
                 <ProfilePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="profile/cards"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <ProfileCardsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="profile/mastery"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <ProfileMasteryPage />
               </Suspense>
             }
           />

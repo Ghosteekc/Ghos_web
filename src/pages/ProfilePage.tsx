@@ -7,7 +7,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Card, Button, Loader } from "@/components/ui";
-import { ProfileCollection } from "@/components/profile/ProfileCollection";
+import { ProfileCollectionNav } from "@/components/profile/ProfileCollectionNav";
 import { useTelegram, usePageRefresh } from "@/hooks";
 import { api } from "@/api/client";
 import { Profile } from "@/types";
@@ -170,7 +170,7 @@ export function ProfilePage() {
         </Card>
       </div>
 
-      <ProfileCollection />
+      <ProfileCollectionNav />
 
       <Button
         variant="secondary"

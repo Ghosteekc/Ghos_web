@@ -1,7 +1,8 @@
 import { cn } from "@/utils";
 import { useCardCatalog } from "@/hooks/CardCatalogProvider";
+import type { CardDisplayMode } from "@/types";
 
-type CardTileSize = "xs" | "sm" | "md" | "grid" | "lg" | "deck";
+type CardTileSize = "xs" | "sm" | "md" | "grid" | "lg" | "deck" | "collection";
 
 const sizeClasses: Record<CardTileSize, string> = {
   xs: "w-9 h-11",
@@ -10,6 +11,7 @@ const sizeClasses: Record<CardTileSize, string> = {
   grid: "w-14 h-[4.25rem] max-w-[4.5rem]",
   lg: "w-full max-w-[4.25rem] aspect-[4/5] mx-auto",
   deck: "w-full max-w-[3rem] aspect-[4/5] mx-auto",
+  collection: "w-full max-w-[4.75rem] aspect-[4/5] mx-auto",
 };
 
 const labelSizeClasses: Record<CardTileSize, string> = {
@@ -19,7 +21,60 @@ const labelSizeClasses: Record<CardTileSize, string> = {
   grid: "max-w-[3.5rem] text-[8px]",
   lg: "max-w-[4rem] text-[8px]",
   deck: "card-name-deck",
+  collection: "card-name-deck",
 };
+
+function CardArt({
+  name,
+  src,
+  iconBase,
+  iconEvo,
+  iconHero,
+  displayMode = "base",
+}: {
+  name: string;
+  src: string;
+  iconBase?: string;
+  iconEvo?: string;
+  iconHero?: string;
+  displayMode?: CardDisplayMode;
+}) {
+  const base = iconBase || src;
+  const evo = iconEvo || base;
+  const hero = iconHero || base;
+
+  if (displayMode === "split" && evo && hero) {
+    return (
+      <div className="relative z-10 w-full h-full">
+        <img
+          src={evo}
+          alt={name}
+          className="absolute inset-0 w-full h-full object-contain object-center drop-shadow-md [clip-path:inset(0_50%_0_0)]"
+          loading="lazy"
+        />
+        <img
+          src={hero}
+          alt={name}
+          className="absolute inset-0 w-full h-full object-contain object-center drop-shadow-md [clip-path:inset(0_0_0_50%)]"
+          loading="lazy"
+        />
+        <div className="absolute inset-y-[8%] left-1/2 w-px -translate-x-1/2 bg-black/50 z-20" aria-hidden />
+      </div>
+    );
+  }
+
+  const active =
+    displayMode === "evo" ? evo : displayMode === "hero" ? hero : base;
+
+  return (
+    <img
+      src={active}
+      alt={name}
+      className="relative z-10 w-full h-full object-contain object-center drop-shadow-md"
+      loading="lazy"
+    />
+  );
+}
 
 interface CardTileProps {
   name: string;
@@ -32,6 +87,10 @@ interface CardTileProps {
   className?: string;
   badge?: string | number;
   levelBadge?: string | number;
+  displayMode?: CardDisplayMode;
+  iconBase?: string;
+  iconEvo?: string;
+  iconHero?: string;
 }
 
 export function CardTile({
@@ -45,9 +104,14 @@ export function CardTile({
   className,
   badge,
   levelBadge,
+  displayMode = "base",
+  iconBase,
+  iconEvo,
+  iconHero,
 }: CardTileProps) {
   const { nameRu, nameShort, iconUrl } = useCardCatalog();
   const src = icon || iconUrl(name);
+  const isCollection = size === "collection";
   const overlayLabel = showLabel && (size === "deck" || size === "lg");
   const label =
     labelOverride ??
@@ -61,14 +125,23 @@ export function CardTile({
         className,
       )}
     >
-      <div className={cn("relative shrink-0 card-tile-wrap", sizeClasses[size])} title={nameRu(name)}>
+      <div
+        className={cn(
+          "relative shrink-0 card-tile-wrap overflow-hidden",
+          sizeClasses[size],
+          isCollection && "collection-card-wrap",
+        )}
+        title={nameRu(name)}
+      >
         <div className="card-tile-glow" aria-hidden />
         {src ? (
-          <img
+          <CardArt
+            name={nameRu(name)}
             src={src}
-            alt={nameRu(name)}
-            className="relative z-10 w-full h-full object-contain object-center drop-shadow-md"
-            loading="lazy"
+            iconBase={iconBase ?? src}
+            iconEvo={iconEvo}
+            iconHero={iconHero}
+            displayMode={displayMode}
           />
         ) : (
           <div className="relative z-10 w-full h-full flex items-center justify-center text-xs font-bold text-cr-text">
@@ -84,7 +157,14 @@ export function CardTile({
           </span>
         )}
         {levelBadge != null && (
-          <span className="absolute top-0 right-0 z-20 min-w-[1.1rem] px-1 py-0.5 rounded-md text-[10px] font-cr leading-none bg-cr-bg/95 text-cr-gold border border-cr-gold/40">
+          <span
+            className={cn(
+              "absolute z-30 font-cr font-extrabold leading-none text-cr-gold",
+              isCollection
+                ? "collection-level-badge"
+                : "top-0 right-0 min-w-[1.1rem] px-1 py-0.5 rounded-md text-[10px] bg-cr-bg/95 border border-cr-gold/40",
+            )}
+          >
             {levelBadge}
           </span>
         )}

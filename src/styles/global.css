@@ -344,6 +344,24 @@
     justify-content: center;
   }
 
+  .collection-card-wrap {
+    overflow: hidden;
+  }
+
+  .collection-level-badge {
+    top: 7%;
+    right: 5%;
+    min-width: 1.65rem;
+    padding: 0.15rem 0.35rem;
+    font-size: 0.82rem;
+    text-align: center;
+    background: rgba(12, 8, 4, 0.92);
+    border: 2px solid rgba(251, 191, 36, 0.75);
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+    text-shadow: var(--cr-stroke-body);
+  }
+
   .card-tile-glow {
     position: absolute;
     inset: -6px -4px;
