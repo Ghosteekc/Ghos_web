@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
+import { MenuNavHint } from "./MenuNavHint";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/utils";
 import { PageRefreshProvider, CardCatalogProvider, useGlobalButtonHaptics } from "@/hooks";
@@ -84,6 +85,7 @@ export function Layout() {
   }, [mobileOpen, isDesktop]);
 
   const sidebarOpen = isDesktop || mobileOpen;
+  const showMenuHint = location.pathname === "/" && !isDesktop && !mobileOpen;
 
   return (
     <div className="min-h-screen flex overflow-x-hidden">
@@ -106,6 +108,8 @@ export function Layout() {
           <Menu className="w-6 h-6 text-cr-text" />
         )}
       </button>
+
+      <MenuNavHint visible={showMenuHint} />
 
       <Sidebar isOpen={sidebarOpen} onClose={() => setMobileOpen(false)} />
 

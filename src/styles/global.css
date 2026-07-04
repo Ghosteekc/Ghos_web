@@ -250,6 +250,23 @@
     transition: opacity 0.2s ease;
   }
 
+  .menu-nav-hint {
+    position: fixed;
+    z-index: 49;
+    top: var(--mobile-top-inset);
+    left: calc(var(--app-content-left) + 1rem + var(--mobile-burger-size) + 0.5rem);
+    right: calc(var(--app-content-right) + 0.75rem);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    background: rgba(24, 24, 48, 0.92);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+  }
+
   .sidebar-overlay {
     @apply fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden;
     opacity: 0;
