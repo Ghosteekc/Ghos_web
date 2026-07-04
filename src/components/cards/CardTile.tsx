@@ -25,6 +25,20 @@ const labelSizeClasses: Record<CardTileSize, string> = {
   collection: "card-name-deck",
 };
 
+function cardFrameClass(displayMode: CardDisplayMode, rarity?: string): string {
+  if (rarity === "champion") return "card-frame-champion";
+  switch (displayMode) {
+    case "evo":
+      return "card-frame-evo";
+    case "hero":
+      return "card-frame-hero";
+    case "split":
+      return "card-frame-split";
+    default:
+      return "card-frame-base";
+  }
+}
+
 function CardArt({
   name,
   src,
@@ -46,20 +60,20 @@ function CardArt({
 
   if (displayMode === "split" && evo && hero) {
     return (
-      <div className="relative z-10 w-full h-full">
+      <div className="relative z-10 h-full w-full">
         <img
           src={evo}
           alt={name}
-          className="absolute inset-0 w-full h-full object-contain object-center drop-shadow-md [clip-path:inset(0_50%_0_0)]"
+          className="absolute inset-0 h-full w-full object-contain object-center drop-shadow-md [clip-path:inset(0_50%_0_0)]"
           loading="lazy"
         />
         <img
           src={hero}
           alt={name}
-          className="absolute inset-0 w-full h-full object-contain object-center drop-shadow-md [clip-path:inset(0_0_0_50%)]"
+          className="absolute inset-0 h-full w-full object-contain object-center drop-shadow-md [clip-path:inset(0_0_0_50%)]"
           loading="lazy"
         />
-        <div className="absolute inset-y-[8%] left-1/2 w-px -translate-x-1/2 bg-black/50 z-20" aria-hidden />
+        <div className="absolute inset-y-[8%] left-1/2 z-20 w-px -translate-x-1/2 bg-black/50" aria-hidden />
       </div>
     );
   }
@@ -71,9 +85,26 @@ function CardArt({
     <img
       src={active}
       alt={name}
-      className="relative z-10 w-full h-full object-contain object-center drop-shadow-md"
+      className="relative z-10 h-full w-full object-contain object-center drop-shadow-md"
       loading="lazy"
     />
+  );
+}
+
+function ElixirCostBadge({ cost }: { cost: number }) {
+  return (
+    <span className="cr-elixir-badge" aria-label={`${cost} эликсира`}>
+      <ElixirIcon size={20} className="text-[#d946ef]" />
+      <span className="cr-elixir-badge-num">{cost}</span>
+    </span>
+  );
+}
+
+function LevelBadge({ level }: { level: string | number }) {
+  return (
+    <span className="cr-level-badge" aria-label={`Уровень ${level}`}>
+      {level}
+    </span>
   );
 }
 
@@ -89,6 +120,7 @@ interface CardTileProps {
   badge?: string | number;
   levelBadge?: string | number;
   elixirCost?: number;
+  rarity?: string;
   displayMode?: CardDisplayMode;
   iconBase?: string;
   iconEvo?: string;
@@ -107,6 +139,7 @@ export function CardTile({
   badge,
   levelBadge,
   elixirCost,
+  rarity,
   displayMode = "base",
   iconBase,
   iconEvo,
@@ -120,52 +153,6 @@ export function CardTile({
     labelOverride ??
     ((compactLabel || size === "deck" || size === "lg") && showLabel ? nameShort(name) : nameRu(name));
 
-  if (isCollection) {
-    return (
-      <div
-        className={cn("relative mx-auto w-full max-w-[4.75rem]", className)}
-        title={nameRu(name)}
-      >
-        <div className="relative aspect-[4/5] w-full">
-          <div className="absolute inset-0 card-tile-wrap">
-            <div className="card-tile-glow" aria-hidden />
-            {src ? (
-              <CardArt
-                name={nameRu(name)}
-                src={src}
-                iconBase={iconBase ?? src}
-                iconEvo={iconEvo}
-                iconHero={iconHero}
-                displayMode={displayMode}
-              />
-            ) : (
-              <div className="relative z-10 flex h-full w-full items-center justify-center text-xs font-bold text-cr-text">
-                {name.charAt(0)}
-              </div>
-            )}
-          </div>
-          {levelBadge != null && (
-            <span
-              className="absolute top-[5%] right-[5%] z-[80] min-w-[1.15rem] rounded-sm border-2 border-amber-400 bg-[#1a1204]/95 px-1 py-0.5 text-[10px] font-bold leading-none text-white shadow-[0_1px_4px_rgba(0,0,0,0.85)] pointer-events-none"
-              aria-label={`Уровень ${levelBadge}`}
-            >
-              {levelBadge}
-            </span>
-          )}
-          {elixirCost != null && (
-            <span
-              className="absolute bottom-[5%] left-[5%] z-[80] inline-flex items-center gap-0.5 rounded-sm border border-pink-500/70 bg-[#1a1204]/95 px-1 py-0.5 shadow-[0_1px_4px_rgba(0,0,0,0.85)] pointer-events-none"
-              aria-label={`${elixirCost} эликсира`}
-            >
-              <ElixirIcon size={11} />
-              <span className="text-[10px] font-bold leading-none text-pink-300">{elixirCost}</span>
-            </span>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       className={cn(
@@ -176,12 +163,19 @@ export function CardTile({
     >
       <div
         className={cn(
-          "relative shrink-0 card-tile-wrap overflow-hidden",
+          "relative shrink-0 card-tile-wrap",
+          isCollection ? "overflow-visible collection-card-wrap" : "overflow-hidden",
           sizeClasses[size],
         )}
         title={nameRu(name)}
       >
-          <div className="card-tile-glow" aria-hidden />
+        {!isCollection && <div className="card-tile-glow" aria-hidden />}
+        <div
+          className={cn(
+            "relative h-full w-full",
+            isCollection && cardFrameClass(displayMode, rarity),
+          )}
+        >
           {src ? (
             <CardArt
               name={nameRu(name)}
@@ -192,36 +186,36 @@ export function CardTile({
               displayMode={displayMode}
             />
           ) : (
-            <div className="relative z-10 w-full h-full flex items-center justify-center text-xs font-bold text-cr-text">
+            <div className="relative z-10 flex h-full w-full items-center justify-center text-xs font-bold text-cr-text">
               {name.charAt(0)}
             </div>
           )}
-          {overlayLabel && (
-            <span
-              className={cn("card-name-deck-overlay", size === "lg" && "card-name-lg-overlay")}
-              title={nameRu(name)}
-            >
-              {label}
-            </span>
-          )}
-          {levelBadge != null && (
-            <span
-              className="absolute top-0 right-0 z-50 min-w-[1.1rem] px-1 py-0.5 rounded-md text-[10px] font-sans font-extrabold leading-none text-white bg-cr-bg/95 border border-cr-gold/40 pointer-events-none"
-              aria-label={`Уровень ${levelBadge}`}
-            >
-              {levelBadge}
-            </span>
-          )}
-          {badge != null && (
-            <span className="absolute bottom-0.5 right-0.5 z-20 px-1 py-0.5 rounded text-[10px] font-bold bg-cr-bg/90 text-cr-gold border border-cr-gold/30">
-              {badge}
-            </span>
-          )}
         </div>
+        {overlayLabel && (
+          <span
+            className={cn("card-name-deck-overlay", size === "lg" && "card-name-lg-overlay")}
+            title={nameRu(name)}
+          >
+            {label}
+          </span>
+        )}
+        {isCollection && levelBadge != null && <LevelBadge level={levelBadge} />}
+        {isCollection && elixirCost != null && <ElixirCostBadge cost={elixirCost} />}
+        {!isCollection && levelBadge != null && (
+          <span className="absolute top-0 right-0 z-50 min-w-[1.1rem] rounded-md border border-cr-gold/40 bg-cr-bg/95 px-1 py-0.5 text-[10px] font-sans font-extrabold leading-none text-white pointer-events-none">
+            {levelBadge}
+          </span>
+        )}
+        {badge != null && (
+          <span className="absolute bottom-0.5 right-0.5 z-20 rounded border border-cr-gold/30 bg-cr-bg/90 px-1 py-0.5 text-[10px] font-bold text-cr-gold">
+            {badge}
+          </span>
+        )}
+      </div>
       {showLabel && !overlayLabel && (
         <span
           className={cn(
-            "card-name-glow leading-none text-center truncate px-0.5 font-extrabold",
+            "card-name-glow truncate px-0.5 text-center font-extrabold leading-none",
             labelSizeClasses[size],
             labelClassName,
           )}
@@ -268,7 +262,7 @@ export function CardDeckGrid({
       {hidden > 0 && (
         <div
           className={cn(
-            "flex items-center justify-center text-xs font-semibold text-cr-muted shrink-0",
+            "flex shrink-0 items-center justify-center text-xs font-semibold text-cr-muted",
             sizeClasses[size],
           )}
         >
@@ -298,14 +292,14 @@ export function CardUsageCompactGrid({ items }: { items: CardUsageItem[] }) {
       {items.map((item) => (
         <div key={item.name} className="flex flex-col items-center gap-1.5 py-1">
           <CardTile name={item.name} size="grid" />
-          <p className="card-name-glow text-xs text-center truncate max-w-[5rem] px-0.5" title={nameRu(item.name)}>
+          <p className="card-name-glow max-w-[5rem] truncate px-0.5 text-center text-xs" title={nameRu(item.name)}>
             {nameShort(item.name)}
           </p>
-          <p className="text-[10px] text-cr-accent font-semibold">
+          <p className="text-[10px] font-semibold text-cr-accent">
             {item.count} игр
             {item.winrate != null ? ` · ${item.winrate.toFixed(0)}%` : ""}
           </p>
-          <div className="w-full h-1 bg-cr-border/40 rounded-full overflow-hidden">
+          <div className="h-1 w-full overflow-hidden rounded-full bg-cr-border/40">
             <div
               className="h-full rounded-full bg-gradient-to-r from-cr-blue to-cr-gold"
               style={{ width: `${Math.min((item.count / maxCount) * 100, 100)}%` }}
