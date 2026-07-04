@@ -52,15 +52,24 @@ export function AnalyticsPage() {
     void load();
   }, [load]);
 
-  const lastResults = useMemo(
-    () =>
-      (stats?.last_results ?? []).slice(-14).map((r, i) => ({
-        name: `Бой ${i + 1}`,
-        rate: r.trophy_change,
+  const lastResults = useMemo(() => {
+    const items = stats?.last_results ?? [];
+    return items.map((r) => {
+      const trophyChange = Number(r.trophy_change) || 0;
+      const date = r.played_date ?? "";
+      const time = r.played_time ?? "";
+      const opponent = r.opponent_name ?? "Соперник";
+      const label = date && time ? `${date} ${time}` : opponent;
+      return {
+        label,
+        trophyChange,
         won: r.won,
-      })),
-    [stats?.last_results],
-  );
+        opponentName: opponent,
+        playedDate: date,
+        playedTime: time,
+      };
+    });
+  }, [stats?.last_results]);
 
   const winrateByDay = useMemo(() => {
     const items = stats?.winrate_by_day ?? [];
@@ -193,18 +202,31 @@ export function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <Card>
           <h3 className="text-sm font-semibold text-cr-text mb-4">Рост трофеев</h3>
-          <div className="h-[220px]">
+          <div className="h-[260px]">
             {lastResults.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={lastResults}>
+                <LineChart data={lastResults} margin={{ bottom: 8, left: 4, right: 8 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} />
-                  <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#181830", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
-                    itemStyle={{ color: "#f3f4f6" }}
+                  <XAxis
+                    dataKey="label"
+                    stroke="#9ca3af"
+                    fontSize={10}
+                    tickLine={false}
+                    interval="preserveStartEnd"
+                    angle={-35}
+                    textAnchor="end"
+                    height={52}
                   />
-                  <Line type="monotone" dataKey="rate" stroke="#fbbf24" strokeWidth={3} dot={{ fill: "#fbbf24", r: 4 }} />
+                  <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip content={<TrophyGrowthTooltip />} />
+                  <Line
+                    type="monotone"
+                    dataKey="trophyChange"
+                    name="Кубки"
+                    stroke="#fbbf24"
+                    strokeWidth={3}
+                    dot={{ fill: "#fbbf24", r: 4 }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
@@ -284,3 +306,40 @@ export function AnalyticsPage() {
 }
 
 export { AnalyticsPage as default };
+
+type TrophyChartPoint = {
+  opponentName: string;
+  playedDate: string;
+  playedTime: string;
+  trophyChange: number;
+  won: boolean;
+};
+
+function TrophyGrowthTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: { payload: TrophyChartPoint }[];
+}) {
+  if (!active || !payload?.[0]) return null;
+  const point = payload[0].payload;
+  const delta = point.trophyChange;
+  return (
+    <div className="rounded-xl border border-white/10 bg-[#181830] px-3 py-2 text-xs shadow-lg">
+      <p className="font-semibold text-cr-text">vs {point.opponentName}</p>
+      {(point.playedDate || point.playedTime) && (
+        <p className="text-cr-muted mt-0.5">
+          {point.playedDate}
+          {point.playedDate && point.playedTime ? " · " : ""}
+          {point.playedTime}
+        </p>
+      )}
+      <p className={delta >= 0 ? "text-cr-win font-bold mt-1" : "text-cr-loss font-bold mt-1"}>
+        {delta > 0 ? "+" : ""}
+        {delta} кубков
+      </p>
+      <p className="text-cr-muted mt-0.5">{point.won ? "Победа" : "Поражение"}</p>
+    </div>
+  );
+}

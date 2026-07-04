@@ -334,7 +334,7 @@ export const api = {
 
 
 
-  getStats: () => cachedGet<StatsOverview>("stats-v2", "/api/stats", TTL.stats),
+  getStats: () => cachedGet<StatsOverview>("stats-v3", "/api/stats", TTL.stats),
 
 
 

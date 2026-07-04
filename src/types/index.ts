@@ -161,7 +161,13 @@ export interface StatsOverview {
   best_cards: { name: string; count: number }[];
   most_used_cards: { name: string; count: number; winrate: number }[];
   archetypes: { name: string; value: number }[];
-  last_results: { won: boolean; trophy_change: number }[];
+  last_results: {
+    won: boolean;
+    trophy_change: number;
+    opponent_name?: string;
+    played_date?: string;
+    played_time?: string;
+  }[];
   activity_heatmap: number[][];
   avg_time?: number;
 }
