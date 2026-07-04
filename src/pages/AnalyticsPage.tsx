@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LineChart,
   Line,
@@ -10,7 +11,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { TrendingUp, TrendingDown, Flame, Clock, Brain, Trophy, Swords } from "lucide-react";
+import { TrendingUp, TrendingDown, Flame, Clock, Brain, Trophy, Swords, ChevronRight } from "lucide-react";
 import { StatsOverview, InsightsData } from "@/types";
 import { Card, Loader, Skeleton } from "@/components/ui";
 import { CardUsageGrid } from "@/components/cards";
@@ -18,6 +19,7 @@ import { api, ApiError } from "@/api/client";
 import { usePageRefresh } from "@/hooks";
 
 export function AnalyticsPage() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<StatsOverview | null>(null);
   const [insights, setInsights] = useState<InsightsData | null>(null);
   const [insightsError, setInsightsError] = useState<string | null>(null);
@@ -123,10 +125,12 @@ export function AnalyticsPage() {
 
           <div className="space-y-3">
             {insights.insights.map((item) => (
-              <div
+              <button
                 key={item.battle_index}
+                type="button"
+                onClick={() => navigate(`/battles/${item.battle_index}`)}
                 className={
-                  "rounded-xl border p-3 " +
+                  "w-full text-left rounded-xl border p-3 transition-colors hover:border-cr-gold/40 " +
                   (item.won ? "border-cr-win/25 bg-cr-win/5" : "border-cr-loss/25 bg-cr-loss/5")
                 }
               >
@@ -136,21 +140,25 @@ export function AnalyticsPage() {
                   ) : (
                     <Swords className="w-4 h-4 text-cr-loss shrink-0 mt-0.5" />
                   )}
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs text-cr-accent font-semibold mb-0.5">vs {item.opponent_name}</p>
                     <p className="text-sm text-cr-text leading-snug">{item.summary}</p>
+                    {item.matchup_score > 0 ? (
+                      <p className="text-[11px] text-cr-muted mt-1">Матчап: {item.matchup_score.toFixed(0)}/100</p>
+                    ) : null}
                   </div>
+                  <ChevronRight className="w-5 h-5 text-cr-muted shrink-0 mt-0.5" />
                 </div>
                 {item.details.length > 0 && (
                   <ul className="mt-2 space-y-1 pl-6">
                     {item.details.slice(0, 2).map((d, i) => (
                       <li key={i} className="text-[11px] text-cr-accent/90 font-medium leading-snug">
-                        {d.replace(/^[^\w\u0400-\u04FF]+/, "")}
+                        {d}
                       </li>
                     ))}
                   </ul>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         </Card>

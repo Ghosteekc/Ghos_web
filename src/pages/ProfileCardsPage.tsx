@@ -61,7 +61,7 @@ export function ProfileCardsPage() {
                 iconHero={card.icon_hero}
                 displayMode={card.display_mode}
                 size="collection"
-                levelBadge={card.owned && card.level != null ? card.level : undefined}
+                levelBadge={card.owned && card.level != null && card.level > 0 ? card.level : undefined}
               />
             </div>
           ))}

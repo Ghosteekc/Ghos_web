@@ -78,6 +78,10 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
               <ChevronRight className="w-5 h-5" />
             </motion.div>
           </div>
+
+          {summary.top_reason ? (
+            <p className="text-xs text-cr-muted mt-3 leading-snug line-clamp-2">{summary.top_reason}</p>
+          ) : null}
         </div>
       </Card>
     </motion.div>

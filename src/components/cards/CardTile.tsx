@@ -127,51 +127,58 @@ export function CardTile({
     >
       <div
         className={cn(
-          "relative shrink-0 card-tile-wrap overflow-hidden",
+          "relative shrink-0",
           sizeClasses[size],
-          isCollection && "collection-card-wrap",
+          isCollection && "collection-tile-shell",
         )}
         title={nameRu(name)}
       >
-        <div className="card-tile-glow" aria-hidden />
-        {src ? (
-          <CardArt
-            name={nameRu(name)}
-            src={src}
-            iconBase={iconBase ?? src}
-            iconEvo={iconEvo}
-            iconHero={iconHero}
-            displayMode={displayMode}
-          />
-        ) : (
-          <div className="relative z-10 w-full h-full flex items-center justify-center text-xs font-bold text-cr-text">
-            {name.charAt(0)}
-          </div>
-        )}
-        {overlayLabel && (
-          <span
-            className={cn("card-name-deck-overlay", size === "lg" && "card-name-lg-overlay")}
-            title={nameRu(name)}
-          >
-            {label}
-          </span>
-        )}
-        {levelBadge != null && (
-          <span
-            className={cn(
-              "absolute z-50 font-cr font-extrabold leading-none text-cr-gold pointer-events-none",
-              isCollection
-                ? "collection-level-badge"
-                : "top-0 right-0 min-w-[1.1rem] px-1 py-0.5 rounded-md text-[10px] bg-cr-bg/95 border border-cr-gold/40",
-            )}
-            aria-label={`Уровень ${levelBadge}`}
-          >
+        <div
+          className={cn(
+            "relative w-full h-full card-tile-wrap overflow-hidden",
+            isCollection && "collection-card-wrap",
+          )}
+        >
+          <div className="card-tile-glow" aria-hidden />
+          {src ? (
+            <CardArt
+              name={nameRu(name)}
+              src={src}
+              iconBase={iconBase ?? src}
+              iconEvo={iconEvo}
+              iconHero={iconHero}
+              displayMode={displayMode}
+            />
+          ) : (
+            <div className="relative z-10 w-full h-full flex items-center justify-center text-xs font-bold text-cr-text">
+              {name.charAt(0)}
+            </div>
+          )}
+          {overlayLabel && (
+            <span
+              className={cn("card-name-deck-overlay", size === "lg" && "card-name-lg-overlay")}
+              title={nameRu(name)}
+            >
+              {label}
+            </span>
+          )}
+          {!isCollection && levelBadge != null && (
+            <span
+              className="absolute top-0 right-0 z-50 min-w-[1.1rem] px-1 py-0.5 rounded-md text-[10px] font-cr font-extrabold leading-none text-cr-gold bg-cr-bg/95 border border-cr-gold/40 pointer-events-none"
+              aria-label={`Уровень ${levelBadge}`}
+            >
+              {levelBadge}
+            </span>
+          )}
+          {badge != null && (
+            <span className="absolute bottom-0.5 right-0.5 z-20 px-1 py-0.5 rounded text-[10px] font-bold bg-cr-bg/90 text-cr-gold border border-cr-gold/30">
+              {badge}
+            </span>
+          )}
+        </div>
+        {isCollection && levelBadge != null && (
+          <span className="collection-level-badge" aria-label={`Уровень ${levelBadge}`}>
             {levelBadge}
-          </span>
-        )}
-        {badge != null && (
-          <span className="absolute bottom-0.5 right-0.5 z-20 px-1 py-0.5 rounded text-[10px] font-bold bg-cr-bg/90 text-cr-gold border border-cr-gold/30">
-            {badge}
           </span>
         )}
       </div>

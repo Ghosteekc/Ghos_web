@@ -75,24 +75,31 @@ export interface BattleSummary {
   played_at?: string;
 }
 
+export interface KeyCardEntry {
+  name: string;
+  name_ru: string;
+  note: string;
+}
+
 export interface BattleDetail {
   index: number;
   won: boolean;
   opponent_name: string;
-  opponent_tag: string;
-  opponent_trophies: number;
   trophy_change: number;
   matchup_score: number;
   duration: number;
   played_at?: string;
-  avg_elixir: number;
-  best_moment: string | null;
+  crown_score?: string;
+  outcome_summary?: string;
   user_deck: string[];
   opponent_deck: string[];
   user_stats: { avg_elixir: number; win_conditions: string[]; spells: string[] };
   opponent_stats: { avg_elixir: number; win_conditions: string[]; spells: string[] };
   reasons: string[];
   opponent_threats: string[];
+  user_key_cards?: KeyCardEntry[];
+  opponent_key_cards?: KeyCardEntry[];
+  low_impact_cards?: KeyCardEntry[];
 }
 
 export interface DeckCard {

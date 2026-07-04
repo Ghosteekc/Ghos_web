@@ -367,24 +367,33 @@
     isolation: isolate;
   }
 
-  .collection-card-wrap {
+  .collection-tile-shell {
     overflow: visible;
   }
 
+  .collection-card-wrap {
+    overflow: hidden;
+  }
+
   .collection-level-badge {
-    top: 2px;
-    right: 2px;
-    min-width: 1.55rem;
-    padding: 0.12rem 0.32rem;
-    font-size: 0.78rem;
-    line-height: 1;
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    z-index: 60;
+    min-width: 1.35rem;
+    padding: 0.1rem 0.28rem;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
     text-align: center;
-    color: rgb(var(--cr-gold));
-    background: rgba(8, 6, 2, 0.96);
-    border: 2px solid rgba(251, 191, 36, 0.85);
-    border-radius: 0.28rem;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
-    text-shadow: var(--cr-stroke-body);
+    color: #fff;
+    background: linear-gradient(180deg, rgba(28, 20, 4, 0.98) 0%, rgba(8, 6, 2, 0.98) 100%);
+    border: 2px solid rgba(251, 191, 36, 0.95);
+    border-radius: 0.3rem;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
+    pointer-events: none;
   }
 
   .card-tile-glow {
