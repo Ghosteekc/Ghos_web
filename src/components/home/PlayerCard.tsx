@@ -3,7 +3,7 @@ import { Profile } from "@/types";
 import { CircularProgress, LinearProgress } from "@/components/ui/Progress";
 import { Trophy, Crown, Flame, Sword, Clock, Zap, TrendingUp, TrendingDown } from "lucide-react";
 import { UI } from "@/constants/labels";
-import { formatNumber, getWinColor, getTrophyChangeColor, cn, formatPlayerTag } from "@/utils";
+import { formatNumber, getTrophyChangeColor, cn, formatPlayerTag } from "@/utils";
 import { useCardCatalog } from "@/hooks/CardCatalogProvider";
 import { Card, Skeleton } from "@/components/ui";
 
@@ -88,17 +88,11 @@ export function PlayerCard({ profile, loading }: PlayerCardProps) {
               {profile.max_trophies != null ? formatNumber(profile.max_trophies) : "—"}
             </span>
           </div>
-          <div className="text-center">
-            <p className="text-xs text-cr-muted mb-1">{UI.winrate}</p>
-            <span className={cn("text-2xl font-bold", getWinColor(profile.winrate ?? 50))}>
-              {profile.winrate?.toFixed(1) ?? "—"}%
-            </span>
-          </div>
           <CircularProgress
             value={profile.winrate ?? 50}
             size={100}
             strokeWidth={6}
-            label={profile.winrate ? `${profile.winrate.toFixed(0)}%` : "—"}
+            label={profile.winrate != null ? `${profile.winrate.toFixed(1)}%` : "—"}
             sublabel={UI.winrate}
             color={profile.winrate && profile.winrate >= 50 ? "#22c55e" : "#ef4444"}
           />
