@@ -1,2 +1,2 @@
 export { PlayerCard } from "./PlayerCard";
-export { StatsGrid } from "./StatsGrid";
+export { HomeStatsCard } from "./HomeStatsCard";
