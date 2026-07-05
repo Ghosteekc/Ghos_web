@@ -4,7 +4,7 @@ import { api, ApiError } from "@/api/client";
 import { Profile } from "@/types";
 import { usePageRefresh } from "@/hooks";
 import { PlayerCard, HomeServicePanel, SupercellDisclaimer } from "@/components/home";
-import { Card, Button, SkeletonGroup } from "@/components/ui";
+import { Card, Button, Loader } from "@/components/ui";
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -31,12 +31,7 @@ export function HomePage() {
   }, [load]);
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <SkeletonGroup count={1} />
-        <SkeletonGroup count={2} />
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error || !profile) {

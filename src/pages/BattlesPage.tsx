@@ -7,7 +7,7 @@ import {
   Filter,
   RefreshCw,
 } from "lucide-react";
-import { Card, Button, Loader, SkeletonGroup } from "@/components/ui";
+import { Card, Button, Loader } from "@/components/ui";
 import { BattleCardSimple } from "@/components/battles/BattleCard";
 import { api, ApiError } from "@/api/client";
 import { BattleSummary } from "@/types";
@@ -79,7 +79,7 @@ export function BattlesPage() {
       )}
 
       {loading ? (
-        <SkeletonGroup count={5} />
+        <Loader />
       ) : (
         <div className="space-y-4">
           {filtered.map((battle, i) => (

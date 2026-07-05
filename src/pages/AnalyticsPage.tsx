@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import { TrendingUp, TrendingDown, Flame, Clock, Brain, Trophy, Swords, ChevronRight } from "lucide-react";
 import { StatsOverview, InsightsData } from "@/types";
-import { Card, Loader, Skeleton } from "@/components/ui";
+import { Card, Loader } from "@/components/ui";
 import { CardUsageGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { usePageRefresh } from "@/hooks";
@@ -90,16 +90,7 @@ export function AnalyticsPage() {
   const mostUsedCards = useMemo(() => stats?.most_used_cards ?? [], [stats?.most_used_cards]);
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <Loader />
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i} className="h-[220px]">
-            <Skeleton className="h-full w-full" />
-          </Card>
-        ))}
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error || !stats) {

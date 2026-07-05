@@ -2,7 +2,7 @@ import { Profile } from "@/types";
 import { Crown, Flame } from "lucide-react";
 import { formatPlayerTag } from "@/utils";
 import { useCardCatalog } from "@/hooks/CardCatalogProvider";
-import { Card, Skeleton } from "@/components/ui";
+import { Card, Loader } from "@/components/ui";
 
 interface PlayerCardProps {
   profile: Profile;
@@ -15,14 +15,7 @@ export function PlayerCard({ profile, loading }: PlayerCardProps) {
   if (loading) {
     return (
       <Card delay={0} className="overflow-hidden">
-        <div className="flex items-center gap-5">
-          <Skeleton className="w-20 h-20 rounded-full" />
-          <div className="flex-1 space-y-3">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20" />
-          </div>
-        </div>
+        <Loader compact showLabel={false} />
       </Card>
     );
   }

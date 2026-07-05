@@ -5,7 +5,6 @@ import {
   X,
   User,
   Trophy,
-  Loader2,
 } from "lucide-react";
 import { Card, Button } from "@/components/ui";
 import { api, ApiError } from "@/api/client";
@@ -88,8 +87,13 @@ export function SearchPage() {
           </button>
         )}
         {loading && (
-          <div className="absolute right-12 top-1/2 -translate-y-1/2">
-            <Loader2 className="w-5 h-5 animate-spin text-cr-gold" />
+          <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none">
+            <img
+              src="/pekka-butterfly.gif"
+              alt=""
+              aria-hidden
+              className="w-6 h-6 object-contain"
+            />
           </div>
         )}
       </div>

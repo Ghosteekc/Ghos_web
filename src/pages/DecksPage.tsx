@@ -14,7 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { Card, Button, SkeletonGroup, ElixirIcon } from "@/components/ui";
+import { Card, Button, Loader, ElixirIcon } from "@/components/ui";
 import { CardTile } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import type { Deck, DeckCard, DeckCompareResult, RandomDeck, TopPlayer } from "@/types";
@@ -153,7 +153,7 @@ export function DecksPage() {
       )}
 
       {loading && filter !== "random" && filter !== "top" && filter !== "arena" ? (
-        <SkeletonGroup count={4} />
+        <Loader />
       ) : filter === "random" ? (
         <RandomDeckPanel
           onCopied={(msg) => {
@@ -299,7 +299,7 @@ function ArenaPanel({ onCopied }: { onCopied: (msg: string) => void }) {
     }
   };
 
-  if (loading) return <SkeletonGroup count={3} />;
+  if (loading) return <Loader />;
 
   if (error) {
     return (
@@ -387,7 +387,7 @@ function TopPlayersPanel({ onCopied }: { onCopied: (msg: string) => void }) {
     }
   };
 
-  if (loading) return <SkeletonGroup count={3} />;
+  if (loading) return <Loader />;
 
   if (error) {
     return (
@@ -595,7 +595,7 @@ function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
     return (
       <div className="space-y-3">
         <RoflModeBar rofl={rofl} onRoflChange={setRofl} />
-        <SkeletonGroup count={1} />
+        <Loader />
       </div>
     );
   }
