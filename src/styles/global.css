@@ -433,6 +433,49 @@
     clip-path: polygon(50% 0%, 93% 16%, 93% 84%, 50% 100%, 7% 84%, 7% 16%);
   }
 
+  .collection-stat-evo {
+    color: #c084fc;
+    text-shadow: var(--cr-stroke-body);
+  }
+
+  .collection-stat-champion {
+    color: #fbbf24;
+    text-shadow: var(--cr-stroke-title);
+  }
+
+  .collection-stat-epic {
+    color: #f472b6;
+    text-shadow: var(--cr-stroke-body);
+  }
+
+  .collection-stat-common {
+    color: #38bdf8;
+    text-shadow: var(--cr-stroke-body);
+  }
+
+  .collection-stat-rare {
+    color: #fb923c;
+    text-shadow: var(--cr-stroke-body);
+  }
+
+  .collection-stat-hero {
+    background: linear-gradient(90deg, #fbbf24 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.85));
+  }
+
+  .collection-stat-legendary {
+    background: linear-gradient(90deg, #a3e635 0%, #f472b6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.85));
+  }
+
   .cr-level-badge {
     position: absolute;
     right: -2px;

@@ -12,13 +12,13 @@ interface CollectionStatsGridProps {
 }
 
 const STAT_ITEMS = [
-  { key: "evolution_count", label: "Эволюции" },
-  { key: "hero_count", label: "Герои" },
-  { key: "champion_count", label: "Чемпионы" },
-  { key: "legendary_count", label: "Легендарные" },
-  { key: "epic_count", label: "Эпические" },
-  { key: "rare_count", label: "Редкие" },
-  { key: "common_count", label: "Обычные" },
+  { key: "evolution_count", label: "Эволюции", tone: "collection-stat-evo" },
+  { key: "hero_count", label: "Герои", tone: "collection-stat-hero" },
+  { key: "champion_count", label: "Чемпионы", tone: "collection-stat-champion" },
+  { key: "legendary_count", label: "Легендарные", tone: "collection-stat-legendary" },
+  { key: "epic_count", label: "Эпические", tone: "collection-stat-epic" },
+  { key: "rare_count", label: "Редкие", tone: "collection-stat-rare" },
+  { key: "common_count", label: "Обычные", tone: "collection-stat-common" },
 ] as const;
 
 export function CollectionStatsGrid({ stats }: CollectionStatsGridProps) {
@@ -29,10 +29,10 @@ export function CollectionStatsGrid({ stats }: CollectionStatsGridProps) {
         <p className="text-lg font-bold text-cr-gold tabular-nums">{stats.collection_level}</p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        {STAT_ITEMS.map(({ key, label }) => (
+        {STAT_ITEMS.map(({ key, label, tone }) => (
           <div key={key} className="rounded-xl bg-cr-bg/50 px-3 py-2">
-            <p className="text-[11px] text-cr-muted">{label}</p>
-            <p className="text-sm font-bold text-cr-text tabular-nums">{stats[key]}</p>
+            <p className={`text-[11px] font-semibold uppercase tracking-wide ${tone}`}>{label}</p>
+            <p className={`text-sm font-bold tabular-nums mt-0.5 ${tone}`}>{stats[key]}</p>
           </div>
         ))}
       </div>
