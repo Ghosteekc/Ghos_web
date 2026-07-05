@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowDown, ArrowLeft, ArrowUp } from "lucide-react";
 import { Card, Button, Loader } from "@/components/ui";
 import { CardTile } from "@/components/cards";
+import { CollectionStatsGrid } from "@/components/profile/CollectionStatsGrid";
 import { usePlayerCollection } from "@/hooks/usePlayerCollection";
 import { usePageRefresh, useCardCatalog } from "@/hooks";
 import type { CollectionCardEntry } from "@/types";
@@ -121,7 +122,9 @@ export function ProfileCardsPage() {
       <PageHeader title="Коллекция карт" onBack={() => navigate("/profile")} />
 
       <Card>
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <CollectionStatsGrid stats={data} />
+
+        <div className="flex flex-wrap items-center justify-between gap-2 mt-5 mb-3 pt-4 border-t border-cr-border">
           <p className="text-sm text-cr-text font-semibold">
             {data.cards_owned} / {data.cards_total} карт
           </p>

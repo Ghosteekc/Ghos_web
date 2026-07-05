@@ -1,42 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, ArrowUpRight } from "lucide-react";
 import { api, ApiError } from "@/api/client";
-import { Profile, BattleSummary, StatsOverview } from "@/types";
+import { Profile } from "@/types";
 import { usePageRefresh } from "@/hooks";
-import { PlayerCard, HomeStatsCard } from "@/components/home";
+import { PlayerCard, HomeServicePanel, SupercellDisclaimer } from "@/components/home";
 import { Card, Button, SkeletonGroup } from "@/components/ui";
-import { BattleCardSimple } from "@/components/battles/BattleCard";
 
 export function HomePage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [battles, setBattles] = useState<BattleSummary[]>([]);
-  const [stats, setStats] = useState<StatsOverview | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [partialWarning, setPartialWarning] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setPartialWarning(null);
     try {
       setError(null);
-      const data = await api.getHome();
-      setProfile(data.profile);
-      setBattles(data.battles ?? []);
-      setStats(data.stats);
+      const data = await api.getProfile();
+      setProfile(data);
     } catch (e) {
-      const msg = e instanceof ApiError ? e.message : "Ошибка загрузки";
-      try {
-        const p = await api.getProfile();
-        setProfile(p);
-        setBattles([]);
-        setStats(null);
-        setPartialWarning(msg);
-        setError(null);
-      } catch {
-        setError(msg);
-      }
+      setError(e instanceof ApiError ? e.message : "Ошибка загрузки");
     } finally {
       setLoading(false);
     }
@@ -51,8 +33,8 @@ export function HomePage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <SkeletonGroup count={2} />
         <SkeletonGroup count={1} />
+        <SkeletonGroup count={2} />
       </div>
     );
   }
@@ -69,73 +51,11 @@ export function HomePage() {
     );
   }
 
-  const lastBattle = battles[0];
-  const lastResult = lastBattle
-    ? lastBattle.won
-      ? `Победа над ${lastBattle.opponent_name}`
-      : `Поражение от ${lastBattle.opponent_name}`
-    : "Нет данных";
-
   return (
     <div className="space-y-6">
-      {partialWarning && (
-        <Card className="!py-3 !px-4 border-cr-gold/30 bg-cr-gold/5">
-          <p className="text-xs text-cr-muted">{partialWarning}</p>
-          <p className="text-xs text-cr-gold mt-1">Профиль загружен. Бои и статистика подгрузятся позже.</p>
-        </Card>
-      )}
-
       <PlayerCard profile={profile} />
-
-      {stats && (
-        <HomeStatsCard
-          stats={stats}
-          profile={profile}
-          onOpenAnalytics={() => navigate("/analytics")}
-        />
-      )}
-
-      <Card className="cursor-pointer group" onClick={() => navigate("/battles")}>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-cr-muted mb-1">Последний бой</p>
-            <p className="text-sm font-semibold text-cr-text">{lastResult}</p>
-            {lastBattle && (
-              <p className={"text-xs mt-1 " + (lastBattle.won ? "text-cr-win" : "text-cr-loss")}>
-                {lastBattle.won ? "+" : ""}{lastBattle.trophy_change} 🏆
-              </p>
-            )}
-          </div>
-          <div className="p-3 rounded-xl bg-cr-blue/10 group-hover:bg-cr-blue/20 transition-colors">
-            <ArrowUpRight className="w-5 h-5 text-cr-blue" />
-          </div>
-        </div>
-      </Card>
-
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-cr-text">Последние бои</h3>
-          <Button variant="ghost" onClick={() => navigate("/battles")} className="!px-3 !py-1.5 text-xs">
-            Все <ChevronRight className="w-3.5 h-3.5 ml-1" />
-          </Button>
-        </div>
-        <div className="space-y-3">
-          {battles.length > 0 ? (
-            battles.slice(0, 8).map((battle, i) => (
-              <BattleCardSimple
-                key={battle.index}
-                summary={battle}
-                index={i}
-                onOpen={() => navigate(`/battles/${battle.index}`)}
-              />
-            ))
-          ) : (
-            <Card className="text-center text-cr-muted text-sm">
-              История боёв пуста. Убедитесь, что подписка активна и тег привязан.
-            </Card>
-          )}
-        </div>
-      </div>
+      <HomeServicePanel profile={profile} onNavigate={navigate} />
+      <SupercellDisclaimer />
     </div>
   );
 }

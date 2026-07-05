@@ -3,6 +3,20 @@ export interface PlayerCollectionData {
   cards_owned: number;
   cards_total: number;
   masteries: CollectionMasteryEntry[];
+  collection_level: number;
+  evolution_count: number;
+  hero_count: number;
+  champion_count: number;
+  legendary_count: number;
+  epic_count: number;
+  rare_count: number;
+  common_count: number;
+  cards_by_level: CardLevelCount[];
+}
+
+export interface CardLevelCount {
+  level: number;
+  count: number;
 }
 
 export type CardDisplayMode = "base" | "evo" | "hero" | "split";
@@ -58,6 +72,10 @@ export interface Profile {
   daily_trophy_change: number | null;
   max_trophies: number | null;
   clan_name: string | null;
+  total_wins: number | null;
+  three_crown_wins: number | null;
+  collection_level: number | null;
+  cards_by_level: CardLevelCount[];
 }
 
 export interface BattleSummary {

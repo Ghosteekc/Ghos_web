@@ -6,25 +6,19 @@ import {
   Settings,
   TrendingUp,
   TrendingDown,
+  Crown,
+  Swords,
+  Layers,
 } from "lucide-react";
 import { Card, Button, Loader } from "@/components/ui";
 import { ProfileCollectionNav } from "@/components/profile/ProfileCollectionNav";
+import { CardLevelScale } from "@/components/profile/CardLevelScale";
 import { useTelegram, usePageRefresh } from "@/hooks";
 import { api } from "@/api/client";
 import { Profile } from "@/types";
 import { formatNumber, getWinColor, formatPlayerTag, getTrophyChangeColor } from "@/utils";
 import { UI } from "@/constants/labels";
 import { useCardCatalog } from "@/hooks/CardCatalogProvider";
-
-function formatSubscription(subscription: Profile["subscription"]) {
-  if (!subscription.active) {
-    return { label: "Не активна", hint: subscription.trial_used ? "Пробный период использован" : "Оформите подписку" };
-  }
-  const expires = subscription.expires_at
-    ? `до ${new Date(subscription.expires_at).toLocaleDateString("ru")}`
-    : "";
-  return { label: "Premium", hint: expires ? `Активна ${expires}` : "Активна" };
-}
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -56,7 +50,6 @@ export function ProfilePage() {
     return <Loader />;
   }
 
-  const subscription = profile ? formatSubscription(profile.subscription) : null;
   const dailyTrophies = profile?.daily_trophy_change;
 
   return (
@@ -168,13 +161,45 @@ export function ProfilePage() {
 
         <Card>
           <div className="flex items-center gap-3 mb-3">
-            <Trophy className="w-5 h-5 text-cr-gold shrink-0" />
-            <h3 className="text-sm font-semibold text-cr-text">Подписка</h3>
+            <Swords className="w-5 h-5 text-cr-win shrink-0" />
+            <h3 className="text-sm font-semibold text-cr-text">Победы</h3>
           </div>
-          <p className="text-lg font-bold text-cr-text">{subscription?.label ?? "—"}</p>
-          <p className="text-label mt-1">{subscription?.hint ?? "—"}</p>
+          <p className="text-2xl font-bold text-cr-text">
+            {profile?.total_wins != null ? formatNumber(profile.total_wins) : "—"}
+          </p>
+          <p className="text-label mt-1">Суммарно за карьеру</p>
+        </Card>
+
+        <Card>
+          <div className="flex items-center gap-3 mb-3">
+            <Crown className="w-5 h-5 text-cr-gold shrink-0" />
+            <h3 className="text-sm font-semibold text-cr-text">На 3 короны</h3>
+          </div>
+          <p className="text-2xl font-bold text-cr-text">
+            {profile?.three_crown_wins != null ? formatNumber(profile.three_crown_wins) : "—"}
+          </p>
+          <p className="text-label mt-1">Побед с полным разгромом</p>
+        </Card>
+
+        <Card>
+          <div className="flex items-center gap-3 mb-3">
+            <Layers className="w-5 h-5 text-cr-blue shrink-0" />
+            <h3 className="text-sm font-semibold text-cr-text">Уровень коллекции</h3>
+          </div>
+          <p className="text-2xl font-bold text-cr-gold">
+            {profile?.collection_level != null ? formatNumber(profile.collection_level) : "—"}
+          </p>
+          <p className="text-label mt-1">Сумма уровней карт + эво/герои</p>
         </Card>
       </div>
+
+      {(profile?.cards_by_level?.length ?? 0) > 0 && (
+        <Card>
+          <h3 className="text-sm font-semibold text-cr-text mb-1">Карты по уровням</h3>
+          <p className="text-[11px] text-cr-muted mb-4">Сколько карт прокачано на каждый уровень</p>
+          <CardLevelScale rows={profile!.cards_by_level} />
+        </Card>
+      )}
 
       <ProfileCollectionNav />
 

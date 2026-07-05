@@ -1,2 +1,3 @@
 export { PlayerCard } from "./PlayerCard";
-export { HomeStatsCard } from "./HomeStatsCard";
+export { HomeServicePanel } from "./HomeServicePanel";
+export { SupercellDisclaimer } from "./SupercellDisclaimer";
