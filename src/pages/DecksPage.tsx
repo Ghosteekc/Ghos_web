@@ -10,8 +10,6 @@ import {
   Trophy,
   Users,
   Swords,
-  ChevronDown,
-  ChevronUp,
   ChevronLeft,
   ChevronRight,
   BarChart3,
@@ -19,7 +17,7 @@ import {
 import { Card, Button, Loader, ElixirIcon } from "@/components/ui";
 import { CardTile } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
-import type { Deck, DeckCard, DeckCompareCardNote, DeckCompareResult, RandomDeck, TopPlayer } from "@/types";
+import type { Deck, DeckCard, RandomDeck, TopPlayer } from "@/types";
 import { usePageRefresh, useTelegram } from "@/hooks";
 
 import { DECK_CATEGORY_LABELS, DECK_FILTER_LABELS, UI } from "@/constants/labels";
@@ -228,141 +226,25 @@ export function DecksPage() {
 
 export { DecksPage as default };
 
-function CompareBlock({ title, items, tone }: { title: string; items: string[]; tone: "win" | "loss" | "muted" }) {
-  if (!items.length) return null;
-  const color =
-    tone === "win" ? "text-cr-win" : tone === "loss" ? "text-cr-loss" : "text-cr-muted";
-  return (
-    <div className="mt-2">
-      <p className={"text-xs font-semibold mb-1 " + color}>{title}</p>
-      <ul className="space-y-1">
-        {items.map((line) => (
-          <li key={line} className="text-xs text-cr-text leading-snug">
-            {line}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function noteToneClass(tone: DeckCompareCardNote["tone"]): string {
-  if (tone === "good") return "border-cr-win/30 bg-cr-win/5";
-  if (tone === "bad") return "border-cr-loss/30 bg-cr-loss/5";
-  if (tone === "warn") return "border-cr-gold/30 bg-cr-gold/5";
-  return "border-cr-border bg-cr-bg/30";
-}
-
-function CardCompareNote({ note, icon }: { note: DeckCompareCardNote; icon?: string }) {
-  return (
-    <li className={"rounded-lg border px-2.5 py-2 flex gap-2.5 " + noteToneClass(note.tone)}>
-      {icon ? (
-        <img src={icon} alt={note.card_ru || note.card} className="w-9 h-11 shrink-0 object-contain" loading="lazy" />
-      ) : null}
-      <p className="text-xs text-cr-text leading-snug min-w-0">{note.text}</p>
-    </li>
-  );
-}
-
-function CardCompareSection({
-  title,
-  notes,
-  deck,
-}: {
-  title: string;
-  notes: DeckCompareCardNote[];
-  deck: DeckCard[];
-}) {
-  const icons = new Map(deck.map((c) => [c.name, c.icon]));
-  if (!notes.length) return null;
-  return (
-    <Card className="!p-3 bg-cr-bg/40">
-      <p className="text-xs font-semibold text-cr-text mb-2">{title}</p>
-      <ul className="space-y-2">
-        {notes.map((note) => (
-          <CardCompareNote key={note.card} note={note} icon={icons.get(note.card)} />
-        ))}
-      </ul>
-    </Card>
-  );
-}
-
-function DeckComparePanel({
-  data,
-  referenceLabel = "Колода соперника",
-}: {
-  data: DeckCompareResult;
-  referenceLabel?: string;
-}) {
-  const userScore = data.matchup_score ?? 50;
-  const refScore = data.opponent_matchup_score ?? 50;
-
-  return (
-    <div className="mt-4 pt-4 border-t border-cr-border space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-cr text-cr-gold">Сравнение с «{data.reference_name}»</p>
-        <div className="text-right shrink-0">
-          <p className="text-[10px] text-cr-muted">Матчап</p>
-          <p className={"text-sm font-bold tabular-nums " + (userScore >= 50 ? "text-cr-win" : "text-cr-loss")}>
-            {userScore.toFixed(0)} / 100
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 text-center text-[10px]">
-        <div className="rounded-lg border border-cr-win/25 bg-cr-win/5 px-2 py-1.5">
-          <p className="text-cr-muted">Ваша колода</p>
-          <p className="font-bold text-cr-win">{userScore.toFixed(0)}%</p>
-        </div>
-        <div className="rounded-lg border border-cr-loss/25 bg-cr-loss/5 px-2 py-1.5">
-          <p className="text-cr-muted">{referenceLabel}</p>
-          <p className="font-bold text-cr-loss">{refScore.toFixed(0)}%</p>
-        </div>
-      </div>
-
-      <CardCompareSection
-        title="Ваша колода — карта за картой"
-        notes={data.user_card_notes ?? []}
-        deck={data.user_deck ?? []}
-      />
-      <CardCompareSection
-        title={`${referenceLabel} — карта за картой`}
-        notes={data.reference_card_notes ?? []}
-        deck={data.reference_deck ?? []}
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Card className="!p-3 bg-cr-bg/40">
-          <p className="text-xs font-semibold text-cr-text mb-2">Итог: ваша колода</p>
-          <CompareBlock title="Сильнее" items={data.user_better} tone="win" />
-          <CompareBlock title="Слабее" items={data.user_worse} tone="loss" />
-        </Card>
-        <Card className="!p-3 bg-cr-bg/40">
-          <p className="text-xs font-semibold text-cr-text mb-2">Итог: {referenceLabel.toLowerCase()}</p>
-          <CompareBlock title="Сильнее вашей" items={data.reference_better} tone="win" />
-          <CompareBlock title="Слабее вашей" items={data.reference_worse} tone="loss" />
-        </Card>
-      </div>
-    </div>
-  );
+function buildComparePath(deck: Deck, fromTab = "arena"): string {
+  const names = deck.cards.map((c) => c.name);
+  if (names.length !== 8) return "";
+  const ref = names.map(encodeURIComponent).join("|");
+  const name = encodeURIComponent(deck.name ?? "Колода");
+  return `/decks/compare?ref=${ref}&name=${name}&from=${fromTab}`;
 }
 
 function ArenaPanel({ onCopied }: { onCopied: (msg: string) => void }) {
+  const navigate = useNavigate();
   const [decks, setDecks] = useState<Deck[]>([]);
   const [arenaName, setArenaName] = useState("");
   const [trophies, setTrophies] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [compareData, setCompareData] = useState<DeckCompareResult | null>(null);
-  const [compareLoading, setCompareLoading] = useState(false);
-  const [compareError, setCompareError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    setExpandedId(null);
-    setCompareData(null);
     try {
       const data = await api.getArenaDecks();
       setDecks(data.decks ?? []);
@@ -379,28 +261,6 @@ function ArenaPanel({ onCopied }: { onCopied: (msg: string) => void }) {
   useEffect(() => {
     void load();
   }, [load]);
-
-  const runCompare = async (deck: Deck) => {
-    const names = deck.cards.map((c) => c.name);
-    if (names.length !== 8) return;
-    if (expandedId === deck.id && compareData) {
-      setExpandedId(null);
-      setCompareData(null);
-      return;
-    }
-    setExpandedId(deck.id);
-    setCompareLoading(true);
-    setCompareError(null);
-    setCompareData(null);
-    try {
-      const result = await api.compareDeck(names);
-      setCompareData(result);
-    } catch (e) {
-      setCompareError(e instanceof ApiError ? e.message : "Не удалось сравнить колоды");
-    } finally {
-      setCompareLoading(false);
-    }
-  };
 
   if (loading) return <Loader />;
 
@@ -436,11 +296,10 @@ function ArenaPanel({ onCopied }: { onCopied: (msg: string) => void }) {
               index={i}
               onCopied={onCopied}
               showCompare
-              compareOpen={expandedId === deck.id}
-              compareLoading={expandedId === deck.id && compareLoading}
-              compareError={expandedId === deck.id ? compareError : null}
-              compareData={expandedId === deck.id ? compareData : null}
-              onCompare={() => void runCompare(deck)}
+              onCompare={() => {
+                const path = buildComparePath(deck, "arena");
+                if (path) navigate(path);
+              }}
             />
           </div>
         ))}
@@ -780,10 +639,6 @@ function DeckCard({
   index,
   onCopied,
   showCompare = false,
-  compareOpen = false,
-  compareLoading = false,
-  compareError = null,
-  compareData = null,
   onCompare,
   onOpenStats,
 }: {
@@ -791,10 +646,6 @@ function DeckCard({
   index: number;
   onCopied: (msg: string) => void;
   showCompare?: boolean;
-  compareOpen?: boolean;
-  compareLoading?: boolean;
-  compareError?: string | null;
-  compareData?: DeckCompareResult | null;
   onCompare?: () => void;
   onOpenStats?: () => void;
 }) {
@@ -909,31 +760,14 @@ function DeckCard({
         ) : null}
 
         {showCompare && onCompare ? (
-          <div className="space-y-2 mb-3">
-            <Button
-              variant="secondary"
-              className="w-full !py-2 text-sm flex items-center justify-center gap-2"
-              onClick={onCompare}
-              disabled={compareLoading}
-            >
-              <Swords className="w-4 h-4" />
-              {compareOpen && compareData ? "Скрыть сравнение" : "Сравнить с моей"}
-              {compareOpen ? (
-                compareLoading ? null : <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </Button>
-            {compareError ? (
-              <p className="text-xs text-cr-loss text-center">{compareError}</p>
-            ) : null}
-            {compareOpen && compareLoading ? (
-              <p className="text-xs text-cr-muted text-center">Анализируем колоды…</p>
-            ) : null}
-            {compareOpen && compareData ? (
-              <DeckComparePanel data={compareData} referenceLabel="Колода вашей арены" />
-            ) : null}
-          </div>
+          <Button
+            variant="secondary"
+            className="w-full !py-2 text-sm flex items-center justify-center gap-2 mb-3"
+            onClick={onCompare}
+          >
+            <Swords className="w-4 h-4" />
+            Сравнить с моей
+          </Button>
         ) : null}
 
         {canImport ? (

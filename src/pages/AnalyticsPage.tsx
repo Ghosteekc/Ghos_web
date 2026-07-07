@@ -179,17 +179,31 @@ export function AnalyticsPage() {
           <div className="min-w-0 flex-1">
             <h3 className="text-sm font-semibold text-cr-text">Мои колоды</h3>
             <p className="text-xs text-cr-muted mt-1 leading-relaxed">
-              Оцените практичность каждой колоды из истории боёв: винрейт и число игр именно на ней,
-              сильные и слабые матчапы, советы что добавить для защиты, сплеша и добивания.
+              Оценка ваших колод по практичности относительно последних боёв
             </p>
-            <Button
-              variant="secondary"
-              className="mt-3 w-full sm:w-auto !py-2 text-sm flex items-center justify-center gap-2"
-              onClick={() => navigate("/decks?tab=mine")}
-            >
-              Открыть мои колоды
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            <div className="mt-3 space-y-3">
+              <Button
+                variant="secondary"
+                className="w-full sm:w-auto !py-2 text-sm flex items-center justify-center gap-2"
+                onClick={() => navigate("/decks?tab=mine")}
+              >
+                Открыть мои колоды
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+              <div>
+                <Button
+                  variant="secondary"
+                  className="w-full sm:w-auto !py-2 text-sm flex items-center justify-center gap-2"
+                  onClick={() => navigate("/decks?tab=arena")}
+                >
+                  Колоды моей арены
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+                <p className="text-[11px] text-cr-muted mt-1.5 leading-snug">
+                  Сравнение вашей колоды относительно колод вашей арены
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
