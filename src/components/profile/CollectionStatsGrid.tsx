@@ -102,7 +102,7 @@ export function CollectionStatsGrid({
               aria-pressed={isActive}
               onClick={() => onFilterChange?.(isActive ? "all" : filter)}
               className={
-                "collection-filter-tab filter-tab " +
+                "collection-filter-tab " +
                 activeClass +
                 (isActive ? " collection-filter-tab--active" : "")
               }

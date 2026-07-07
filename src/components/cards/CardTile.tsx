@@ -1,4 +1,5 @@
 import { cn } from "@/utils";
+import { useState } from "react";
 import { useCardCatalog } from "@/hooks/CardCatalogProvider";
 import { ElixirIcon } from "@/components/ui/ElixirIcon";
 import type { CardDisplayMode } from "@/types";
@@ -46,6 +47,7 @@ function CardArt({
   iconEvo,
   iconHero,
   displayMode = "base",
+  fallbackSrc,
 }: {
   name: string;
   src: string;
@@ -53,25 +55,31 @@ function CardArt({
   iconEvo?: string;
   iconHero?: string;
   displayMode?: CardDisplayMode;
+  fallbackSrc?: string;
 }) {
   const base = iconBase || src;
   const evo = iconEvo || base;
   const hero = iconHero || base;
+  const [broken, setBroken] = useState(false);
+
+  const pick = (url: string) => (broken && fallbackSrc ? fallbackSrc : url);
 
   if (displayMode === "split" && evo && hero) {
     return (
       <div className="relative z-10 h-full w-full">
         <img
-          src={evo}
+          src={pick(evo)}
           alt={name}
           className="absolute inset-0 h-full w-full object-contain object-center drop-shadow-md [clip-path:inset(0_50%_0_0)]"
           loading="lazy"
+          onError={() => setBroken(true)}
         />
         <img
-          src={hero}
+          src={pick(hero)}
           alt={name}
           className="absolute inset-0 h-full w-full object-contain object-center drop-shadow-md [clip-path:inset(0_0_0_50%)]"
           loading="lazy"
+          onError={() => setBroken(true)}
         />
         <div className="absolute inset-y-[8%] left-1/2 z-20 w-px -translate-x-1/2 bg-black/50" aria-hidden />
       </div>
@@ -83,10 +91,11 @@ function CardArt({
 
   return (
     <img
-      src={active}
+      src={pick(active)}
       alt={name}
       className="relative z-10 h-full w-full object-contain object-center drop-shadow-md"
       loading="lazy"
+      onError={() => setBroken(true)}
     />
   );
 }
@@ -147,6 +156,8 @@ export function CardTile({
 }: CardTileProps) {
   const { nameRu, nameShort, iconUrl } = useCardCatalog();
   const src = icon || iconUrl(name);
+  const fallbackSrc =
+    name.trim().toLowerCase() === "ronin" ? "/cards/ronin.png" : iconUrl(name) || undefined;
   const isCollection = size === "collection";
   const overlayLabel = showLabel && (size === "deck" || size === "lg");
   const label =
@@ -184,6 +195,7 @@ export function CardTile({
               iconEvo={iconEvo}
               iconHero={iconHero}
               displayMode={displayMode}
+              fallbackSrc={fallbackSrc}
             />
           ) : (
             <div className="relative z-10 flex h-full w-full items-center justify-center text-xs font-bold text-cr-text">

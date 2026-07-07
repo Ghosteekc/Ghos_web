@@ -19,7 +19,8 @@ export function Button({
   disabled = false,
   type = "button",
 }: ButtonProps) {
-  const baseStyles = "px-5 py-3 rounded-cr font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none";
+  const baseStyles =
+    "inline-flex items-center justify-center gap-2 px-5 py-3 rounded-cr font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none";
   const variants = {
     primary: "bg-gradient-to-r from-cr-gold to-yellow-500 text-cr-bg shadow-glow hover:shadow-glow-blue",
     secondary: "bg-cr-blue/20 text-cr-blue border border-cr-blue/30 hover:bg-cr-blue/30",

@@ -217,7 +217,7 @@ export function MineDeckStatsPage() {
       </Card>
 
       <Button variant="secondary" className="w-full" onClick={() => navigate("/decks")}>
-        <Swords className="w-4 h-4 mr-2" />
+        <Swords className="w-4 h-4 shrink-0" />
         К моим колодам
       </Button>
     </div>
