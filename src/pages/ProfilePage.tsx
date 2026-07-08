@@ -53,9 +53,9 @@ export function ProfilePage() {
       )}
 
       {profile && (
-        <Card>
-          <div className="flex items-center gap-5">
-            <div className="w-20 h-20 shrink-0 rounded-full bg-gradient-to-br from-cr-blue to-cr-gold p-[3px] shadow-glow overflow-hidden">
+        <Card className="!p-3">
+          <div className="flex items-center gap-3">
+            <div className="w-16 h-16 shrink-0 rounded-full bg-gradient-to-br from-cr-blue to-cr-gold p-[2px] shadow-glow overflow-hidden">
               {profile.avatar_url ? (
                 <img
                   src={profile.avatar_url}
@@ -94,10 +94,10 @@ export function ProfilePage() {
         </Card>
       )}
 
-      <Card>
-        <div className="flex items-center gap-5">
-          <div className="w-14 h-14 shrink-0 rounded-full bg-cr-surface border border-cr-border flex items-center justify-center">
-            <User className="w-7 h-7 text-cr-muted" />
+      <Card className="!p-3">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 shrink-0 rounded-full bg-cr-surface border border-cr-border flex items-center justify-center">
+            <User className="w-5 h-5 text-cr-muted" />
           </div>
           <div className="min-w-0">
           <p className="text-label mb-1">Telegram</p>
@@ -113,9 +113,9 @@ export function ProfilePage() {
       {profile && <ProfileStatGrid profile={profile} />}
 
       {(profile?.cards_by_level?.length ?? 0) > 0 && (
-        <Card>
+        <Card className="!p-3">
           <h3 className="text-sm font-semibold text-cr-text mb-1">Карты по уровням</h3>
-          <p className="text-[11px] text-cr-muted mb-4">Сколько карт прокачано на каждый уровень</p>
+          <p className="text-[11px] text-cr-muted mb-3">Сколько карт прокачано на каждый уровень</p>
           <CardLevelScale rows={profile!.cards_by_level} />
         </Card>
       )}

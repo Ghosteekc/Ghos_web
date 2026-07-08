@@ -11,7 +11,7 @@ import {
   ComposedChart,
   Bar,
 } from "recharts";
-import { TrendingUp, TrendingDown, Flame, Clock, Brain, Trophy, Swords, ChevronRight, Layers } from "lucide-react";
+import { TrendingUp, TrendingDown, Flame, Clock, Brain, Swords, ChevronRight, Layers } from "lucide-react";
 import { StatsOverview, InsightsData } from "@/types";
 import { Card, Button, Loader } from "@/components/ui";
 import { CardUsageGrid } from "@/components/cards";
@@ -51,6 +51,11 @@ export function AnalyticsPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const lossInsights = useMemo(
+    () => (insights?.insights ?? []).filter((item) => !item.won).slice(0, 7),
+    [insights?.insights],
+  );
 
   const lastResults = useMemo(() => {
     const items = stats?.last_results ?? [];
@@ -111,14 +116,14 @@ export function AnalyticsPage() {
         <p className="page-subtitle mt-1">Подробная статистика по вашим боям</p>
       </div>
 
-      {(insights?.patterns.length || insights?.insights.length) ? (
+      {(insights?.patterns.length || lossInsights.length) ? (
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <Brain className="w-5 h-5 text-cr-blue" />
-            <h3 className="text-sm font-semibold text-cr-text">Разбор боёв</h3>
+            <h3 className="text-sm font-semibold text-cr-text">Разбор поражений</h3>
           </div>
 
-          {insights.patterns.length > 0 && (
+          {insights?.patterns.length ? (
             <div className="space-y-2 mb-4">
               {insights.patterns.map((p, i) => (
                 <p key={i} className="text-xs text-cr-gold bg-cr-gold/10 border border-cr-gold/20 rounded-lg px-3 py-2">
@@ -126,25 +131,18 @@ export function AnalyticsPage() {
                 </p>
               ))}
             </div>
-          )}
+          ) : null}
 
           <div className="space-y-3">
-            {insights.insights.map((item) => (
+            {lossInsights.map((item) => (
               <button
                 key={item.battle_index}
                 type="button"
                 onClick={() => navigate(`/battles/${item.battle_index}`)}
-                className={
-                  "w-full text-left rounded-xl border p-3 transition-colors hover:border-cr-gold/40 " +
-                  (item.won ? "border-cr-win/25 bg-cr-win/5" : "border-cr-loss/25 bg-cr-loss/5")
-                }
+                className="w-full text-left rounded-xl border p-3 transition-colors hover:border-cr-gold/40 border-cr-loss/25 bg-cr-loss/5"
               >
                 <div className="flex items-start gap-2 mb-1.5">
-                  {item.won ? (
-                    <Trophy className="w-4 h-4 text-cr-win shrink-0 mt-0.5" />
-                  ) : (
-                    <Swords className="w-4 h-4 text-cr-loss shrink-0 mt-0.5" />
-                  )}
+                  <Swords className="w-4 h-4 text-cr-loss shrink-0 mt-0.5" />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-cr-accent font-semibold mb-0.5">vs {item.opponent_name}</p>
                     <p className="text-sm text-cr-text leading-snug">{item.summary}</p>

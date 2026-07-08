@@ -30,9 +30,9 @@ export function ProfileCollectionNav() {
             className="!p-0 overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
             onClick={() => navigate(item.to)}
           >
-            <div className="w-full flex items-center gap-4 p-4">
-              <div className="w-11 h-11 shrink-0 rounded-xl bg-cr-gold/10 border border-cr-gold/25 flex items-center justify-center">
-                <Icon className="w-5 h-5 text-cr-gold" />
+            <div className="w-full flex items-center gap-3 px-3 py-2.5">
+              <div className="w-9 h-9 shrink-0 rounded-xl bg-cr-gold/10 border border-cr-gold/25 flex items-center justify-center">
+                <Icon className="w-4 h-4 text-cr-gold" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-cr-text">{item.label}</p>
