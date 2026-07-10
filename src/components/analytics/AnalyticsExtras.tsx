@@ -3,6 +3,7 @@ import { Shield, Swords, Wand2, Sparkles, ChevronDown, ChevronUp } from "lucide-
 import { api, ApiError } from "@/api/client";
 import { Card, Button, Loader } from "@/components/ui";
 import { CardDeckGrid } from "@/components/cards";
+import { useCardCatalog } from "@/hooks";
 import type { CounterDeckData, CustomizeData, OpponentEntry, SynergyData, WinrateEntry } from "@/types";
 
 function ErrorCard({ message }: { message: string }) {
@@ -147,6 +148,7 @@ export function OpponentsPanel() {
 }
 
 export function DeckToolsPanel() {
+  const { nameRu } = useCardCatalog();
   const [customize, setCustomize] = useState<CustomizeData | null>(null);
   const [synergy, setSynergy] = useState<SynergyData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -219,7 +221,7 @@ export function DeckToolsPanel() {
             <h3 className="font-semibold text-cr-text">Синергии</h3>
           </div>
           <p className="text-xs text-cr-muted mb-2">
-            Ядро: {synergy.core.join(", ")} · эликсир {synergy.avg_elixir.toFixed(1)}
+            Ядро: {synergy.core.map((c) => nameRu(c)).join(", ")} · эликсир {synergy.avg_elixir.toFixed(1)}
           </p>
           <CardDeckGrid cards={synergy.deck} size="sm" showLabels maxVisible={8} />
         </Card>
