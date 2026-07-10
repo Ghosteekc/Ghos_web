@@ -1,13 +1,10 @@
 import { NavLink } from "react-router-dom";
 import {
   Home,
-  User,
   BarChart3,
   GitCompare,
   History,
-  Search,
-  Star,
-  Settings,
+  LayoutGrid,
   Trophy,
   X,
 } from "lucide-react";
@@ -15,13 +12,10 @@ import { cn } from "@/utils";
 
 const navItems = [
   { to: "/", icon: Home, label: "Главная" },
-  { to: "/profile", icon: User, label: "Профиль" },
-  { to: "/analytics", icon: BarChart3, label: "Аналитика" },
+  { to: "/battles", icon: History, label: "Бои" },
   { to: "/decks", icon: GitCompare, label: "Колоды" },
-  { to: "/battles", icon: History, label: "История" },
-  { to: "/search", icon: Search, label: "Поиск" },
-  { to: "/favorites", icon: Star, label: "Любимые" },
-  { to: "/settings", icon: Settings, label: "Настройки" },
+  { to: "/analytics", icon: BarChart3, label: "Аналитика" },
+  { to: "/more", icon: LayoutGrid, label: "Ещё" },
 ];
 
 export function Sidebar({ isOpen = true, onClose }: { isOpen?: boolean; onClose?: () => void }) {

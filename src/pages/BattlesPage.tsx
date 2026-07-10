@@ -2,15 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Trophy,
-  Flame,
-  Target,
-  Filter,
   RefreshCw,
 } from "lucide-react";
 import { Card, Button, Loader } from "@/components/ui";
 import { BattleCardSimple } from "@/components/battles/BattleCard";
 import { api, ApiError } from "@/api/client";
 import { BattleSummary } from "@/types";
+import { battleDetailPath } from "@/utils";
 import { usePageRefresh } from "@/hooks";
 
 export function BattlesPage() {
@@ -43,7 +41,16 @@ export function BattlesPage() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await load();
+    try {
+      await api.syncData();
+      const res = await api.getBattles();
+      setBattles(res.battles ?? []);
+      setError(null);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "Не удалось синхронизировать");
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const filtered = battles.filter((b) => {
@@ -56,10 +63,12 @@ export function BattlesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="page-title">История боёв</h1>
-        <Button variant="ghost" onClick={onRefresh} className="!p-2" disabled={refreshing}>
+        <Button variant="ghost" onClick={() => void onRefresh()} className="!p-2" disabled={refreshing} aria-label="Синхронизировать">
           <RefreshCw className={"w-5 h-5 " + (refreshing ? "animate-spin" : "")} />
         </Button>
       </div>
+
+      <p className="text-xs text-cr-muted -mt-4">Кнопка обновления подтягивает свежие бои из Clash Royale</p>
 
       <div className="filter-tab-row">
         {(["all", "wins", "losses"] as const).map((f) => (
@@ -83,7 +92,12 @@ export function BattlesPage() {
       ) : (
         <div className="space-y-4">
           {filtered.map((battle, i) => (
-            <BattleCardSimple key={battle.index} summary={battle} index={i} onOpen={() => navigate(`/battles/${battle.index}`)} />
+            <BattleCardSimple
+              key={`${battle.timestamp}-${battle.index}`}
+              summary={battle}
+              index={i}
+              onOpen={() => navigate(battleDetailPath(battle.timestamp, battle.index))}
+            />
           ))}
           {filtered.length === 0 && (
             <Card className="text-center">

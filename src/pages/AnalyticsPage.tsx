@@ -18,9 +18,21 @@ import { CardUsageGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { cacheHas, cacheGet } from "@/api/cache";
 import { usePageRefresh } from "@/hooks";
+import { battleDetailPath } from "@/utils";
+import { DeckWinratesPanel, OpponentsPanel, DeckToolsPanel } from "@/components/analytics/AnalyticsExtras";
+
+const ANALYTICS_TABS = [
+  { id: "overview", label: "Обзор" },
+  { id: "decks", label: "Колоды" },
+  { id: "opponents", label: "Соперники" },
+  { id: "tools", label: "Улучшения" },
+] as const;
+
+type AnalyticsTab = (typeof ANALYTICS_TABS)[number]["id"];
 
 export function AnalyticsPage() {
   const navigate = useNavigate();
+  const [tab, setTab] = useState<AnalyticsTab>("overview");
   const [stats, setStats] = useState<StatsOverview | null>(() => cacheGet<StatsOverview>("stats-v5"));
   const [insights, setInsights] = useState<InsightsData | null>(() => cacheGet<InsightsData>("insights"));
   const [insightsError, setInsightsError] = useState<string | null>(null);
@@ -99,11 +111,11 @@ export function AnalyticsPage() {
   }, [stats?.winrate_by_day]);
   const mostUsedCards = useMemo(() => stats?.most_used_cards ?? [], [stats?.most_used_cards]);
 
-  if (loading) {
+  if (loading && tab === "overview") {
     return <Loader />;
   }
 
-  if (error || !stats) {
+  if ((error || !stats) && tab === "overview") {
     return (
       <Card className="text-center">
         <p className="text-cr-loss mb-2">{error ?? "Нет данных"}</p>
@@ -118,9 +130,28 @@ export function AnalyticsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="page-title">Аналитика</h1>
-        <p className="page-subtitle mt-1">Подробная статистика по вашим боям</p>
+        <p className="page-subtitle mt-1">Статистика, соперники и улучшение колод</p>
       </div>
 
+      <div className="filter-tab-row">
+        {ANALYTICS_TABS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setTab(item.id)}
+            className={"filter-tab " + (tab === item.id ? "filter-tab--active" : "")}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "decks" && <DeckWinratesPanel />}
+      {tab === "opponents" && <OpponentsPanel />}
+      {tab === "tools" && <DeckToolsPanel />}
+
+      {tab === "overview" && stats && (
+        <>
       {(insights?.patterns.length || lossInsights.length) ? (
         <Card>
           <div className="flex items-center gap-2 mb-4">
@@ -143,7 +174,7 @@ export function AnalyticsPage() {
               <button
                 key={item.battle_index}
                 type="button"
-                onClick={() => navigate(`/battles/${item.battle_index}`)}
+                onClick={() => navigate(battleDetailPath(item.timestamp, item.battle_index))}
                 className="w-full text-left rounded-xl border p-3 transition-colors hover:border-cr-gold/40 border-cr-loss/25 bg-cr-loss/5"
               >
                 <div className="flex items-start gap-2 mb-1.5">
@@ -341,6 +372,8 @@ export function AnalyticsPage() {
           )}
         </Card>
       </div>
+        </>
+      )}
     </div>
   );
 }

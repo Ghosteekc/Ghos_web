@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Star, ExternalLink } from "lucide-react";
+import { Star, ExternalLink, Trash2 } from "lucide-react";
 import { Card, Button, Loader } from "@/components/ui";
 import { CardDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
@@ -15,6 +15,7 @@ export function FavoritesPage() {
   const [entries, setEntries] = useState<FavoriteEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [removing, setRemoving] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -35,6 +36,20 @@ export function FavoritesPage() {
     void load();
   }, [load]);
 
+  const remove = async (index: number) => {
+    const entry = entries[index];
+    if (!entry) return;
+    setRemoving(index);
+    try {
+      await api.removeFavoriteDeck(entry.cards);
+      setEntries((prev) => prev.filter((_, i) => i !== index));
+    } catch {
+      setError("Не удалось удалить колоду");
+    } finally {
+      setRemoving(null);
+    }
+  };
+
   if (loading) return <Loader />;
 
   return (
@@ -52,15 +67,27 @@ export function FavoritesPage() {
                   <Star className="w-5 h-5 text-cr-gold shrink-0" />
                   <p className="text-sm font-medium text-cr-text">Колода #{i + 1}</p>
                 </div>
-                {entry.deck_link && (
+                <div className="flex items-center gap-1 shrink-0">
+                  {entry.deck_link && (
+                    <Button
+                      variant="ghost"
+                      className="!p-2"
+                      onClick={() => openLink(entry.deck_link!)}
+                      aria-label="Открыть в игре"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
-                    className="!p-2 shrink-0"
-                    onClick={() => openLink(entry.deck_link!)}
+                    className="!p-2 text-cr-loss hover:bg-cr-loss/10"
+                    disabled={removing === i}
+                    onClick={() => void remove(i)}
+                    aria-label="Удалить"
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
-                )}
+                </div>
               </div>
               <CardDeckGrid cards={entry.cards} size="sm" showLabels maxVisible={8} />
             </Card>

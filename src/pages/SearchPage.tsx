@@ -1,10 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   X,
   User,
   Trophy,
+  ChevronRight,
 } from "lucide-react";
 import { Card, Button } from "@/components/ui";
 import { api, ApiError } from "@/api/client";
@@ -12,6 +14,7 @@ import { SearchResult } from "@/types";
 import { usePageRefresh } from "@/hooks";
 
 export function SearchPage() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -116,7 +119,12 @@ export function SearchPage() {
           >
             <h3 className="text-sm text-cr-muted">Результаты</h3>
             {results.map((result, i) => (
-              <Card key={result.player_tag} delay={i * 0.05} className="cursor-pointer">
+              <Card
+                key={result.player_tag}
+                delay={i * 0.05}
+                className="cursor-pointer"
+                onClick={() => navigate(`/player/${result.player_tag}`)}
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-cr-surface flex items-center justify-center">
@@ -127,12 +135,15 @@ export function SearchPage() {
                       <p className="text-xs text-cr-muted font-mono">#{result.player_tag}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 text-cr-gold">
-                      <Trophy className="w-4 h-4" />
-                      <span className="text-sm font-semibold">{result.trophies}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <div className="flex items-center gap-1 text-cr-gold justify-end">
+                        <Trophy className="w-4 h-4" />
+                        <span className="text-sm font-semibold">{result.trophies}</span>
+                      </div>
+                      <p className="text-xs text-cr-muted">{result.arena}</p>
                     </div>
-                    <p className="text-xs text-cr-muted">{result.arena}</p>
+                    <ChevronRight className="w-5 h-5 text-cr-muted" />
                   </div>
                 </div>
               </Card>

@@ -75,7 +75,7 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-cr-border flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="mt-4 pt-4 border-t border-cr-border flex items-center justify-between">
           <div className="flex gap-2">
             <Button variant="ghost" onClick={handleCopy} className="!px-3 !py-2 text-xs">
               <Copy className="w-4 h-4 mr-1.5" />
@@ -86,7 +86,7 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
               Статистика
             </Button>
           </div>
-          <ChevronRight className="w-4 h-4 text-cr-muted group-hover:text-cr-gold transition-colors" />
+          <ChevronRight className="w-4 h-4 text-cr-muted" />
         </div>
       </Card>
     </motion.div>

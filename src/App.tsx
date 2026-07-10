@@ -15,6 +15,8 @@ const BattlesPage = lazy(() => import("@/pages/BattlesPage"));
 const BattleDetailPage = lazy(() => import("@/pages/BattleDetailPage"));
 const SearchPage = lazy(() => import("@/pages/SearchPage"));
 const FavoritesPage = lazy(() => import("@/pages/FavoritesPage"));
+const MorePage = lazy(() => import("@/pages/MorePage"));
+const PlayerPreviewPage = lazy(() => import("@/pages/PlayerPreviewPage"));
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
 
 function PageLoader() {
@@ -103,6 +105,14 @@ export default function App() {
             }
           />
           <Route
+            path="battles/t/:battleTime"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <BattleDetailPage />
+              </Suspense>
+            }
+          />
+          <Route
             path="battles/:index"
             element={
               <Suspense fallback={<PageLoader />}>
@@ -123,6 +133,22 @@ export default function App() {
             element={
               <Suspense fallback={<PageLoader />}>
                 <FavoritesPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="player/:tag"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <PlayerPreviewPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="more"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <MorePage />
               </Suspense>
             }
           />

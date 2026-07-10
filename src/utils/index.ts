@@ -53,6 +53,17 @@ export const formatPlayerTag = (tag: string | null | undefined): string => {
   return clean ? `#${clean}` : "—";
 };
 
+/** Stable battle URL — survives server restart (no session index). */
+export const battleDetailPath = (timestamp: string, fallbackIndex?: number): string => {
+  if (timestamp) {
+    return `/battles/t/${encodeURIComponent(timestamp)}`;
+  }
+  if (fallbackIndex !== undefined) {
+    return `/battles/${fallbackIndex}`;
+  }
+  return "/battles";
+};
+
 export const getWinColor = (winrate: number): string => {
   if (winrate >= 60) return "text-cr-win";
   if (winrate <= 40) return "text-cr-loss";

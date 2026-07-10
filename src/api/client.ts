@@ -31,7 +31,11 @@ import {
   DeckCompareResult,
   MineDeckStats,
   InsightsData,
-
+  WinrateEntry,
+  OpponentEntry,
+  CounterDeckData,
+  CustomizeData,
+  SynergyData,
 } from "@/types";
 
 import { cacheGet, cacheSet, cacheInvalidate, cacheHas, inflight, TTL, sleep } from "./cache";
@@ -273,7 +277,38 @@ export const api = {
 
   getBattle: (index: number) => request<BattleDetail>(`/api/battles/${index}`),
 
+  getBattleByTime: (timestamp: string) =>
+    request<BattleDetail>(`/api/battles/by-time/${encodeURIComponent(timestamp)}`),
 
+  getWinrates: () => cachedGet<WinrateEntry[]>("winrates", "/api/winrates", TTL.stats),
+
+  getOpponents: () => cachedGet<OpponentEntry[]>("opponents", "/api/opponents", TTL.battles),
+
+  getCounterDeck: (index: number) =>
+    request<CounterDeckData>(`/api/opponents/${index}/counter`),
+
+  getCustomizeDeck: () => cachedGet<CustomizeData>("customize", "/api/customize", TTL.battles),
+
+  getSynergyDeck: () => cachedGet<SynergyData>("synergy", "/api/synergy", TTL.battles),
+
+  getPlayerPreview: (tag: string) => {
+    const clean = tag.replace(/^#/, "");
+    return cachedGet<SearchResult>(`player:${clean}`, `/api/players/${encodeURIComponent(clean)}`, TTL.profile);
+  },
+
+  removeFavoriteDeck: (deck: string[]) => {
+    cacheInvalidate("favorites");
+    return request<{ ok: true }>("/api/favorites", {
+      method: "DELETE",
+      body: JSON.stringify({ deck }),
+    });
+  },
+
+  prefetchDeckTabs: () => {
+    void cachedGet<DecksListData>("decks:meta", "/api/decks?type=meta", TTL.battles).catch(() => {});
+    void cachedGet<TopPlayersData>("top-players-v2", "/api/decks/top-players?limit=10", TTL.topPlayers).catch(() => {});
+    void cachedGet<ArenaDecksData>("arena-decks-v2", "/api/decks/arena", TTL.arenaDecks).catch(() => {});
+  },
 
   getDecks: (type?: string) => {
 

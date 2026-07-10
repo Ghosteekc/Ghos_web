@@ -2,10 +2,7 @@ import {
   BarChart3,
   GitCompare,
   History,
-  Search,
-  Star,
   Settings,
-  User,
   Link2,
   ChevronRight,
   Sparkles,
@@ -15,13 +12,10 @@ import { Profile } from "@/types";
 import { formatPlayerTag } from "@/utils";
 
 const quickLinks = [
-  { to: "/analytics", icon: BarChart3, label: "Аналитика", hint: "Графики и инсайты" },
+  { to: "/analytics", icon: BarChart3, label: "Аналитика", hint: "Графики, соперники, улучшения" },
   { to: "/decks", icon: GitCompare, label: "Колоды", hint: "Мета, сравнение, рандом" },
   { to: "/battles", icon: History, label: "История", hint: "Разбор последних боёв" },
-  { to: "/search", icon: Search, label: "Поиск", hint: "Игроки и карты" },
-  { to: "/profile", icon: User, label: "Профиль", hint: "Коллекция и рейтинг" },
-  { to: "/favorites", icon: Star, label: "Любимые", hint: "Сохранённые колоды" },
-  { to: "/settings", icon: Settings, label: "Настройки", hint: "Тема, синхронизация" },
+  { to: "/more", icon: Settings, label: "Ещё", hint: "Профиль, поиск, избранное" },
 ] as const;
 
 interface HomeServicePanelProps {

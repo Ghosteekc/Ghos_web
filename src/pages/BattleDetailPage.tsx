@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Card, Button, Loader, LinearProgress } from "@/components/ui";
 import { CardTile } from "@/components/cards";
-import { api } from "@/api/client";
+import { api, ApiError } from "@/api/client";
 import { BattleDetail } from "@/types";
 import { formatTime, getTrophyChangeColor, formatBattlePlayedAt } from "@/utils";
 import { usePageRefresh } from "@/hooks";
@@ -56,21 +56,31 @@ function KeyCardsBlock({
 }
 
 export function BattleDetailPage() {
-  const { index } = useParams();
+  const { index, battleTime } = useParams();
   const navigate = useNavigate();
   const [battle, setBattle] = useState<BattleDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const b = await api.getBattle(Number(index));
+      setError(null);
+      let b: BattleDetail;
+      if (battleTime) {
+        b = await api.getBattleByTime(decodeURIComponent(battleTime));
+      } else if (index !== undefined && index !== "") {
+        b = await api.getBattle(Number(index));
+      } else {
+        throw new Error("Бой не указан");
+      }
       setBattle(b);
     } catch (e) {
-      console.error(e);
+      setBattle(null);
+      setError(e instanceof ApiError ? e.message : "Бой не найден");
     } finally {
       setLoading(false);
     }
-  }, [index]);
+  }, [index, battleTime]);
 
   usePageRefresh(load);
 
@@ -80,7 +90,14 @@ export function BattleDetailPage() {
   }, [load]);
 
   if (loading) return <Loader />;
-  if (!battle) return <Card className="text-center">Бой не найден</Card>;
+  if (!battle) {
+    return (
+      <Card className="text-center space-y-3">
+        <p className="text-cr-loss">{error ?? "Бой не найден"}</p>
+        <Button onClick={() => navigate("/battles")}>К истории</Button>
+      </Card>
+    );
+  }
 
   const detailReasons = battle.reasons.length > 1 ? battle.reasons.slice(1) : [];
 

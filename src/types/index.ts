@@ -308,6 +308,9 @@ export interface SearchResult {
   player_name: string;
   trophies: number;
   arena: string;
+  max_trophies?: number | null;
+  clan_name?: string | null;
+  exp_level?: number | null;
 }
 
 export interface Settings {
@@ -321,6 +324,45 @@ export interface HomeData {
   profile: Profile;
   battles: BattleSummary[];
   stats: StatsOverview | null;
+}
+
+export interface WinrateEntry {
+  cards: string[];
+  wins: number;
+  losses: number;
+  total: number;
+  winrate: number;
+}
+
+export interface OpponentEntry {
+  index: number;
+  name: string;
+  deck: string[];
+  threats: string[];
+  avg_elixir: number;
+  won_against: boolean;
+}
+
+export interface CounterDeckData {
+  opponent_name: string;
+  opponent_deck: string[];
+  counter_deck: string[];
+  threats: string[];
+  preferred_cards: string[];
+}
+
+export interface CustomizeData {
+  original: string[];
+  customized: string[];
+  issues: string[];
+  avg_elixir: number;
+}
+
+export interface SynergyData {
+  core: string[];
+  deck: string[];
+  synergies: Record<string, string[]>;
+  avg_elixir: number;
 }
 
 export type TabType =
