@@ -40,6 +40,24 @@ function filterFromTab(tab: string | null): string {
 
 const CATEGORY_LABELS = DECK_CATEGORY_LABELS;
 
+function formatArenaSubtitle(arenaName: string, trophies: number): string {
+  if (!arenaName && trophies > 0) {
+    return `${trophies.toLocaleString("ru-RU")} 🏆`;
+  }
+  const compact = arenaName.replace(/\s/g, "");
+  const trophyStr = String(trophies);
+  if (
+    trophies > 0 &&
+    (arenaName.includes("🏆") || compact.includes(trophyStr))
+  ) {
+    return arenaName;
+  }
+  if (trophies > 0) {
+    return `${arenaName} · ${trophies.toLocaleString("ru-RU")} 🏆`;
+  }
+  return arenaName;
+}
+
 function formatUpdatedAt(iso: string | null | undefined) {
   if (!iso) return null;
   try {
@@ -255,16 +273,16 @@ function buildComparePath(deck: Deck, fromTab = "arena"): string {
 function ArenaPanel({ onCopied }: { onCopied: (msg: string) => void }) {
   const navigate = useNavigate();
   const [decks, setDecks] = useState<Deck[]>(() => {
-    const hit = cacheGet<ArenaDecksData>("arena-decks-v2");
+    const hit = cacheGet<ArenaDecksData>("arena-decks-v3");
     return hit?.decks ?? [];
   });
-  const [arenaName, setArenaName] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v2")?.arena_name ?? "");
-  const [trophies, setTrophies] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v2")?.trophies ?? 0);
-  const [loading, setLoading] = useState(() => !cacheHas("arena-decks-v2"));
+  const [arenaName, setArenaName] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v3")?.arena_name ?? "");
+  const [trophies, setTrophies] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v3")?.trophies ?? 0);
+  const [loading, setLoading] = useState(() => !cacheHas("arena-decks-v3"));
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!cacheHas("arena-decks-v2")) {
+    if (!cacheHas("arena-decks-v3")) {
       setLoading(true);
     }
     setError(null);
@@ -308,8 +326,7 @@ function ArenaPanel({ onCopied }: { onCopied: (msg: string) => void }) {
   return (
     <div className="space-y-4">
       <p className="text-xs text-cr-muted text-center">
-        {arenaName}
-        {trophies > 0 ? ` · ${trophies} 🏆` : ""}
+        {formatArenaSubtitle(arenaName, trophies)}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full overflow-x-hidden">
         {decks.map((deck, i) => (
