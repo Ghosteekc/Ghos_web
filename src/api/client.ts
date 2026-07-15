@@ -36,6 +36,7 @@ import {
   CounterDeckData,
   CustomizeData,
   SynergyData,
+  ConstructorData,
 } from "@/types";
 
 import { cacheGet, cacheSet, cacheInvalidate, cacheHas, inflight, TTL, sleep } from "./cache";
@@ -385,15 +386,40 @@ export const api = {
 
   getCardCatalog: () =>
 
-    cachedGet<{ cards: { name: string; name_ru: string; name_short?: string; icon: string; id?: number; elixir?: number }[] }>(
+    cachedGet<{
+      cards: {
+        name: string;
+        name_ru: string;
+        name_short?: string;
+        icon: string;
+        id?: number;
+        elixir?: number;
+        max_evolution_level?: number;
+        has_hero?: boolean;
+        icon_evo?: string;
+        icon_hero?: string;
+      }[];
+    }>(
 
-      "catalog",
+      "catalog-v2",
 
       "/api/cards/catalog",
 
       TTL.stats,
 
     ),
+
+
+
+  buildConstructorDecks: (slots: { name: string; slot: number }[]) =>
+
+    request<ConstructorData>("/api/decks/constructor", {
+
+      method: "POST",
+
+      body: JSON.stringify({ slots }),
+
+    }),
 
 
 

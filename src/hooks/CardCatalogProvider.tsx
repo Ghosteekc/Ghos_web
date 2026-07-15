@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { api } from "@/api/client";
 import { lsGet, lsSet, TTL } from "@/api/cache";
 
-const CATALOG_LS_KEY = "card-catalog-v5";
+const CATALOG_LS_KEY = "card-catalog-v6";
 
 export interface CardCatalogItem {
   name: string;
@@ -11,6 +11,10 @@ export interface CardCatalogItem {
   icon: string;
   id?: number | null;
   elixir?: number | null;
+  max_evolution_level?: number;
+  has_hero?: boolean;
+  icon_evo?: string;
+  icon_hero?: string;
 }
 
 interface CardCatalogContextValue {

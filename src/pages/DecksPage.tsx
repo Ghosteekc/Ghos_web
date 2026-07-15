@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Card, Button, Loader, ElixirIcon } from "@/components/ui";
 import { CardTile } from "@/components/cards";
+import { ConstructorPanel, ConstructorDeckGrid } from "@/components/decks/ConstructorPanel";
 import { api, ApiError } from "@/api/client";
 import { cacheHas, cacheGet } from "@/api/cache";
 import type { ArenaDecksData, TopPlayersData } from "@/types";
@@ -29,6 +30,7 @@ const DECK_FILTERS = [
   { id: "top", label: DECK_FILTER_LABELS.top },
   { id: "mine", label: DECK_FILTER_LABELS.mine },
   { id: "arena", label: DECK_FILTER_LABELS.arena },
+  { id: "constructor", label: DECK_FILTER_LABELS.constructor },
   { id: "random", label: DECK_FILTER_LABELS.random },
 ] as const;
 
@@ -73,7 +75,10 @@ function formatUpdatedAt(iso: string | null | undefined) {
   }
 }
 
-function DeckCardsGrid({ cards }: { cards: DeckCard[] }) {
+function DeckCardsGrid({ cards, useVariants = false }: { cards: DeckCard[]; useVariants?: boolean }) {
+  if (useVariants) {
+    return <ConstructorDeckGrid cards={cards} />;
+  }
   const sorted = [...cards].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
   return (
     <div className="grid grid-cols-4 gap-x-2 gap-y-1 mb-4">
@@ -97,7 +102,7 @@ export function DecksPage() {
   const [copyHint, setCopyHint] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (filter === "random" || filter === "top" || filter === "arena") {
+    if (filter === "random" || filter === "top" || filter === "arena" || filter === "constructor") {
       setLoading(false);
       setDecks([]);
       setError(null);
@@ -144,7 +149,9 @@ export function DecksPage() {
         <span className="text-sm text-cr-muted">
           {filter === "random"
             ? "Генератор"
-            : filter === "top"
+            : filter === "constructor"
+              ? "Конструктор"
+              : filter === "top"
               ? "Рейтинг"
               : filter === "arena"
                 ? "Арена"
@@ -159,6 +166,8 @@ export function DecksPage() {
           "Топ-10 игроков из глобального списка лидеров (Легендарный путь): колода, винрейт на ней и кубки."
         ) : filter === "arena" ? (
           "Популярные колоды на вашем диапазоне кубков: лучший винрейт игроков арены + мета. «Сравнить» — разбор относительно вашей колоды."
+        ) : filter === "constructor" ? (
+          "Выберите 4 карты — бот соберёт полные колоды с лучшей синергией. Ячейки 1 и 3 — эволюция, 2 — герой, 4 — обычная карта."
         ) : filter === "mine" ? (
           "Ваши колоды из истории боёв. Нажмите «Статистика» для разбора матчапов и советов."
         ) : (
@@ -192,7 +201,7 @@ export function DecksPage() {
         <Card className="text-center text-cr-loss text-sm">{error}</Card>
       )}
 
-      {loading && filter !== "random" && filter !== "top" && filter !== "arena" ? (
+      {loading && filter !== "random" && filter !== "top" && filter !== "arena" && filter !== "constructor" ? (
         <Loader />
       ) : null}
 
@@ -214,6 +223,23 @@ export function DecksPage() {
         />
       </div>
 
+      <div className={filter === "constructor" ? "" : "hidden"}>
+        <ConstructorPanel
+          renderDeckCard={(deck, i) => (
+            <div key={`${deck.id}-${deck.name}`} className="w-full">
+              <DeckCard
+                deck={deck}
+                index={i}
+                onCopied={(msg) => {
+                  setCopyHint(msg);
+                  setTimeout(() => setCopyHint(null), 3000);
+                }}
+              />
+            </div>
+          )}
+        />
+      </div>
+
       <div className={filter === "arena" ? "" : "hidden"}>
         <ArenaPanel
           onCopied={(msg) => {
@@ -223,7 +249,7 @@ export function DecksPage() {
         />
       </div>
 
-      {filter !== "random" && filter !== "top" && filter !== "arena" ? (
+      {filter !== "random" && filter !== "top" && filter !== "arena" && filter !== "constructor" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full overflow-x-hidden">
           {decks.map((deck, i) => (
             <div key={`${deck.id}-${deck.name}`} className="w-full">
@@ -761,7 +787,7 @@ function DeckCard({
           <p className="text-xs text-cr-muted mb-3">{deck.description}</p>
         )}
 
-        <DeckCardsGrid cards={cards} />
+        <DeckCardsGrid cards={cards} useVariants={deck.type === "constructor"} />
 
         {deck.type === "meta" && deck.total_games > 0 && (
           <div className="flex items-center justify-between text-sm mb-3">
@@ -784,6 +810,24 @@ function DeckCard({
               <span className="text-cr-muted">{UI.games}</span>
               <span className="font-semibold text-cr-text">{deck.total_games ?? 0}</span>
             </div>
+          </>
+        )}
+
+        {deck.type === "constructor" && (
+          <>
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-cr-muted">Синергия</span>
+              <span className="font-bold text-cr-gold">
+                {(deck.synergy_score ?? deck.winrate).toFixed(0)}%
+              </span>
+            </div>
+            {deck.synergy_notes && deck.synergy_notes.length > 0 ? (
+              <ul className="text-[11px] text-cr-muted space-y-0.5 mb-3">
+                {deck.synergy_notes.slice(0, 2).map((note, i) => (
+                  <li key={i}>{note}</li>
+                ))}
+              </ul>
+            ) : null}
           </>
         )}
 

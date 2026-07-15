@@ -142,10 +142,12 @@ export interface Deck {
   avg_elixir: number;
   best_matchups: BattleSummary[];
   worst_matchups: BattleSummary[];
-  type: "meta" | "mine" | "arena" | "rated" | "classic" | "2v2" | "tournament" | "legend_path" | "random";
+  type: "meta" | "mine" | "arena" | "rated" | "classic" | "2v2" | "tournament" | "legend_path" | "random" | "constructor";
   category?: string;
   deck_link?: string | null;
   description?: string;
+  synergy_score?: number;
+  synergy_notes?: string[];
 }
 
 export interface CardInfo {
@@ -369,6 +371,24 @@ export interface SynergyData {
   synergies: Record<string, string[]>;
   avg_elixir: number;
   deck_link?: string | null;
+}
+
+export interface ConstructorDeckEntry {
+  id: number;
+  name: string;
+  cards: DeckCard[];
+  synergy_score: number;
+  synergy_notes: string[];
+  avg_elixir: number;
+  deck_link?: string | null;
+  description: string;
+  type: string;
+  category: string;
+}
+
+export interface ConstructorData {
+  core: DeckCard[];
+  decks: ConstructorDeckEntry[];
 }
 
 export type TabType =
