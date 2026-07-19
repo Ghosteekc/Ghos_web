@@ -36,12 +36,6 @@ export function CardCatalogProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const base = import.meta.env.VITE_API_URL?.trim();
-    if (!base) {
-      setReady(true);
-      return;
-    }
-
     let cancelled = false;
 
     const cached = lsGet<{ cards: CardCatalogItem[] }>(CATALOG_LS_KEY, TTL.catalog);

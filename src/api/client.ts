@@ -41,9 +41,22 @@ import {
 
 import { cacheGet, cacheSet, cacheInvalidate, cacheHas, inflight, TTL, sleep } from "./cache";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
+const API_BASE = (import.meta.env.VITE_API_URL ?? "").trim();
 
+function apiUrl(path: string): string {
+  return `${API_BASE}${path}`;
+}
 
+function usesDirectTunnel(): boolean {
+  return API_BASE.includes("loca.lt");
+}
+
+function connectionHint(): string {
+  if (usesDirectTunnel()) {
+    return " Туннель до бота не отвечает — перезапустите start-tunnel.ps1 в отдельном окне PowerShell.";
+  }
+  return " Проверьте, что бот и localtunnel запущены (vercel.json → ghosteekcr.loca.lt).";
+}
 
 export class ApiError extends Error {
 
@@ -79,7 +92,7 @@ function buildRequestHeaders(extra?: HeadersInit): HeadersInit {
 
   };
 
-  if (API_BASE.includes("loca.lt")) {
+  if (usesDirectTunnel()) {
 
     headers["Bypass-Tunnel-Reminder"] = "true";
 
@@ -95,7 +108,7 @@ function isTunnelBlockedResponse(res: Response, contentType: string): boolean {
 
   if (res.status === 511 || res.status === 403) return true;
 
-  if (API_BASE.includes("loca.lt") && !contentType.includes("application/json")) return true;
+  if (usesDirectTunnel() && !contentType.includes("application/json")) return true;
 
   return false;
 
@@ -112,30 +125,15 @@ function isRetryable(status: number) {
 
 
 async function requestOnce<T>(path: string, options?: RequestInit): Promise<T> {
-
-  if (!API_BASE.trim()) {
-
-    throw new ApiError(
-
-      "Сервис временно недоступен. Попробуйте позже.",
-
-      0,
-
-    );
-
-  }
-
-
-
   let res: Response;
 
   const controller = new AbortController();
-  const timeoutMs = API_BASE.includes("loca.lt") ? 35_000 : 20_000;
+  const timeoutMs = usesDirectTunnel() ? 35_000 : 25_000;
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
 
-    res = await fetch(`${API_BASE}${path}`, {
+    res = await fetch(apiUrl(path), {
 
       ...options,
 
@@ -147,9 +145,7 @@ async function requestOnce<T>(path: string, options?: RequestInit): Promise<T> {
 
   } catch (err) {
 
-    const tunnelHint = API_BASE.includes("loca.lt")
-      ? " Туннель до бота не отвечает — перезапустите start-tunnel.ps1 в отдельном окне PowerShell."
-      : "";
+    const tunnelHint = connectionHint();
     const aborted = err instanceof DOMException && err.name === "AbortError";
     throw new ApiError(
       aborted
@@ -209,8 +205,15 @@ async function requestOnce<T>(path: string, options?: RequestInit): Promise<T> {
     }
 
     const body = await res.json().catch(() => ({ detail: res.statusText }));
+    const detail = body.detail;
+    const message =
+      typeof detail === "string"
+        ? detail
+        : Array.isArray(detail)
+          ? detail.map((item) => item?.msg ?? String(item)).join("; ")
+          : `Ошибка сервера (${res.status})`;
 
-    throw new ApiError(body.detail ?? `Ошибка сервера (${res.status})`, res.status);
+    throw new ApiError(message, res.status);
 
   }
 
