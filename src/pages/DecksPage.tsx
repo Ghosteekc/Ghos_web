@@ -13,10 +13,12 @@ import {
   ChevronLeft,
   ChevronRight,
   BarChart3,
+  ScanSearch,
 } from "lucide-react";
 import { Card, Button, Loader, ElixirIcon } from "@/components/ui";
 import { CardTile } from "@/components/cards";
 import { ConstructorPanel, ConstructorDeckGrid } from "@/components/decks/ConstructorPanel";
+import { DeckPassport } from "@/analytics/deckPassport";
 import { api, ApiError } from "@/api/client";
 import { cacheHas, cacheGet } from "@/api/cache";
 import type { ArenaDecksData, TopPlayersData } from "@/types";
@@ -100,6 +102,7 @@ export function DecksPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>(() => filterFromTab(searchParams.get("tab")));
   const [copyHint, setCopyHint] = useState<string | null>(null);
+  const [passportDeck, setPassportDeck] = useState<Deck | null>(null);
 
   const load = useCallback(async () => {
     if (filter === "random" || filter === "top" || filter === "arena" || filter === "constructor") {
@@ -211,6 +214,7 @@ export function DecksPage() {
             setCopyHint(msg);
             setTimeout(() => setCopyHint(null), 3000);
           }}
+          onAnalyze={setPassportDeck}
         />
       </div>
 
@@ -234,6 +238,7 @@ export function DecksPage() {
                   setCopyHint(msg);
                   setTimeout(() => setCopyHint(null), 3000);
                 }}
+                onAnalyze={() => setPassportDeck(deck)}
               />
             </div>
           )}
@@ -246,6 +251,7 @@ export function DecksPage() {
             setCopyHint(msg);
             setTimeout(() => setCopyHint(null), 3000);
           }}
+          onAnalyze={setPassportDeck}
         />
       </div>
 
@@ -268,6 +274,7 @@ export function DecksPage() {
                       }
                     : undefined
                 }
+                onAnalyze={() => setPassportDeck(deck)}
               />
             </div>
           ))}
@@ -282,6 +289,8 @@ export function DecksPage() {
           ) : null}
         </div>
       ) : null}
+
+      <DeckPassport deck={passportDeck} onClose={() => setPassportDeck(null)} />
     </div>
   );
 }
@@ -296,7 +305,13 @@ function buildComparePath(deck: Deck, fromTab = "arena"): string {
   return `/decks/compare?ref=${ref}&name=${name}&from=${fromTab}`;
 }
 
-function ArenaPanel({ onCopied }: { onCopied: (msg: string) => void }) {
+function ArenaPanel({
+  onCopied,
+  onAnalyze,
+}: {
+  onCopied: (msg: string) => void;
+  onAnalyze: (deck: Deck) => void;
+}) {
   const navigate = useNavigate();
   const [decks, setDecks] = useState<Deck[]>(() => {
     const hit = cacheGet<ArenaDecksData>("arena-decks-v4");
@@ -369,6 +384,7 @@ function ArenaPanel({ onCopied }: { onCopied: (msg: string) => void }) {
                 const path = buildComparePath(deck, "arena");
                 if (path) navigate(path);
               }}
+              onAnalyze={() => onAnalyze(deck)}
             />
           </div>
         ))}
@@ -592,7 +608,13 @@ function RoflModeBar({
   );
 }
 
-function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
+function RandomDeckPanel({
+  onCopied,
+  onAnalyze,
+}: {
+  onCopied: (msg: string) => void;
+  onAnalyze: (deck: Deck) => void;
+}) {
   const { openLink } = useTelegram();
   const [deck, setDeck] = useState<RandomDeck | null>(null);
   const [loading, setLoading] = useState(true);
@@ -705,31 +727,62 @@ function RandomDeckPanel({ onCopied }: { onCopied: (msg: string) => void }) {
           ))}
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            variant="secondary"
-            className="flex-1 !py-2 text-sm flex items-center justify-center gap-2"
-            onClick={() => void roll()}
-            disabled={loading}
-          >
-            <RefreshCw className={"w-4 h-4 " + (loading ? "animate-spin" : "")} />
-            Перегенерировать
-          </Button>
-          {deck.deck_link ? (
+        <div className="flex flex-col gap-2">
+          {deck.cards.length === 8 ? (
+            <Button
+              variant="secondary"
+              className="w-full !py-2 text-sm flex items-center justify-center gap-2"
+              onClick={() =>
+                onAnalyze({
+                  id: 0,
+                  name: deck.rofl_name ?? "Случайная колода",
+                  cards: deck.card_infos.map((c, slot) => ({
+                    ...c,
+                    slot,
+                    rarity: undefined,
+                    evolution_level: 0,
+                    is_hero: false,
+                  })),
+                  winrate: 0,
+                  total_games: 0,
+                  avg_elixir: deck.avg_elixir,
+                  best_matchups: [],
+                  worst_matchups: [],
+                  type: "random",
+                  deck_link: deck.deck_link,
+                })
+              }
+            >
+              <ScanSearch className="w-4 h-4" />
+              Анализ
+            </Button>
+          ) : null}
+          <div className="flex gap-2">
             <Button
               variant="secondary"
               className="flex-1 !py-2 text-sm flex items-center justify-center gap-2"
-              onClick={() => void importDeck()}
+              onClick={() => void roll()}
+              disabled={loading}
             >
-              <ExternalLink className="w-4 h-4" />
-              В игру
+              <RefreshCw className={"w-4 h-4 " + (loading ? "animate-spin" : "")} />
+              Перегенерировать
             </Button>
-          ) : null}
-          {deck.cards.length === 8 ? (
-            <Button variant="ghost" className="!px-3 shrink-0" onClick={() => void saveFavorite()} aria-label="В избранное">
-              <Star className="w-4 h-4" />
-            </Button>
-          ) : null}
+            {deck.deck_link ? (
+              <Button
+                variant="secondary"
+                className="flex-1 !py-2 text-sm flex items-center justify-center gap-2"
+                onClick={() => void importDeck()}
+              >
+                <ExternalLink className="w-4 h-4" />
+                В игру
+              </Button>
+            ) : null}
+            {deck.cards.length === 8 ? (
+              <Button variant="ghost" className="!px-3 shrink-0" onClick={() => void saveFavorite()} aria-label="В избранное">
+                <Star className="w-4 h-4" />
+              </Button>
+            ) : null}
+          </div>
         </div>
       </Card>
     </motion.div>
@@ -743,6 +796,7 @@ function DeckCard({
   showCompare = false,
   onCompare,
   onOpenStats,
+  onAnalyze,
 }: {
   deck: Deck;
   index: number;
@@ -750,6 +804,7 @@ function DeckCard({
   showCompare?: boolean;
   onCompare?: () => void;
   onOpenStats?: () => void;
+  onAnalyze?: () => void;
 }) {
   const { openLink } = useTelegram();
   const cards = deck.cards ?? [];
@@ -888,6 +943,17 @@ function DeckCard({
           >
             <Swords className="w-4 h-4" />
             Сравнить с моей
+          </Button>
+        ) : null}
+
+        {canFavorite && onAnalyze ? (
+          <Button
+            variant="secondary"
+            className="w-full !py-2 text-sm flex items-center justify-center gap-2 mb-3"
+            onClick={onAnalyze}
+          >
+            <ScanSearch className="w-4 h-4" />
+            Анализ
           </Button>
         ) : null}
 
