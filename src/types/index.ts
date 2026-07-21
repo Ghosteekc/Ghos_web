@@ -388,6 +388,22 @@ export interface ConstructorDeckEntry {
   category: string;
   archetype?: string;
   confidence?: number;
+  balanced?: boolean;
+  score_breakdown?: ScoreBreakdown;
+}
+
+export interface ScoreBreakdown {
+  synergy: number;
+  offense: number;
+  defense: number;
+  anti_air: number;
+  anti_swarm: number;
+  spell_balance: number;
+  elixir: number;
+  archetype_fit: number;
+  total: number;
+  hard_issues: string[];
+  soft_issues: string[];
 }
 
 export interface ConstructorData {

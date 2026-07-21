@@ -11,8 +11,11 @@ import {
 } from "./constants";
 import {
   balanceIssues,
+  computeScoreBreakdown,
   finalizeDeck,
   fillersFromTemplate,
+  hardConstraintIssues,
+  isPlayableBalanced,
   meaningfulOverlap,
   templateIsUsable,
 } from "./balance";
@@ -127,6 +130,30 @@ function rankSimilar(core: string[], archetype: string, limit: number): ScoredDe
   return scored.slice(0, limit);
 }
 
+function resultBalanced(deck: string[], core: string[], archetype: string): boolean {
+  const breakdown = computeScoreBreakdown(deck, core, archetype);
+  return isPlayableBalanced(breakdown, coreSynergyAvg(deck, core));
+}
+
+function coreSynergyAvg(deck: string[], core: string[]): number {
+  let total = 0;
+  let n = 0;
+  for (const c of core) {
+    for (const d of deck) {
+      if (c !== d) {
+        total += pairSynergy(c, d);
+        n += 1;
+      }
+    }
+  }
+  return n ? total / n : 0;
+}
+
+function rankScore(r: BuildResult): number {
+  const total = r.scoreBreakdown?.total ?? 0;
+  return total * 0.5 + r.synergyScore * 0.3 + r.confidence * 0.2;
+}
+
 function buildOneVariant(
   core: string[],
   pool: Set<string>,
@@ -158,7 +185,7 @@ export function buildDeckFromCore(core: string[], pool?: Set<string>): BuildResu
   const best = ranked[0];
 
   const deck = buildOneVariant(core, cardPool, archetype, best?.record);
-  const issues = balanceIssues(deck, archetype);
+  const breakdown = computeScoreBreakdown(deck, core, archetype);
 
   return {
     deck,
@@ -168,7 +195,8 @@ export function buildDeckFromCore(core: string[], pool?: Set<string>): BuildResu
     confidence: Math.round((best?.confidence ?? 40) * 10) / 10,
     sourceDeckId: best?.record.id,
     sourceDeckName: undefined,
-    balanced: issues.length === 0,
+    balanced: resultBalanced(deck, core, archetype),
+    scoreBreakdown: breakdown,
   };
 }
 
@@ -202,22 +230,25 @@ export function buildMultipleDecks(core: string[], limit = 6): BuildResult[] {
     if (results.length >= limit) break;
     for (const fillerSkip of [0, 1, 2]) {
       const deck = buildOneVariant(core, pool, archetype, sd.record, fillerSkip);
-      if (deck.length !== 8 || balanceIssues(deck, sd.record.archetype).includes("win_condition")) {
+      const arch = sd.record.archetype;
+      if (deck.length !== 8 || hardConstraintIssues(deck, core).length) {
         continue;
       }
       const key = deckKey(deck);
       if (seen.has(key)) continue;
       seen.add(key);
+      const breakdown = computeScoreBreakdown(deck, core, arch);
 
       results.push({
         deck,
-        archetype: sd.record.archetype,
+        archetype: arch,
         averageElixir: avgElixir(deck),
         synergyScore: deckSynergyScore(deck),
         confidence: Math.round(sd.confidence * 10) / 10,
         sourceDeckId: sd.record.id,
         sourceDeckName: undefined,
-        balanced: balanceIssues(deck, sd.record.archetype).length === 0,
+        balanced: resultBalanced(deck, core, arch),
+        scoreBreakdown: breakdown,
       });
       break;
     }
@@ -226,34 +257,34 @@ export function buildMultipleDecks(core: string[], limit = 6): BuildResult[] {
   if (!results.length) {
     const fallback = buildOneVariant(core, pool, archetype);
     seen.add(deckKey(fallback));
+    const breakdown = computeScoreBreakdown(fallback, core, archetype);
     results.push({
       deck: fallback,
       archetype,
       averageElixir: avgElixir(fallback),
       synergyScore: deckSynergyScore(fallback),
       confidence: 35,
-      balanced: balanceIssues(fallback, archetype).length === 0,
+      balanced: resultBalanced(fallback, core, archetype),
+      scoreBreakdown: breakdown,
     });
   }
 
   const genericFallback = finalizeDeck(core, core, pool, archetype);
   const gKey = deckKey(genericFallback);
   if (!seen.has(gKey) && results.length < limit) {
+    const breakdown = computeScoreBreakdown(genericFallback, core, archetype);
     results.push({
       deck: genericFallback,
       archetype,
       averageElixir: avgElixir(genericFallback),
       synergyScore: deckSynergyScore(genericFallback),
       confidence: 30,
-      balanced: balanceIssues(genericFallback, archetype).length === 0,
+      balanced: resultBalanced(genericFallback, core, archetype),
+      scoreBreakdown: breakdown,
     });
   }
 
-  results.sort(
-    (a, b) =>
-      Number(b.balanced) - Number(a.balanced) ||
-      b.synergyScore + b.confidence - (a.synergyScore + a.confidence),
-  );
+  results.sort((a, b) => rankScore(b) - rankScore(a));
   return dedupeBuildResults(results).slice(0, limit);
 }
 

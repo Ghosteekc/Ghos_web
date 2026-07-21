@@ -4,6 +4,7 @@ export type {
   CardMeta,
   CardRole,
   DeckRecord,
+  ScoreBreakdown,
   ScoredDeck,
 } from "./types";
 
@@ -19,4 +20,14 @@ export {
 
 export { avgElixir, cardRoles, getAllCards, getAllDecks } from "./database";
 export { deckSynergyScore, pairSynergy, synergyNotes } from "./synergy";
-export { balanceIssues, buildDeckFromCore, buildMultipleDecks, detectArchetype } from "./builder";
+export {
+  balanceIssues,
+  buildDeckFromCore,
+  buildMultipleDecks,
+  detectArchetype,
+} from "./builder";
+export {
+  computeScoreBreakdown,
+  hardConstraintIssues,
+  softBalanceIssues,
+} from "./balance";

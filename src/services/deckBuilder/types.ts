@@ -58,6 +58,20 @@ export interface DecksData {
   meta: { version: number; count: number; source: string };
 }
 
+export interface ScoreBreakdown {
+  synergy: number;
+  offense: number;
+  defense: number;
+  anti_air: number;
+  anti_swarm: number;
+  spell_balance: number;
+  elixir: number;
+  archetype_fit: number;
+  total: number;
+  hard_issues: string[];
+  soft_issues: string[];
+}
+
 export interface BuildResult {
   deck: string[];
   archetype: string;
@@ -67,6 +81,7 @@ export interface BuildResult {
   sourceDeckId?: string;
   sourceDeckName?: string;
   balanced?: boolean;
+  scoreBreakdown?: ScoreBreakdown;
 }
 
 export interface ScoredDeck {
