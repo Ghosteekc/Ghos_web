@@ -27,18 +27,18 @@ const ARENA_DEFINITIONS: { name: string; minTrophies: number }[] = [
   { name: "Тихая обитель", minTrophies: 6500 },
   { name: "Драконья купальня", minTrophies: 7000 },
   { name: "Тренировочный лагерь", minTrophies: 7500 },
-  { name: "Clash Fest", minTrophies: 8000 },
+  { name: "Фестиваль Clash", minTrophies: 8000 },
   { name: "БЛИНЧИКИ!", minTrophies: 8500 },
-  { name: "Valkalla", minTrophies: 9000 },
+  { name: "Вальхалла", minTrophies: 9000 },
   { name: "Легендарная арена", minTrophies: 9500 },
-  { name: "Lumberlove Cabin", minTrophies: 10000 },
-  { name: "Royal Road", minTrophies: 10500 },
-  { name: "Musketeer Street", minTrophies: 11000 },
-  { name: "Summit of Heroes", minTrophies: 11500 },
-  { name: "Magic Academy", minTrophies: 12000 },
-  { name: "Ultimate Clash Pit", minTrophies: 12500 },
-  { name: "Little Prince's Tavern", minTrophies: 13000 },
-  { name: "Spirit Square", minTrophies: 13500 },
+  { name: "Сруб лесоруба", minTrophies: 10000 },
+  { name: "Королевская дорога", minTrophies: 10500 },
+  { name: "Улица мушкетёров", minTrophies: 11000 },
+  { name: "Вершина героев", minTrophies: 11500 },
+  { name: "Академия магии", minTrophies: 12000 },
+  { name: "Яма решающего Clash", minTrophies: 12500 },
+  { name: "Таверна маленького принца", minTrophies: 13000 },
+  { name: "Площадь духов", minTrophies: 13500 },
 ];
 
 const EARLY_CARDS = [
@@ -105,19 +105,30 @@ const ARENA_NAME_ALIASES: Record<string, number> = {
   "boot camp": 20,
   "training camp": 20,
   "clash fest": 21,
+  "фестиваль clash": 21,
   "pancake": 22,
   "блин": 22,
   "valkalla": 23,
+  "вальхалла": 23,
   "legendary arena": 24,
   "legendary": 24,
+  "легендарная": 24,
   "lumberlove": 25,
+  "лесоруб": 25,
   "royal road": 26,
+  "королевская дорога": 26,
   "musketeer street": 27,
+  "мушкет": 27,
   "summit of heroes": 28,
+  "вершина героев": 28,
   "magic academy": 29,
+  "академия магии": 29,
   "ultimate clash pit": 30,
+  "решающего clash": 30,
   "little prince": 31,
+  "маленького принца": 31,
   "spirit square": 32,
+  "площадь духов": 32,
 };
 
 export function getRecommendedLevelForArena(arena: number): number {
@@ -126,7 +137,9 @@ export function getRecommendedLevelForArena(arena: number): number {
   if (arena <= 12) return 10;
   if (arena <= 16) return 12;
   if (arena <= 20) return 13;
-  return 14;
+  if (arena <= 28) return 14;
+  if (arena <= 30) return 15;
+  return 16;
 }
 
 export function resolveArenaByTrophies(trophies: number): number {
