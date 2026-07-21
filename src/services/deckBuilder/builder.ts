@@ -29,6 +29,7 @@ import type { BuildResult, DeckRecord, ScoredDeck } from "./types";
 function detectArchetype(core: string[]): string {
   const coreWins = core.filter((c) => WIN_CONDITIONS.has(c));
   for (const win of coreWins) {
+    if (win === "Wall Breakers") return "Split Lane";
     if (["Lava Hound", "Balloon"].includes(win)) return "Lava";
     if (["Golem", "Giant", "Electro Giant"].includes(win)) return "Beatdown";
     if (win === "Royal Giant") return "Royal Giant";
@@ -91,8 +92,10 @@ function scoreDeckMatch(core: string[], archetype: string, record: DeckRecord): 
   const weightedOverlap = overlapScore(core, record.cards);
   const cardScore = weightedOverlap * (WEIGHT_CARD_MATCH / 4);
   const archScore = record.archetype === archetype ? WEIGHT_ARCHETYPE : 0;
-  const elixirDiff = Math.abs(record.avgElixir - avgElixir(core));
-  const elixirScore = Math.max(0, WEIGHT_ELIXIR - elixirDiff * 5);
+  const coreAvg = avgElixir(core);
+  const elixirDiff = Math.abs(record.avgElixir - coreAvg);
+  const elixirPenalty = coreAvg <= 3.0 ? elixirDiff * 8 : elixirDiff * 5;
+  const elixirScore = Math.max(0, WEIGHT_ELIXIR - elixirPenalty);
   const synScore = (coreSynergyWithDeck(core, record.cards) / 100) * WEIGHT_SYNERGY;
   const popScore = ((record.popularity ?? 50) / 100) * WEIGHT_POPULARITY;
 
@@ -246,7 +249,11 @@ export function buildMultipleDecks(core: string[], limit = 6): BuildResult[] {
     });
   }
 
-  results.sort((a, b) => b.synergyScore + b.confidence - (a.synergyScore + a.confidence));
+  results.sort(
+    (a, b) =>
+      Number(b.balanced) - Number(a.balanced) ||
+      b.synergyScore + b.confidence - (a.synergyScore + a.confidence),
+  );
   return dedupeBuildResults(results).slice(0, limit);
 }
 

@@ -55,6 +55,7 @@ export const ARCHETYPE_ELIXIR: Record<string, [number, number]> = {
   Siege: [2.8, 3.6],
   Control: [3.0, 4.0],
   Graveyard: [3.2, 4.2],
+  "Split Lane": [2.8, 3.6],
   Meta: [2.8, 4.4],
 };
 
@@ -64,10 +65,34 @@ export const FILL_PRIORITY: CardRole[] = [
   "small_spell",
   "air_defense",
   "mini_tank",
+  "defensive",
+  "anti_tank",
+  "anti_swarm",
   "building",
   "dps",
   "cycle",
   "counterpush",
+];
+
+/** Мини-тank для отвлечения на дешёвых колодах. */
+export const CHEAP_DECK_ANCHORS = ["Knight", "Valkyrie", "Ice Golem"] as const;
+
+/** Спам / ответ на тяжёлые юниты. */
+export const ANTI_TANK_SWARM_CARDS = [
+  "Skeleton Army",
+  "Guards",
+  "Goblin Gang",
+  "Bats",
+  "Skeletons",
+  "Mini P.E.K.K.A",
+] as const;
+
+/** Критичные роли — добиваем заменой слабого филлера, даже если колода уже из 8 карт. */
+export const CRITICAL_BALANCE_ROLES: CardRole[] = [
+  "mini_tank",
+  "defensive",
+  "anti_tank",
+  "anti_swarm",
 ];
 
 export const ARCHETYPE_ANCHORS: Record<string, ReadonlySet<string>> = {

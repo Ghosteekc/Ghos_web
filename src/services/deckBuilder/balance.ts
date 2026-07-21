@@ -1,6 +1,9 @@
 import {
+  ANTI_TANK_SWARM_CARDS,
   ARCHETYPE_ELIXIR,
   ARCHETYPE_PRIMARY_WIN,
+  CHEAP_DECK_ANCHORS,
+  CRITICAL_BALANCE_ROLES,
   DEFAULT_ELIXIR_MAX,
   DEFAULT_ELIXIR_MIN,
   FILL_PRIORITY,
@@ -62,6 +65,17 @@ function elixirBounds(archetype: string): [number, number] {
   return ARCHETYPE_ELIXIR[archetype] ?? [DEFAULT_ELIXIR_MIN, DEFAULT_ELIXIR_MAX];
 }
 
+function isCheapDeck(deck: string[], archetype: string): boolean {
+  return avgElixir(deck) <= 3.35 || archetype === "Cycle" || archetype === "Split Lane";
+}
+
+function preferredCardsForRole(role: string, cheap: boolean): string[] {
+  if (!cheap) return [];
+  if (role === "mini_tank" || role === "defensive") return [...CHEAP_DECK_ANCHORS];
+  if (role === "anti_tank") return [...ANTI_TANK_SWARM_CARDS];
+  return [];
+}
+
 function hasRole(deck: string[], role: string): boolean {
   return deck.some((c) => cardRoles(c).has(role));
 }
@@ -98,6 +112,8 @@ function pickForRole(
 ): string | undefined {
   const [lo, hi] = elixirBounds(archetype);
   const mid = (lo + hi) / 2;
+  const cheap = isCheapDeck(deck, archetype);
+  const preferred = preferredCardsForRole(role, cheap);
   const candidates = [...pool].filter((c) => {
     if (deck.includes(c)) return false;
     if (excludeSpells && isSpellCard(c)) return false;
@@ -105,13 +121,81 @@ function pickForRole(
   });
   if (!candidates.length) return undefined;
 
+  const roleScore = (card: string) => {
+    let score = deck.reduce((s, x) => s + pairSynergy(card, x), 0) / deck.length;
+    const prefIdx = preferred.indexOf(card);
+    if (prefIdx >= 0) score += (preferred.length - prefIdx) * 4;
+    return score;
+  };
+
   return candidates.sort((a, b) => {
-    const synA = deck.reduce((s, x) => s + pairSynergy(a, x), 0) / deck.length;
-    const synB = deck.reduce((s, x) => s + pairSynergy(b, x), 0) / deck.length;
+    const synA = roleScore(a);
+    const synB = roleScore(b);
     const elA = Math.abs(avgElixir([...deck, a]) - mid);
     const elB = Math.abs(avgElixir([...deck, b]) - mid);
     return synB - synA || elA - elB;
   })[0];
+}
+
+function fillerDropScore(card: string, deck: string[], neededRole: string): number {
+  const roles = cardRoles(card);
+  let score = deck.reduce((s, x) => s + pairSynergy(card, x), 0);
+  if (roles.has("mini_tank") || roles.has("defensive")) score += 25;
+  if (roles.has("anti_tank")) score += 18;
+  if (roles.has("anti_swarm")) score += 10;
+  if (GENERIC_CARDS.has(card)) score -= 8;
+  if (neededRole === "mini_tank" || neededRole === "defensive") {
+    if (roles.has("air_defense") && !roles.has("mini_tank") && !roles.has("defensive")) {
+      score -= 15;
+    }
+    if (roles.has("splash") && !roles.has("mini_tank")) score -= 8;
+  }
+  if (neededRole === "anti_tank" && roles.has("air_defense") && !roles.has("anti_tank")) {
+    score -= 10;
+  }
+  return score;
+}
+
+function replaceWeakestFiller(deck: string[], core: string[], replacement: string, neededRole?: string): string[] {
+  const coreSet = new Set(core);
+  const fillers = deck.filter((c) => !coreSet.has(c));
+  if (!fillers.length) return deck;
+  const worst = fillers.sort(
+    (a, b) =>
+      fillerDropScore(a, deck, neededRole ?? "") - fillerDropScore(b, deck, neededRole ?? ""),
+  )[0];
+  return deck.map((c) => (c === worst ? replacement : c));
+}
+
+function enforceCriticalBalance(
+  deck: string[],
+  core: string[],
+  pool: Set<string>,
+  archetype: string,
+): string[] {
+  let out = [...deck];
+  let issues = balanceIssues(out, archetype);
+
+  for (const role of CRITICAL_BALANCE_ROLES) {
+    if (!issues.includes(role)) continue;
+    const pick = pickForRole(out, pool, role, archetype, true);
+    if (!pick || out.includes(pick)) continue;
+    out = replaceWeakestFiller(out, core, pick, role);
+    issues = balanceIssues(out, archetype);
+  }
+
+  if (
+    isCheapDeck(out, archetype) &&
+    !out.some((c) => cardRoles(c).has("mini_tank") || cardRoles(c).has("defensive"))
+  ) {
+    for (const anchor of CHEAP_DECK_ANCHORS) {
+      if (!pool.has(anchor) || out.includes(anchor)) continue;
+      out = replaceWeakestFiller(out, core, anchor, "mini_tank");
+      break;
+    }
+  }
+
+  return out;
 }
 
 function pickWinForArchetype(
@@ -133,18 +217,6 @@ function pickWinForArchetype(
       deck.reduce((s, x) => s + pairSynergy(b, x), 0) -
       deck.reduce((s, x) => s + pairSynergy(a, x), 0),
   )[0];
-}
-
-function replaceWeakestFiller(deck: string[], core: string[], replacement: string): string[] {
-  const coreSet = new Set(core);
-  const fillers = deck.filter((c) => !coreSet.has(c));
-  if (!fillers.length) return deck;
-  const worst = fillers.sort(
-    (a, b) =>
-      deck.reduce((s, x) => s + pairSynergy(a, x), 0) -
-      deck.reduce((s, x) => s + pairSynergy(b, x), 0),
-  )[0];
-  return deck.map((c) => (c === worst ? replacement : c));
 }
 
 function trimExcessSpells(deck: string[], core: string[]): string[] {
@@ -262,6 +334,10 @@ export function finalizeDeck(
     if (!extra) break;
     out.push(extra);
   }
+
+  out = enforceCriticalBalance(out, core, pool, archetype);
+  out = trimExcessSpells(out, core);
+  out = trimExcessWins(out, core);
 
   return out.slice(0, 8);
 }
