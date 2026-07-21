@@ -3,6 +3,7 @@ import {
   SYNERGY_PARTIAL,
   SYNERGY_STRONG,
   SYNERGY_WEAK,
+  WIN_CONDITIONS,
 } from "./constants";
 import { cardRoles, getCardMeta, getSynergyPairScore } from "./database";
 
@@ -27,19 +28,31 @@ function isBuildingCard(name: string): boolean {
   return meta?.type === "building" || cardRoles(name).has("building");
 }
 
-/** Полезная карта (юнит), с которой показываем синергию — не дух, не здание, не заклинание. */
-function isUsefulTroopForSynergy(name: string): boolean {
-  if (isSpiritCard(name) || isSpellCard(name) || isBuildingCard(name)) return false;
-  return getCardMeta(name)?.type === "troop";
+/** Атакующая карта — win condition (Hog, Wall Breakers, Miner и т.д.). */
+function isAttackingCard(name: string): boolean {
+  return WIN_CONDITIONS.has(name) || cardRoles(name).has("win_condition");
 }
 
-/** Синергия только между заклинанием и полезным юнитом (Hog + Earthquake, P.E.K.K.A + Zap). */
-export function isValidSynergyPair(a: string, b: string): boolean {
+/** Духи/здания/заклинания не синергируют между собой. */
+function isBlockedSynergyPair(a: string, b: string): boolean {
+  const aSpirit = isSpiritCard(a);
+  const bSpirit = isSpiritCard(b);
   const aSpell = isSpellCard(a);
   const bSpell = isSpellCard(b);
-  if (aSpell === bSpell) return false;
-  const troop = aSpell ? b : a;
-  return isUsefulTroopForSynergy(troop);
+  const aBuilding = isBuildingCard(a);
+  const bBuilding = isBuildingCard(b);
+
+  if (aSpirit && (bSpell || bBuilding)) return true;
+  if (bSpirit && (aSpell || aBuilding)) return true;
+  if (aSpell && bBuilding) return true;
+  if (aSpell && bSpell) return true;
+  return false;
+}
+
+/** Синергия только с участием атакующей карты (Hog + Valkyrie, Wall Breakers + Electro Spirit). */
+export function isValidSynergyPair(a: string, b: string): boolean {
+  if (isBlockedSynergyPair(a, b)) return false;
+  return isAttackingCard(a) || isAttackingCard(b);
 }
 
 export function pairSynergy(a: string, b: string): number {

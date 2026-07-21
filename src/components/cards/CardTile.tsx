@@ -308,7 +308,7 @@ export function CardUsageCompactGrid({ items }: { items: CardUsageItem[] }) {
           </p>
           <p className="text-[10px] font-semibold text-cr-accent">
             {item.count} игр
-            {item.winrate != null ? ` · ${item.winrate.toFixed(0)}%` : ""}
+            {item.winrate != null ? ` · ${item.winrate.toFixed(0)}% WR` : ""}
           </p>
           {item.winrate != null ? (
             <div className="h-1 w-full overflow-hidden rounded-full bg-cr-border/40">
