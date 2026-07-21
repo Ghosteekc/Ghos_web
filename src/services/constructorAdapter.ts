@@ -1,6 +1,6 @@
-import { buildMultipleDecks, synergyNotes, type BuildResult } from "@/services/deckBuilder";
 import type { ConstructorDeckEntry, Deck, DeckCard } from "@/types";
-
+import { api, ApiError } from "@/api/client";
+import { buildMultipleDecks, synergyNotes, type BuildResult } from "@/services/deckBuilder";
 type CatalogLike = {
   name: string;
   icon: string;
@@ -80,6 +80,50 @@ function toDeckCard(
   };
 }
 
+export function constructorEntryToDeck(entry: ConstructorDeckEntry): Deck {
+  return {
+    id: entry.id,
+    name: entry.name,
+    cards: entry.cards,
+    winrate: entry.synergy_score,
+    total_games: 0,
+    avg_elixir: entry.avg_elixir,
+    type: "constructor",
+    category: entry.category,
+    deck_link: entry.deck_link,
+    description: entry.description,
+    best_matchups: [],
+    worst_matchups: [],
+    synergy_score: entry.synergy_score,
+    synergy_notes: entry.synergy_notes,
+    archetype: entry.archetype,
+    confidence: entry.confidence,
+  } as Deck & { archetype?: string; confidence?: number };
+}
+
+function constructorApiErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    return error.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "Не удалось собрать колоды";
+}
+
+/** Генерация колод через backend (единственный источник истины для конструктора). */
+export async function fetchConstructorDecks(
+  slots: { name: string; slot: number }[],
+): Promise<Deck[]> {
+  const data = await api.buildConstructorDecks(slots);
+  return data.decks.map(constructorEntryToDeck);
+}
+
+export { constructorApiErrorMessage };
+
+/**
+ * @deprecated Локальная генерация — только для отладки. UI использует fetchConstructorDecks().
+ */
 export function buildConstructorDecksLocal(
   slots: { name: string; slot: number }[],
   catalog: CatalogLike[],
@@ -135,25 +179,4 @@ export function buildConstructorDecksLocal(
   }
 
   return { core, decks: unique };
-}
-
-export function constructorEntryToDeck(entry: ConstructorDeckEntry): Deck {
-  return {
-    id: entry.id,
-    name: entry.name,
-    cards: entry.cards,
-    winrate: entry.synergy_score,
-    total_games: 0,
-    avg_elixir: entry.avg_elixir,
-    type: "constructor",
-    category: entry.category,
-    deck_link: entry.deck_link,
-    description: entry.description,
-    best_matchups: [],
-    worst_matchups: [],
-    synergy_score: entry.synergy_score,
-    synergy_notes: entry.synergy_notes,
-    archetype: entry.archetype,
-    confidence: entry.confidence,
-  } as Deck & { archetype?: string; confidence?: number };
 }

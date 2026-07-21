@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { Search, X, Sparkles, Wand2 } from "lucide-react";
 
@@ -11,11 +11,8 @@ import { CardTile } from "@/components/cards";
 import { useCardCatalog } from "@/hooks";
 
 import {
-
-  buildConstructorDecksLocal,
-
-  constructorEntryToDeck,
-
+  fetchConstructorDecks,
+  constructorApiErrorMessage,
 } from "@/services/constructorAdapter";
 
 import type { CardDisplayMode, Deck, DeckCard } from "@/types";
@@ -206,71 +203,55 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
 
 
-  const buildDecks = useCallback((current: (SlotPick)[], cat: CatalogCard[]) => {
+  const buildRequestRef = useRef(0);
 
+  const buildDecks = useCallback(async (current: (SlotPick)[]) => {
     const picks = current.filter((s): s is NonNullable<SlotPick> => Boolean(s));
-
-    if (picks.length !== 4 || cat.length === 0) {
-
+    if (picks.length !== 4) {
       setDecks([]);
-
       return;
-
     }
 
+    const requestId = ++buildRequestRef.current;
     setLoading(true);
-
     setError(null);
 
     try {
-
-      const data = buildConstructorDecksLocal(
-
-        picks.map((p) => ({ name: p.name, slot: p.slot })),
-
-        cat,
-
-      );
-
-      setDecks(data.decks.map(constructorEntryToDeck));
-
+      const payload = picks
+        .slice()
+        .sort((a, b) => a.slot - b.slot)
+        .map((p) => ({ name: p.name, slot: p.slot }));
+      const built = await fetchConstructorDecks(payload);
+      if (requestId !== buildRequestRef.current) return;
+      setDecks(built);
     } catch (e) {
-
+      if (requestId !== buildRequestRef.current) return;
       setDecks([]);
-
-      setError(e instanceof Error ? e.message : "Не удалось собрать колоды");
-
+      setError(constructorApiErrorMessage(e));
     } finally {
-
-      setLoading(false);
-
+      if (requestId === buildRequestRef.current) {
+        setLoading(false);
+      }
     }
-
   }, []);
 
 
 
   useEffect(() => {
 
-    if (filledCount !== 4 || catalog.length === 0) {
-
-      if (filledCount !== 4) {
-
-        setDecks([]);
-
-        setError(null);
-
-      }
-
+    if (filledCount !== 4) {
+      setDecks([]);
+      setError(null);
       return;
-
     }
 
-    const timer = setTimeout(() => buildDecks(slots, catalog), 200);
+    const timer = setTimeout(() => {
+      void buildDecks(slots);
+    }, 200);
 
     return () => clearTimeout(timer);
 
-  }, [slots, filledCount, catalog, buildDecks]);
+  }, [slots, filledCount, buildDecks]);
 
 
 
