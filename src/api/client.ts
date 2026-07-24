@@ -414,7 +414,7 @@ export const api = {
   getCounterDeck: (index: number) =>
     request<CounterDeckData>(`/api/opponents/${index}/counter`),
 
-  getCustomizeDeck: () => cachedGet<CustomizeData>("customize-v6", "/api/customize", TTL.battles),
+  getCustomizeDeck: () => cachedGet<CustomizeData>("customize-v7", "/api/customize", TTL.battles),
 
   getSynergyDeck: () => cachedGet<SynergyData>("synergy-v2", "/api/synergy", TTL.battles),
 

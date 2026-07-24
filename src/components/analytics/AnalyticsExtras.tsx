@@ -225,10 +225,6 @@ function deckLevels(cards?: CustomizeData["original_cards"]) {
   return cards?.map((c) => c.level ?? null) ?? [];
 }
 
-function deckLevelWarnings(cards?: CustomizeData["original_cards"]) {
-  return cards?.map((c) => Boolean(c.needs_upgrade)) ?? [];
-}
-
 function deckIcons(cards?: CustomizeData["original_cards"]) {
   return cards?.map((c) => c.icon ?? "");
 }
@@ -245,7 +241,7 @@ export function DeckToolsPanel() {
     try {
       setError(null);
       if (force) {
-        cacheInvalidate("customize-v6");
+        cacheInvalidate("customize-v7");
       }
       const custom = await api.getCustomizeDeck().catch(() => null);
       setCustomize(custom);
@@ -310,7 +306,6 @@ export function DeckToolsPanel() {
             cards={customize.original}
             icons={deckIcons(customize.original_cards)}
             levels={deckLevels(customize.original_cards)}
-            levelWarnings={deckLevelWarnings(customize.original_cards)}
             size="sm"
             showLabels
             maxVisible={8}
@@ -318,7 +313,7 @@ export function DeckToolsPanel() {
 
           {upgrades.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs text-cr-gold mb-2">Прокачать в первую очередь</p>
+              <p className="text-xs text-cr-gold mb-2">Рекомендуемый уровень карт</p>
               <ul className="space-y-1.5">
                 {upgrades.map((u) => (
                   <li
@@ -351,7 +346,6 @@ export function DeckToolsPanel() {
                 cards={customize.customized}
                 icons={deckIcons(customize.customized_cards)}
                 levels={deckLevels(customize.customized_cards)}
-                levelWarnings={deckLevelWarnings(customize.customized_cards)}
                 size="sm"
                 showLabels
                 maxVisible={8}
@@ -372,7 +366,6 @@ export function DeckToolsPanel() {
                 cards={customize.level_alt_deck}
                 icons={deckIcons(customize.level_alt_cards)}
                 levels={deckLevels(customize.level_alt_cards)}
-                levelWarnings={deckLevelWarnings(customize.level_alt_cards)}
                 size="sm"
                 showLabels
                 maxVisible={8}
