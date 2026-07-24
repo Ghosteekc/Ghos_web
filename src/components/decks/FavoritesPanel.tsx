@@ -88,7 +88,7 @@ export function FavoritesPanel() {
                   </Button>
                 </div>
               </div>
-              <CardDeckGrid cards={entry.cards} size="sm" showLabels maxVisible={8} />
+              <CardDeckGrid cards={entry.cards} size="deck" showLabels maxVisible={8} />
             </Card>
           ))}
         </div>
