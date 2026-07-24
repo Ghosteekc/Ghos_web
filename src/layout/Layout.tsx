@@ -47,6 +47,9 @@ export function Layout() {
     if (webApp) {
       webApp.ready();
       webApp.expand();
+      // Lock the sheet: content swipes must not close/minimize the Mini App.
+      // Users can still dismiss via the header drag handle / Close button.
+      webApp.disableVerticalSwipes?.();
     }
     applyTelegramSafeArea();
     if (!webApp) return;

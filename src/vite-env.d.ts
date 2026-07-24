@@ -19,6 +19,10 @@ export interface TelegramWebApp {
   ready: () => void;
   expand: () => void;
   close: () => void;
+  /** Bot API 7.7+ — disable swipe-down to close/minimize the Mini App. */
+  isVerticalSwipesEnabled?: boolean;
+  enableVerticalSwipes?: () => void;
+  disableVerticalSwipes?: () => void;
   openTelegramLink: (url: string) => void;
   openLink: (url: string) => void;
   themeParams: Record<string, string>;
