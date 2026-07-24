@@ -8,7 +8,7 @@ import { Card, Button, Loader, ScrollToTopButton } from "@/components/ui";
 import { BattleCardSimple } from "@/components/battles/BattleCard";
 import { api, ApiError } from "@/api/client";
 import { BattleSummary } from "@/types";
-import { battleDetailPath } from "@/utils";
+import { battleDetailPath, cn } from "@/utils";
 import { usePageRefresh } from "@/hooks";
 
 export function BattlesPage() {
@@ -76,7 +76,8 @@ export function BattlesPage() {
             key={f}
             type="button"
             onClick={() => setFilter(f)}
-            className={"filter-tab " + (filter === f ? "filter-tab--active" : "")}
+            className={cn("filter-tab", filter === f && "filter-tab--active")}
+            aria-pressed={filter === f}
           >
             {f === "all" ? "Все" : f === "wins" ? "Победы" : "Поражения"}
           </button>

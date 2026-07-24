@@ -181,15 +181,16 @@
       drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.28))
       drop-shadow(0 0 0 1px rgba(100, 135, 220, 0.28));
     --pb-filter-pressed:
-      drop-shadow(0 1px 0 rgba(0, 0, 0, 0.22))
-      drop-shadow(0 0 0 1px rgba(80, 110, 190, 0.25));
+      drop-shadow(0 1px 0 rgba(0, 0, 0, 0.32))
+      drop-shadow(0 0 0 1px rgba(120, 160, 240, 0.38));
     --pb-shadow-raised:
       inset 0 1px 0 rgba(255, 255, 255, 0.14),
       inset 0 -1px 0 rgba(0, 0, 0, 0.38),
       inset 0 0 0 1px rgba(130, 165, 240, 0.14);
     --pb-shadow-pressed:
-      inset 0 3px 8px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      inset 0 3px 7px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.35);
     --pb-inner-ring:
       inset 0 0 0 2px rgba(140, 175, 255, 0.55),
       inset 0 0 14px rgba(88, 118, 210, 0.12);
@@ -226,23 +227,43 @@
   .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active {
     transform: translate(1px, 1px);
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed), var(--pb-inner-ring);
+    box-shadow: var(--pb-shadow-pressed);
     filter: var(--pb-filter-pressed);
   }
 
   .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active::after {
-    opacity: 1;
+    opacity: 0;
+  }
+
+  .pixel-btn:not(.pixel-btn--ghost):not(.pixel-btn--primary).pixel-btn--active {
+    color: rgb(var(--cr-gold));
+    text-shadow: var(--cr-stroke-title);
+  }
+
+  .pixel-btn:not(.pixel-btn--ghost):not(.pixel-btn--primary).pixel-btn--active .pixel-btn-hint {
+    color: rgba(251, 191, 36, 0.78);
+    text-shadow: var(--cr-stroke-body);
   }
 
   .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) {
     transform: translate(1px, 2px);
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed), var(--pb-inner-ring);
+    box-shadow: var(--pb-shadow-pressed);
     filter: var(--pb-filter-pressed);
   }
 
   .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled)::after {
-    opacity: 1;
+    opacity: 0;
+  }
+
+  .pixel-btn:not(.pixel-btn--ghost):not(.pixel-btn--primary):active:not(:disabled) {
+    color: rgb(var(--cr-gold));
+    text-shadow: var(--cr-stroke-title);
+  }
+
+  .pixel-btn:not(.pixel-btn--ghost):not(.pixel-btn--primary):active:not(:disabled) .pixel-btn-hint {
+    color: rgba(251, 191, 36, 0.78);
+    text-shadow: var(--cr-stroke-body);
   }
 
   .pixel-bevel::after {
@@ -434,11 +455,29 @@
   }
 
   .filter-tab {
-    @apply pixel-btn pixel-btn--chip whitespace-nowrap text-sm font-semibold text-cr-text;
+    @apply pixel-btn pixel-btn--chip flex-1 justify-center whitespace-nowrap text-sm font-semibold text-cr-text;
   }
 
-  .filter-tab--active {
-    @apply pixel-btn--active text-cr-text;
+  .filter-tab.filter-tab--active {
+    transform: translate(1px, 1px);
+    background: var(--pb-bg-pressed);
+    box-shadow: var(--pb-shadow-pressed);
+    filter: var(--pb-filter-pressed);
+    color: rgb(var(--cr-gold));
+    text-shadow: var(--cr-stroke-title);
+  }
+
+  .filter-tab.filter-tab--active:active:not(:disabled) {
+    transform: translate(1px, 2px);
+  }
+
+  .filter-tab:active:not(:disabled) {
+    transform: translate(1px, 2px);
+    background: var(--pb-bg-pressed);
+    box-shadow: var(--pb-shadow-pressed);
+    filter: var(--pb-filter-pressed);
+    color: rgb(var(--cr-gold));
+    text-shadow: var(--cr-stroke-title);
   }
 
   .filter-tab-row {
@@ -469,15 +508,19 @@
 
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active,
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) {
-    --pb-inner-ring:
-      inset 0 0 0 2px rgba(59, 100, 200, 0.52),
-      inset 0 0 12px rgba(59, 100, 200, 0.1);
     --pb-shadow-pressed:
-      inset 0 3px 6px rgba(15, 23, 42, 0.14),
-      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+      inset 0 3px 7px rgba(15, 23, 42, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      inset 0 0 0 1px rgba(15, 23, 42, 0.12);
     --pb-filter-pressed:
-      drop-shadow(0 1px 0 rgba(15, 23, 42, 0.08))
-      drop-shadow(0 0 0 1px rgba(59, 100, 200, 0.2));
+      drop-shadow(0 1px 0 rgba(15, 23, 42, 0.1))
+      drop-shadow(0 0 0 1px rgba(59, 100, 200, 0.28));
+  }
+
+  [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):not(.pixel-btn--primary).pixel-btn--active,
+  [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):not(.pixel-btn--primary):active:not(:disabled) {
+    color: rgb(180 120 8);
+    text-shadow: none;
   }
 
   .pixel-btn--chip-sm {
@@ -557,8 +600,26 @@
     @apply text-cr-muted;
   }
 
-  .segment-tab--active {
-    @apply pixel-btn--active text-cr-text;
+  .segment-tab.segment-tab--active {
+    transform: translate(1px, 1px);
+    background: var(--pb-bg-pressed);
+    box-shadow: var(--pb-shadow-pressed);
+    filter: var(--pb-filter-pressed);
+    color: rgb(var(--cr-gold));
+    text-shadow: var(--cr-stroke-title);
+  }
+
+  .segment-tab.segment-tab--active:active:not(:disabled) {
+    transform: translate(1px, 2px);
+  }
+
+  .segment-tab:active:not(:disabled) {
+    transform: translate(1px, 2px);
+    background: var(--pb-bg-pressed);
+    box-shadow: var(--pb-shadow-pressed);
+    filter: var(--pb-filter-pressed);
+    color: rgb(var(--cr-gold));
+    text-shadow: var(--cr-stroke-title);
   }
 
   .sidebar-item {
@@ -568,7 +629,16 @@
   }
 
   .sidebar-item.active {
-    @apply pixel-btn--active text-cr-gold;
+    transform: translate(1px, 1px);
+    background: var(--pb-bg-pressed);
+    box-shadow: var(--pb-shadow-pressed);
+    filter: var(--pb-filter-pressed);
+    color: rgb(var(--cr-gold));
+    text-shadow: var(--cr-stroke-title);
+  }
+
+  .sidebar-item.active:active:not(:disabled) {
+    transform: translate(1px, 2px);
   }
 
   .sidebar-item:not(.active) {
