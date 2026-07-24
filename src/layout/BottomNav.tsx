@@ -9,7 +9,7 @@ const BUBBLE_HIT_X = 58;
 const BUBBLE_HIT_Y = 50;
 
 const STRETCH_TWEEN = { type: "tween" as const, duration: 0.18, ease: [0.22, 0.08, 0.24, 1] as const };
-const NEAR_TAB_TWEEN = { type: "tween" as const, duration: 0.34, ease: [0.28, 0.1, 0.22, 1] as const };
+const NEAR_TAB_TWEEN = { type: "tween" as const, duration: 0.22, ease: [0.28, 0.1, 0.22, 1] as const };
 
 const NEAR_TAB_SPRING = { stiffness: 215, damping: 37, mass: 0.86 };
 const FAR_TAB_SPRING = { stiffness: 270, damping: 23, mass: 0.72 };
@@ -127,7 +127,7 @@ type BottomNavItemProps = {
   isActive: boolean;
   isHighlighted: boolean;
   onItemRef: (index: number, el: HTMLAnchorElement | null) => void;
-  onPointerDown: (event: React.PointerEvent<HTMLAnchorElement>) => void;
+  onNavigate: (event: React.MouseEvent<HTMLAnchorElement>, index: number) => void;
 };
 
 const BottomNavItem = memo(function BottomNavItem({
@@ -136,7 +136,7 @@ const BottomNavItem = memo(function BottomNavItem({
   isActive,
   isHighlighted,
   onItemRef,
-  onPointerDown,
+  onNavigate,
 }: BottomNavItemProps) {
   const Icon = item.icon;
 
@@ -148,7 +148,7 @@ const BottomNavItem = memo(function BottomNavItem({
       className={`bottom-nav-item${isHighlighted ? " is-highlighted" : ""}`}
       aria-label={item.label}
       aria-current={isActive ? "page" : undefined}
-      onPointerDown={onPointerDown}
+      onClick={(event) => onNavigate(event, index)}
     >
       <span className="bottom-nav-item-content">
         <span className="bottom-nav-icon-slot" aria-hidden>
@@ -187,6 +187,7 @@ export function BottomNav() {
   const lastDragHapticIndexRef = useRef(activeIndex);
   const prevActiveIndexRef = useRef(activeIndex);
   const bubbleFocusIndexRef = useRef(activeIndex);
+  const motionControlsRef = useRef<Array<{ stop: () => void }>>([]);
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [bubbleFocusIndex, setBubbleFocusIndex] = useState(activeIndex);
   const highlightedIndex = previewIndex ?? bubbleFocusIndex;
@@ -195,6 +196,24 @@ export function BottomNav() {
     if (bubbleAnimatingRef.current === active) return;
     bubbleAnimatingRef.current = active;
     bubbleLayerRef.current?.classList.toggle("bottom-nav-liquid-bubble--animating", active);
+  }, []);
+
+  const stopBubbleMotion = useCallback(() => {
+    for (const control of motionControlsRef.current) {
+      control.stop();
+    }
+    motionControlsRef.current = [];
+    bubbleX.stop();
+    scaleX.stop();
+    scaleY.stop();
+    setBubbleAnimating(false);
+  }, [bubbleX, scaleX, scaleY, setBubbleAnimating]);
+
+  const registerMotionControl = useCallback((control: { stop: () => void }) => {
+    motionControlsRef.current.push(control);
+    return () => {
+      motionControlsRef.current = motionControlsRef.current.filter((item) => item !== control);
+    };
   }, []);
 
   const refreshBubbleMetrics = useCallback(() => {
@@ -266,20 +285,39 @@ export function BottomNav() {
   );
 
   const animateStretch = useCallback(
-    (x: number, y: number, config: BubbleTransition = STRETCH_TWEEN) =>
-      Promise.all([animate(scaleX, x, config), animate(scaleY, y, config)]),
-    [scaleX, scaleY],
+    (x: number, y: number, config: BubbleTransition = STRETCH_TWEEN) => {
+      const sx = animate(scaleX, x, config);
+      const sy = animate(scaleY, y, config);
+      const unregisterSx = registerMotionControl(sx);
+      const unregisterSy = registerMotionControl(sy);
+      return Promise.all([sx, sy]).finally(() => {
+        unregisterSx();
+        unregisterSy();
+      });
+    },
+    [scaleX, scaleY, registerMotionControl],
   );
 
   const animateBubbleX = useCallback(
     (target: number, fromIndex: number, toIndex: number) => {
+      if (fromIndex === toIndex && Math.abs(bubbleX.get() - target) < 0.5) {
+        bubbleX.set(target);
+        bubbleFocusIndexRef.current = toIndex;
+        setBubbleFocusIndex(toIndex);
+        scaleX.set(1);
+        scaleY.set(1);
+        setBubbleAnimating(false);
+        return Promise.resolve();
+      }
+
+      stopBubbleMotion();
       const tabSteps = getTabSteps(fromIndex, toIndex);
       const moveTransition = getMoveTransition(fromIndex, toIndex);
       const releaseTransition = getReleaseTransition(fromIndex, toIndex);
       const centers = getTabCenters();
       setBubbleAnimating(true);
 
-      return animate(bubbleX, target, {
+      const control = animate(bubbleX, target, {
         ...moveTransition,
         onUpdate: (latest) => {
           applyStretchFromPull(Math.abs(latest - target), tabSteps);
@@ -298,8 +336,21 @@ export function BottomNav() {
           });
         },
       });
+      const unregister = registerMotionControl(control);
+
+      return control.then(() => {
+        unregister();
+      });
     },
-    [applyStretchFromPull, bubbleX, animateStretch, getTabCenters, setBubbleAnimating],
+    [
+      applyStretchFromPull,
+      bubbleX,
+      animateStretch,
+      getTabCenters,
+      registerMotionControl,
+      setBubbleAnimating,
+      stopBubbleMotion,
+    ],
   );
 
   const syncBubbleToIndex = useCallback(
@@ -345,9 +396,20 @@ export function BottomNav() {
       setBubbleFocusIndex(activeIndex);
       return;
     }
-    syncBubbleToIndex(activeIndex, true, prevActiveIndexRef.current);
+    stopBubbleMotion();
+    refreshLayoutMetrics();
+    const track = trackRef.current;
+    if (!track) {
+      prevActiveIndexRef.current = activeIndex;
+      return;
+    }
+    void animateBubbleX(
+      clampBubbleXForTrack(getTabCenterX(activeIndex), track.offsetWidth),
+      prevActiveIndexRef.current,
+      activeIndex,
+    );
     prevActiveIndexRef.current = activeIndex;
-  }, [activeIndex, syncBubbleToIndex]);
+  }, [activeIndex, animateBubbleX, clampBubbleXForTrack, getTabCenterX, refreshLayoutMetrics, stopBubbleMotion]);
 
   useEffect(() => {
     const onResize = () => {
@@ -420,6 +482,7 @@ export function BottomNav() {
     previewIndexRef.current = nextIndex;
     setPreviewIndex(nextIndex);
 
+    stopBubbleMotion();
     void animateBubbleX(targetX, activeIndex, nextIndex).then(() => {
       previewIndexRef.current = null;
       setPreviewIndex(null);
@@ -434,10 +497,26 @@ export function BottomNav() {
     });
   };
 
-  const onNavItemPointerDown = (event: React.PointerEvent<HTMLAnchorElement>) => {
-    if (event.button !== 0) return;
-    haptic.selection();
-  };
+  const navigateToTab = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, index: number, to: string) => {
+      event.preventDefault();
+      if (isDraggingRef.current) return;
+      if (index === activeIndex) return;
+
+      haptic.selection();
+      stopBubbleMotion();
+      previewIndexRef.current = null;
+      setPreviewIndex(null);
+      skipNavAnimateRef.current = true;
+      prevActiveIndexRef.current = activeIndex;
+      bubbleFocusIndexRef.current = index;
+      setBubbleFocusIndex(index);
+      refreshLayoutMetrics();
+      syncBubbleToIndex(index, false);
+      navigate(to);
+    },
+    [activeIndex, navigate, refreshLayoutMetrics, stopBubbleMotion, syncBubbleToIndex],
+  );
 
   const onNavItemRef = useCallback((index: number, el: HTMLAnchorElement | null) => {
     itemRefs.current[index] = el;
@@ -480,7 +559,7 @@ export function BottomNav() {
                 isActive={activeId === item.id}
                 isHighlighted={index === highlightedIndex}
                 onItemRef={onNavItemRef}
-                onPointerDown={onNavItemPointerDown}
+                onNavigate={(event) => navigateToTab(event, index, item.to)}
               />
             ))}
           </div>
