@@ -178,18 +178,21 @@
     --pb-bg-pressed: rgb(4 10 28);
     --pb-clip: url(#cr-notch-btn);
     --pb-filter-raised:
-      drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.42))
-      drop-shadow(0 0 0 1px rgba(0, 0, 0, 0.88));
+      drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.38))
+      drop-shadow(0 0 0 1px rgba(90, 120, 210, 0.32));
     --pb-filter-pressed:
-      drop-shadow(0 1px 0 rgba(0, 0, 0, 0.32))
-      drop-shadow(0 0 0 1px rgba(0, 0, 0, 0.72));
+      drop-shadow(0 1px 0 rgba(0, 0, 0, 0.28))
+      drop-shadow(0 0 0 1px rgba(70, 95, 170, 0.28));
     --pb-shadow-raised:
       inset 2px 2px 0 0 var(--pb-light),
-      inset -2px -2px 0 0 var(--pb-dark);
+      inset -2px -2px 0 0 var(--pb-dark),
+      inset 0 0 0 1px rgba(120, 155, 235, 0.14);
     --pb-shadow-pressed:
-      inset 0 3px 7px rgba(0, 0, 0, 0.55),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+      inset 0 3px 8px rgba(0, 0, 0, 0.58),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --pb-inner-ring:
+      inset 0 0 0 2px rgba(140, 175, 255, 0.68),
+      inset 0 0 16px rgba(88, 118, 210, 0.14);
     background: var(--pb-bg);
     border: none;
     border-radius: 0;
@@ -211,6 +214,7 @@
   .pixel-btn {
     @apply relative cursor-pointer select-none inline-flex items-center justify-center gap-2;
     @apply font-semibold disabled:opacity-50 disabled:pointer-events-none;
+    isolation: isolate;
     -webkit-tap-highlight-color: transparent;
     color: rgb(var(--cr-text));
     text-shadow: var(--cr-stroke-body);
@@ -221,24 +225,146 @@
       background 85ms ease-out;
   }
 
-  /* Selected tab / filter — stays slightly recessed */
-  .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active {
+  .pixel-btn:not(.pixel-btn--ghost):not(.pixel-ticket).pixel-btn--active {
     transform: translate(1px, 1px);
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed);
+    box-shadow: var(--pb-shadow-pressed), var(--pb-inner-ring);
     filter: var(--pb-filter-pressed);
+  }
+
+  .pixel-btn:not(.pixel-btn--ghost):not(.pixel-ticket).pixel-btn--active::after {
+    opacity: 1;
+  }
+
+  .pixel-btn:not(.pixel-btn--ghost):not(.pixel-ticket):active:not(:disabled) {
+    transform: translate(1px, 2px);
+    background: var(--pb-bg-pressed);
+    box-shadow: var(--pb-shadow-pressed), var(--pb-inner-ring);
+    filter: var(--pb-filter-pressed);
+  }
+
+  .pixel-btn:not(.pixel-btn--ghost):not(.pixel-ticket):active:not(:disabled)::after {
+    opacity: 1;
+  }
+
+  /* Inner contour follows ticket clip (clip-path buttons only) */
+  .pixel-bevel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    clip-path: var(--pb-clip);
+    -webkit-clip-path: var(--pb-clip);
+    box-shadow: var(--pb-inner-ring);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 85ms ease-out;
+    z-index: 0;
+  }
+
+  .pixel-bevel > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* SVG ticket menu buttons */
+  .pixel-ticket {
+    clip-path: none;
+    -webkit-clip-path: none;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    filter: none;
+    padding: 0;
+    overflow: visible;
+    min-height: 3.35rem;
+    width: 100%;
+  }
+
+  .pixel-ticket__shape {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.38));
+    transition: filter 85ms ease-out;
+    pointer-events: none;
+  }
+
+  .pixel-ticket__path {
+    fill: rgb(8 16 42);
+    stroke: rgba(115, 150, 235, 0.38);
+    stroke-width: 1.25;
+    paint-order: stroke fill;
+    transition:
+      fill 85ms ease-out,
+      stroke 85ms ease-out,
+      stroke-width 85ms ease-out;
+  }
+
+  .pixel-ticket .pixel-btn-chevron {
+    position: absolute;
+    right: 0.85rem;
+  }
+
+  .pixel-ticket__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 3.35rem;
+    padding: 0.5rem 2rem 0.5rem 0.5rem;
+    box-sizing: border-box;
+  }
+
+  .pixel-ticket.pixel-btn--active,
+  .pixel-ticket:active:not(:disabled) {
+    background: transparent;
+    box-shadow: none;
+    filter: none;
+  }
+
+  .pixel-ticket.pixel-btn--active {
+    transform: translate(1px, 1px);
+  }
+
+  .pixel-ticket:active:not(:disabled) {
+    transform: translate(1px, 2px);
+  }
+
+  .pixel-ticket.pixel-btn--active .pixel-ticket__shape,
+  .pixel-ticket:active:not(:disabled) .pixel-ticket__shape {
+    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.28));
+  }
+
+  .pixel-ticket.pixel-btn--active .pixel-ticket__path,
+  .pixel-ticket:active:not(:disabled) .pixel-ticket__path {
+    fill: rgb(4 10 28);
+    stroke: rgba(147, 180, 255, 0.78);
+    stroke-width: 2.25;
+    filter: drop-shadow(0 0 10px rgba(88, 118, 210, 0.22));
+  }
+
+  .pixel-ticket:not(.pixel-btn--active):not(:active) .pixel-ticket__path {
+    fill: rgb(8 16 42);
+  }
+
+  [data-theme="light"] .pixel-ticket__path {
+    fill: rgb(235 240 252);
+    stroke: rgba(59, 100, 200, 0.35);
+  }
+
+  [data-theme="light"] .pixel-ticket.pixel-btn--active .pixel-ticket__path,
+  [data-theme="light"] .pixel-ticket:active:not(:disabled) .pixel-ticket__path {
+    fill: rgb(210 220 242);
+    stroke: rgba(59, 100, 200, 0.62);
   }
 
   .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active .pixel-btn-chevron {
     @apply text-cr-gold opacity-100;
-  }
-
-  /* Momentary press — deeper sink */
-  .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) {
-    transform: translate(1px, 2px);
-    background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed);
-    filter: var(--pb-filter-pressed);
   }
 
   .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) .pixel-btn-icon-slot,
@@ -251,11 +377,15 @@
     transform: translateY(calc(-50% + 1px));
   }
 
-  .pixel-btn--nav {
+  .pixel-btn--nav:not(.pixel-ticket) {
     @apply pixel-bevel w-full min-h-[3.35rem] pl-2 pr-8 py-2 text-left;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+
+  .pixel-btn--nav.pixel-ticket {
+    display: block;
   }
 
   .pixel-btn--grid-cell {
@@ -405,13 +535,15 @@
 
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active,
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) {
+    --pb-inner-ring:
+      inset 0 0 0 2px rgba(59, 100, 200, 0.52),
+      inset 0 0 12px rgba(59, 100, 200, 0.1);
     --pb-shadow-pressed:
-      inset 0 3px 6px rgba(15, 23, 42, 0.18),
-      inset 0 1px 0 rgba(255, 255, 255, 0.65),
-      inset 0 0 0 1px rgba(15, 23, 42, 0.12);
+      inset 0 3px 6px rgba(15, 23, 42, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
     --pb-filter-pressed:
-      drop-shadow(0 1px 0 rgba(15, 23, 42, 0.1))
-      drop-shadow(0 0 0 1px rgba(15, 23, 42, 0.14));
+      drop-shadow(0 1px 0 rgba(15, 23, 42, 0.08))
+      drop-shadow(0 0 0 1px rgba(59, 100, 200, 0.2));
   }
 
   .pixel-btn--chip-sm {
