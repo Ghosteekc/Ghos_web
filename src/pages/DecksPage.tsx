@@ -422,7 +422,7 @@ function TopPlayersPanel({ onCopied }: { onCopied: (msg: string) => void }) {
                 <p className={"text-xs font-bold mt-0.5 " + (player.total_games > 0 ? (player.winrate >= 50 ? "text-cr-win" : "text-cr-loss") : "text-cr-muted")}>
                   {player.total_games > 0
                     ? `${UI.winrateShort} ${player.winrate.toFixed(0)}%`
-                    : "Винрейт: нет данных"}
+                    : "Винрейт: н/д"}
                 </p>
               </div>
             </div>

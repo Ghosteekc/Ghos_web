@@ -182,6 +182,9 @@ export function AnalyticsPage() {
 
             <Card className="lg:col-span-2">
               <h3 className="text-sm font-semibold text-cr-text mb-2">Винрейт по дням</h3>
+              <p className="text-[11px] text-cr-muted mb-3">
+                Фиолетовая линия — процент побед · ведите пальцем, тап — закрепить
+              </p>
               <ChartTooltipAnchor className="h-[220px]" pointCount={winrateByDay.length}>
                 {winrateByDay.length > 0 ? (
                   <WinrateDayChart data={winrateByDay} />
@@ -189,9 +192,6 @@ export function AnalyticsPage() {
                   <p className="text-cr-muted text-sm text-center pt-16">Нет данных по дням</p>
                 )}
               </ChartTooltipAnchor>
-              <p className="text-[11px] text-cr-muted mt-2 text-center">
-                Фиолетовая линия — процент побед · ведите пальцем, тап — закрепить
-              </p>
             </Card>
           </div>
         </>
