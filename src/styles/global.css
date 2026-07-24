@@ -263,45 +263,69 @@
   }
 
   .pixel-btn--tile {
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
-    aspect-ratio: 1;
-    max-height: 6.5rem;
-    padding: 0.4rem 0.35rem;
-    gap: 0.2rem;
-    text-align: center;
+    min-height: 3.75rem;
+    padding: 0.55rem 1.75rem 0.55rem 0.65rem;
+    gap: 0.5rem;
+    text-align: left;
   }
 
   .pixel-btn--tile .pixel-btn-text {
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    width: 100%;
-    flex: 0 0 auto;
-    min-height: 0;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .pixel-btn--tile .pixel-btn-label {
     font-size: 0.8125rem;
     font-weight: 800;
-    line-height: 1.2;
+    line-height: 1.25;
     white-space: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-align: center;
+    word-break: normal;
+    hyphens: auto;
+    text-align: left;
+    display: block;
   }
 
   .pixel-btn--tile .pixel-btn-icon-slot {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 2.5rem;
+    height: 2.5rem;
     flex-shrink: 0;
   }
 
   .pixel-btn--tile .pixel-btn-emoji {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+  }
+
+  .pixel-btn-tile-chevron {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+    transform: translateY(-50%);
+    color: rgb(var(--cr-muted));
+    opacity: 0.75;
+    pointer-events: none;
+    z-index: 2;
+    transition:
+      transform 85ms ease-out,
+      color 85ms ease-out,
+      opacity 85ms ease-out;
+  }
+
+  .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active .pixel-btn-tile-chevron {
+    @apply text-cr-gold opacity-100;
+  }
+
+  .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) .pixel-btn-tile-chevron,
+  .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active .pixel-btn-tile-chevron {
+    transform: translateY(calc(-50% + 1px));
   }
 
   .pixel-btn--nav-row {

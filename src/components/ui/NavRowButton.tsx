@@ -53,7 +53,11 @@ export function NavRowButton({
         <span className="pixel-btn-label">{label}</span>
         {hint ? <span className="pixel-btn-hint">{hint}</span> : null}
       </span>
-      {isRow ? <ChevronRight className="pixel-btn-chevron" aria-hidden /> : null}
+      {isRow ? (
+        <ChevronRight className="pixel-btn-chevron" aria-hidden />
+      ) : (
+        <ChevronRight className="pixel-btn-tile-chevron" aria-hidden />
+      )}
     </button>
   );
 }
