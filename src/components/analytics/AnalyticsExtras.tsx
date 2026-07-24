@@ -229,6 +229,10 @@ function deckLevelWarnings(cards?: CustomizeData["original_cards"]) {
   return cards?.map((c) => Boolean(c.needs_upgrade)) ?? [];
 }
 
+function deckIcons(cards?: CustomizeData["original_cards"]) {
+  return cards?.map((c) => c.icon ?? "");
+}
+
 export function DeckToolsPanel() {
   const [customize, setCustomize] = useState<CustomizeData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -304,7 +308,7 @@ export function DeckToolsPanel() {
           <p className="text-xs text-cr-muted mb-2 mt-3">Было</p>
           <CardDeckGrid
             cards={customize.original}
-            icons={customize.original_cards?.map((c) => c.icon)}
+            icons={deckIcons(customize.original_cards)}
             levels={deckLevels(customize.original_cards)}
             levelWarnings={deckLevelWarnings(customize.original_cards)}
             size="sm"
@@ -345,7 +349,7 @@ export function DeckToolsPanel() {
               <p className="text-xs text-cr-muted mb-2 mt-4">По синергии</p>
               <CardDeckGrid
                 cards={customize.customized}
-                icons={customize.customized_cards?.map((c) => c.icon)}
+                icons={deckIcons(customize.customized_cards)}
                 levels={deckLevels(customize.customized_cards)}
                 levelWarnings={deckLevelWarnings(customize.customized_cards)}
                 size="sm"
@@ -366,7 +370,7 @@ export function DeckToolsPanel() {
               ) : null}
               <CardDeckGrid
                 cards={customize.level_alt_deck}
-                icons={customize.level_alt_cards?.map((c) => c.icon)}
+                icons={deckIcons(customize.level_alt_cards)}
                 levels={deckLevels(customize.level_alt_cards)}
                 levelWarnings={deckLevelWarnings(customize.level_alt_cards)}
                 size="sm"
