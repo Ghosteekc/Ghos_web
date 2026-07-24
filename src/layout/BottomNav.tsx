@@ -9,7 +9,7 @@ const BUBBLE_HIT_X = 58;
 const BUBBLE_HIT_Y = 50;
 
 const STRETCH_TWEEN = { type: "tween" as const, duration: 0.18, ease: [0.22, 0.08, 0.24, 1] as const };
-const NEAR_TAB_TWEEN = { type: "tween" as const, duration: 0.22, ease: [0.28, 0.1, 0.22, 1] as const };
+const NEAR_TAB_TWEEN = { type: "tween" as const, duration: 0.28, ease: [0.28, 0.1, 0.22, 1] as const };
 
 const NEAR_TAB_SPRING = { stiffness: 215, damping: 37, mass: 0.86 };
 const FAR_TAB_SPRING = { stiffness: 270, damping: 23, mass: 0.72 };
@@ -127,7 +127,7 @@ type BottomNavItemProps = {
   isActive: boolean;
   isHighlighted: boolean;
   onItemRef: (index: number, el: HTMLAnchorElement | null) => void;
-  onNavigate: (event: React.MouseEvent<HTMLAnchorElement>, index: number) => void;
+  onPointerDown: (event: React.PointerEvent<HTMLAnchorElement>) => void;
 };
 
 const BottomNavItem = memo(function BottomNavItem({
@@ -136,7 +136,7 @@ const BottomNavItem = memo(function BottomNavItem({
   isActive,
   isHighlighted,
   onItemRef,
-  onNavigate,
+  onPointerDown,
 }: BottomNavItemProps) {
   const Icon = item.icon;
 
@@ -148,7 +148,7 @@ const BottomNavItem = memo(function BottomNavItem({
       className={`bottom-nav-item${isHighlighted ? " is-highlighted" : ""}`}
       aria-label={item.label}
       aria-current={isActive ? "page" : undefined}
-      onClick={(event) => onNavigate(event, index)}
+      onPointerDown={onPointerDown}
     >
       <span className="bottom-nav-item-content">
         <span className="bottom-nav-icon-slot" aria-hidden>
@@ -396,20 +396,10 @@ export function BottomNav() {
       setBubbleFocusIndex(activeIndex);
       return;
     }
-    stopBubbleMotion();
     refreshLayoutMetrics();
-    const track = trackRef.current;
-    if (!track) {
-      prevActiveIndexRef.current = activeIndex;
-      return;
-    }
-    void animateBubbleX(
-      clampBubbleXForTrack(getTabCenterX(activeIndex), track.offsetWidth),
-      prevActiveIndexRef.current,
-      activeIndex,
-    );
+    syncBubbleToIndex(activeIndex, true, prevActiveIndexRef.current);
     prevActiveIndexRef.current = activeIndex;
-  }, [activeIndex, animateBubbleX, clampBubbleXForTrack, getTabCenterX, refreshLayoutMetrics, stopBubbleMotion]);
+  }, [activeIndex, syncBubbleToIndex, refreshLayoutMetrics]);
 
   useEffect(() => {
     const onResize = () => {
@@ -497,25 +487,12 @@ export function BottomNav() {
     });
   };
 
-  const navigateToTab = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>, index: number, to: string) => {
-      event.preventDefault();
-      if (isDraggingRef.current) return;
-      if (index === activeIndex) return;
-
+  const onNavItemPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLAnchorElement>) => {
+      if (event.button !== 0 || isDraggingRef.current) return;
       haptic.selection();
-      stopBubbleMotion();
-      previewIndexRef.current = null;
-      setPreviewIndex(null);
-      skipNavAnimateRef.current = true;
-      prevActiveIndexRef.current = activeIndex;
-      bubbleFocusIndexRef.current = index;
-      setBubbleFocusIndex(index);
-      refreshLayoutMetrics();
-      syncBubbleToIndex(index, false);
-      navigate(to);
     },
-    [activeIndex, navigate, refreshLayoutMetrics, stopBubbleMotion, syncBubbleToIndex],
+    [],
   );
 
   const onNavItemRef = useCallback((index: number, el: HTMLAnchorElement | null) => {
@@ -559,7 +536,7 @@ export function BottomNav() {
                 isActive={activeId === item.id}
                 isHighlighted={index === highlightedIndex}
                 onItemRef={onNavItemRef}
-                onNavigate={(event) => navigateToTab(event, index, item.to)}
+                onPointerDown={onNavItemPointerDown}
               />
             ))}
           </div>
