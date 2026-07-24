@@ -1,7 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/utils";
-import { TICKET_PATH, TICKET_VIEWBOX } from "./ticketShape";
 
 export interface NavRowButtonProps {
   label: string;
@@ -28,6 +27,8 @@ export function NavRowButton({
   disabled,
   "aria-pressed": ariaPressed,
 }: NavRowButtonProps) {
+  const isRow = Boolean(hint || Icon);
+
   return (
     <button
       type={type}
@@ -35,33 +36,24 @@ export function NavRowButton({
       onClick={onClick}
       aria-pressed={ariaPressed ?? active}
       className={cn(
-        "pixel-btn pixel-btn--nav pixel-ticket",
+        "pixel-btn pixel-bevel",
+        isRow ? "pixel-btn--nav-row" : "pixel-btn--tile",
         active && "pixel-btn--active",
         className,
       )}
     >
-      <svg
-        className="pixel-ticket__shape"
-        viewBox={TICKET_VIEWBOX}
-        preserveAspectRatio="none"
-        aria-hidden
-      >
-        <path className="pixel-ticket__path" d={TICKET_PATH} vectorEffect="non-scaling-stroke" />
-      </svg>
-      <span className="pixel-ticket__content">
-        <span className="pixel-btn-icon-slot" aria-hidden>
-          {emoji ? (
-            <span className="pixel-btn-emoji">{emoji}</span>
-          ) : Icon ? (
-            <Icon className="pixel-btn-icon" strokeWidth={2.25} />
-          ) : null}
-        </span>
-        <span className="pixel-btn-text">
-          <span className="pixel-btn-label">{label}</span>
-          {hint ? <span className="pixel-btn-hint">{hint}</span> : null}
-        </span>
-        <ChevronRight className="pixel-btn-chevron" aria-hidden />
+      <span className="pixel-btn-icon-slot" aria-hidden>
+        {emoji ? (
+          <span className="pixel-btn-emoji">{emoji}</span>
+        ) : Icon ? (
+          <Icon className="pixel-btn-icon" strokeWidth={2.25} />
+        ) : null}
       </span>
+      <span className="pixel-btn-text">
+        <span className="pixel-btn-label">{label}</span>
+        {hint ? <span className="pixel-btn-hint">{hint}</span> : null}
+      </span>
+      {isRow ? <ChevronRight className="pixel-btn-chevron" aria-hidden /> : null}
     </button>
   );
 }
