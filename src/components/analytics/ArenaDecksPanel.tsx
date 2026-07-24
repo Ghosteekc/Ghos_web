@@ -6,15 +6,15 @@ import { cacheGet, cacheHas } from "@/api/cache";
 import { Card, Button, Loader } from "@/components/ui";
 import type { ArenaDecksData, Deck } from "@/types";
 
-const ARENA_DECKS_CACHE = "arena-decks-v7";
+const ARENA_DECKS_CACHE = "arena-decks-v8";
 
 function formatArenaSubtitle(arenaName: string, trophies: number, source?: string): string {
   const base =
     arenaName && trophies > 0 && !arenaName.replace(/\s/g, "").includes(String(trophies))
       ? `${arenaName} · ${trophies.toLocaleString("ru-RU")} 🏆`
       : arenaName || (trophies > 0 ? `${trophies.toLocaleString("ru-RU")} 🏆` : "Ваша арена");
-  if (source === "tv_royale" || source === "tv_royale_arena") {
-    return `${base} · колоды игроков TV Royale на вашей арене`;
+  if (source === "arena_live" || source === "arena_battles" || source === "arena_pool") {
+    return `${base} · колоды игроков вашей арены`;
   }
   return base;
 }
@@ -83,10 +83,13 @@ export function ArenaDecksPanel({ renderDeck }: ArenaDecksPanelProps) {
   if (!decks.length) {
     return (
       <Card className="text-center">
-        <p className="text-cr-muted">Нет колод TV Royale для вашей арены</p>
+        <p className="text-cr-muted">Нет данных по колодам вашей арены</p>
         <p className="text-xs text-cr-muted mt-1">
-          Не удалось найти игроков с той же ареной в рейтинге. Попробуйте обновить позже.
+          Сыграйте несколько рейтинговых боёв или обновите страницу через минуту.
         </p>
+        <Button className="mt-3" onClick={() => void load()}>
+          Обновить
+        </Button>
       </Card>
     );
   }
