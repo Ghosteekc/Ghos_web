@@ -96,7 +96,7 @@ export function DeckWinratesPanel() {
               {row.winrate.toFixed(1)}%
             </span>
           </div>
-          <CardDeckGrid cards={row.cards} size="sm" showLabels maxVisible={8} />
+          <CardDeckGrid cards={row.cards} size="lg" showLabels maxVisible={8} />
         </Card>
       ))}
     </div>
