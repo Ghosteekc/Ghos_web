@@ -64,11 +64,20 @@ const INDEX_HYSTERESIS = 0.45;
 
 const BUBBLE_MOVE_SPRING = {
   type: "spring" as const,
-  stiffness: 118,
-  damping: 28,
-  mass: 1.05,
-  restDelta: 0.35,
-  restSpeed: 0.35,
+  // Near-tab dock feel: light follow, almost no overshoot
+  stiffness: 200,
+  damping: 36,
+  mass: 0.88,
+  restDelta: 0.4,
+  restSpeed: 0.4,
+};
+
+const BUBBLE_STRETCH_SPRING = {
+  type: "spring" as const,
+  stiffness: 260,
+  damping: 34,
+  mass: 0.8,
+  restDelta: 0.01,
 };
 
 function readDockTopPx(): number {
@@ -407,8 +416,10 @@ function useTooltipPlacement(
       const margin = 8;
       const dockTop = readDockTopPx();
 
-      let left = rect.left + coordinate.x;
-      left = Math.min(window.innerWidth - margin - tipW / 2, Math.max(margin + tipW / 2, left));
+      // Store LEFT edge (not center) so we never need translateX — transforms kill backdrop-filter.
+      const centerX = rect.left + coordinate.x;
+      let left = centerX - tipW / 2;
+      left = Math.min(window.innerWidth - margin - tipW, Math.max(margin, left));
 
       let top = rect.top + 6;
       const maxTop = dockTop - tipH - margin;
@@ -461,6 +472,9 @@ function ChartTooltipBubbleShell({
   const mvLeft = useMotionValue(0);
   const mvTop = useMotionValue(0);
   const mvOpacity = useMotionValue(0);
+  const mvScaleX = useMotionValue(1);
+  const mvScaleY = useMotionValue(1);
+  const scrubbing = scrub?.scrubbing ?? false;
 
   const pinned = scrub?.pinned ?? false;
   const wantVisible = scrub ? scrub.isVisible && Boolean(active) : Boolean(active);
@@ -510,62 +524,97 @@ function ChartTooltipBubbleShell({
       seededRef.current = true;
       mvLeft.set(position.left);
       mvTop.set(position.top);
+      mvScaleX.set(1);
+      mvScaleY.set(1);
       void animate(mvOpacity, 1, { duration: 0.18, ease: "easeOut" });
       return;
     }
 
-    // Soft follow only — no scale/stretch (that blew the tip up).
-    moveControlsRef.current = [
+    const dx = Math.abs(position.left - mvLeft.get());
+    // Tiny dock-like squash — hard-capped so it cannot explode.
+    if (dx > 6 && (scrubbing || pinned)) {
+      const stretch = Math.min(1.025, 1 + dx / 900);
+      mvScaleX.set(stretch);
+      mvScaleY.set(Math.max(0.985, 2 - stretch));
+      moveControlsRef.current.push(
+        animate(mvScaleX, 1, BUBBLE_STRETCH_SPRING),
+        animate(mvScaleY, 1, BUBBLE_STRETCH_SPRING),
+      );
+    }
+
+    moveControlsRef.current.push(
       animate(mvLeft, position.left, BUBBLE_MOVE_SPRING),
       animate(mvTop, position.top, BUBBLE_MOVE_SPRING),
-    ];
-  }, [position?.left, position?.top, shown, mvLeft, mvTop, mvOpacity]);
+    );
+  }, [
+    position?.left,
+    position?.top,
+    shown,
+    scrubbing,
+    pinned,
+    mvLeft,
+    mvTop,
+    mvOpacity,
+    mvScaleX,
+    mvScaleY,
+  ]);
 
   if (!rendered) return null;
 
   return createPortal(
-    <motion.div
+    <div
       className={`chart-tooltip-bubble-anchor${shown && position ? " is-shown" : ""}`}
-      role={pinned ? "button" : undefined}
-      tabIndex={pinned ? 0 : undefined}
-      aria-label={pinned ? "Закрыть подсказку" : undefined}
-      onPointerDown={
-        pinned
-          ? (event) => {
-              event.stopPropagation();
-              event.preventDefault();
-            }
-          : undefined
-      }
-      onClick={
-        pinned
-          ? (event) => {
-              event.stopPropagation();
-              scrub?.onTooltipPress();
-            }
-          : undefined
-      }
-      onKeyDown={
-        pinned
-          ? (event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                scrub?.onTooltipPress();
-              }
-            }
-          : undefined
-      }
       style={{
         position: "fixed",
-        left: mvLeft,
-        top: mvTop,
-        opacity: mvOpacity,
+        left: 0,
+        top: 0,
         zIndex: 40,
-        pointerEvents: pinned && shown ? "auto" : "none",
-        cursor: pinned ? "pointer" : "default",
+        pointerEvents: "none",
       }}
     >
-      <div ref={bubbleRef} className="chart-tooltip-bubble">
+      <motion.div
+        ref={bubbleRef}
+        className={`chart-tooltip-bubble${pinned ? " is-pinned" : ""}`}
+        role={pinned ? "button" : undefined}
+        tabIndex={pinned ? 0 : undefined}
+        aria-label={pinned ? "Закрыть подсказку" : undefined}
+        onPointerDown={
+          pinned
+            ? (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+              }
+            : undefined
+        }
+        onClick={
+          pinned
+            ? (event) => {
+                event.stopPropagation();
+                scrub?.onTooltipPress();
+              }
+            : undefined
+        }
+        onKeyDown={
+          pinned
+            ? (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  scrub?.onTooltipPress();
+                }
+              }
+            : undefined
+        }
+        style={{
+          position: "fixed",
+          left: mvLeft,
+          top: mvTop,
+          opacity: mvOpacity,
+          scaleX: mvScaleX,
+          scaleY: mvScaleY,
+          pointerEvents: pinned && shown ? "auto" : "none",
+          cursor: pinned ? "pointer" : "default",
+        }}
+      >
         <span className="chart-tooltip-bubble-glass" aria-hidden />
         <span className="chart-tooltip-bubble-ring" aria-hidden />
         <div className="chart-tooltip-bubble-content">
@@ -580,11 +629,13 @@ function ChartTooltipBubbleShell({
             style={{ opacity: pinned ? 1 : 0 }}
             aria-hidden={!pinned}
           >
-            Нажмите, чтобы закрыть
+            Нажмите,
+            <br />
+            чтобы закрыть
           </p>
         </div>
-      </div>
-    </motion.div>,
+      </motion.div>
+    </div>,
     document.body,
   );
 }
