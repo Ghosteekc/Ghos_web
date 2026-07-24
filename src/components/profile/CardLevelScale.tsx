@@ -24,9 +24,9 @@ export function CardLevelScale({ rows, className }: CardLevelScaleProps) {
         return (
           <div key={row.level} className="grid grid-cols-[2.5rem_1fr_2.75rem] items-center gap-2 text-xs">
             <span className="text-cr-muted font-semibold tabular-nums">{row.level}</span>
-            <div className="h-2 rounded-full bg-cr-bg/80 overflow-hidden">
+            <div className="level-bar-track h-2 rounded-full bg-cr-bg/80 overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-cr-blue to-cr-gold"
+                className="level-bar-fill h-full rounded-full bg-gradient-to-r from-cr-blue to-cr-gold"
                 style={{ width: `${width}%` }}
               />
             </div>
