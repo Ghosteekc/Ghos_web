@@ -30,7 +30,7 @@ function isBuildingCard(name: string): boolean {
 
 /** Атакующая карта — win condition (Hog, Wall Breakers, Miner и т.д.). */
 function isAttackingCard(name: string): boolean {
-  return WIN_CONDITIONS.has(name) || cardRoles(name).has("win_condition");
+  return WIN_CONDITIONS.has(name);
 }
 
 /** Духи/здания/заклинания не синергируют между собой. */

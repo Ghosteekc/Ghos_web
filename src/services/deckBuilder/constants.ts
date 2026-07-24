@@ -15,22 +15,21 @@ export const WIN_CONDITIONS = new Set([
   "Goblin Barrel", "Lava Hound", "Miner", "Giant", "P.E.K.K.A", "Battle Ram",
   "Wall Breakers", "Royal Hogs", "Goblin Giant", "Elixir Golem", "Electro Giant",
   "Skeleton Barrel", "Sparky", "Three Musketeers", "Elite Barbarians", "Goblin Drill",
-  "Royal Ghost", "Bandit", "Ram Rider", "Mighty Miner", "Skeleton King",
-  "Goblin Machine", "Boss Bandit", "Rune Giant",
+  "Ram Rider", "Mighty Miner", "Goblin Machine", "Boss Bandit", "Rune Giant",
 ]);
 
 /** Главная угроза архетипа — без неё шаблон нельзя брать */
 export const ARCHETYPE_PRIMARY_WIN: Record<string, string[]> = {
-  Cycle: ["Hog Rider", "Mortar", "Miner"],
+  Cycle: ["Hog Rider", "Mortar", "Miner", "Wall Breakers"],
   "Log Bait": ["Goblin Barrel"],
-  Beatdown: ["Golem", "Giant", "Electro Giant", "P.E.K.K.A"],
+  Beatdown: ["Golem", "Giant", "Electro Giant", "P.E.K.K.A", "Goblin Giant"],
   Lava: ["Lava Hound", "Balloon"],
   "Royal Giant": ["Royal Giant"],
-  "Bridge Spam": ["P.E.K.K.A", "Battle Ram", "Royal Ghost", "Bandit"],
+  "Bridge Spam": ["Battle Ram", "Ram Rider", "P.E.K.K.A", "Elite Barbarians"],
   Siege: ["X-Bow", "Mortar"],
-  Control: ["Miner", "X-Bow", "Graveyard"],
+  Control: ["Miner", "X-Bow", "Graveyard", "Goblin Drill"],
   Graveyard: ["Graveyard"],
-  Meta: [],
+  Meta: ["Hog Rider", "Miner", "Battle Ram", "Royal Giant", "Goblin Barrel"],
 };
 
 export const WEIGHT_CARD_MATCH = 25;

@@ -18,8 +18,13 @@ export function isSpellCard(name: string): boolean {
   return roles.has("spell") || roles.has("small_spell") || roles.has("big_spell");
 }
 
+/** Primary tower-push attackers (Hog, Giant…) — Bandit/support push does not count. */
+export function isAttackWin(name: string): boolean {
+  return WIN_CONDITIONS.has(name);
+}
+
 export function isWinCard(name: string): boolean {
-  return WIN_CONDITIONS.has(name) || cardRoles(name).has("win_condition");
+  return isAttackWin(name) || cardRoles(name).has("win_condition");
 }
 
 export function countSpells(deck: string[]): number {
@@ -27,7 +32,7 @@ export function countSpells(deck: string[]): number {
 }
 
 export function countWins(deck: string[]): number {
-  return deck.filter(isWinCard).length;
+  return deck.filter(isAttackWin).length;
 }
 
 export function meaningfulOverlap(core: string[], templateCards: string[]): string[] {
@@ -99,7 +104,7 @@ export function hardConstraintIssues(deck: string[], core: string[] = []): strin
   if (deck.length !== 8) issues.push("deck_size");
   if (new Set(deck).size !== deck.length) issues.push("duplicate_cards");
   if (core.length && !core.every((c) => deck.includes(c))) issues.push("missing_core");
-  if (!deck.some((c) => isWinCard(c))) issues.push("win_condition");
+  if (!deck.some((c) => isAttackWin(c))) issues.push("win_condition");
   if (countWins(deck) > MAX_WINS) issues.push("too_many_wins");
   if (countSpells(deck) > MAX_SPELLS) issues.push("too_many_spells");
   return issues;
@@ -148,7 +153,7 @@ function axisSynergy(deck: string[], core: string[]): number {
 
 function axisOffense(deck: string[]): number {
   let score = 0;
-  if (deck.some(isWinCard)) score += 40;
+  if (deck.some(isAttackWin)) score += 40;
   if (hasRole(deck, "dps")) score += 20;
   if (hasRole(deck, "counterpush")) score += 15;
   if (hasRole(deck, "tank")) score += 15;
@@ -309,7 +314,7 @@ function pickBestFiller(
   const candidates = [...pool].filter((c) => {
     if (deck.includes(c)) return false;
     if (!allowSpells && isSpellCard(c)) return false;
-    if (!allowWins && isWinCard(c)) return false;
+    if (!allowWins && isAttackWin(c)) return false;
     return true;
   });
   if (!candidates.length) return undefined;
@@ -318,7 +323,7 @@ function pickBestFiller(
   let bestScore = Number.NEGATIVE_INFINITY;
   for (const card of candidates) {
     if (isSpellCard(card) && countSpells(deck) >= MAX_SPELLS) continue;
-    if (isWinCard(card) && countWins(deck) >= MAX_WINS) continue;
+    if (isAttackWin(card) && countWins(deck) >= MAX_WINS) continue;
     const score = fillerCandidateScore(card, deck, core, archetype, missing);
     if (score > bestScore) {
       bestScore = score;
@@ -330,7 +335,8 @@ function pickBestFiller(
 
 function replaceWeakestFiller(deck: string[], core: string[], replacement: string): string[] {
   const coreSet = new Set(core);
-  const fillers = deck.filter((c) => !coreSet.has(c));
+  let fillers = deck.filter((c) => !coreSet.has(c) && !isAttackWin(c));
+  if (!fillers.length) fillers = deck.filter((c) => !coreSet.has(c));
   if (!fillers.length || deck.includes(replacement)) return deck;
   const worst = fillers.sort(
     (a, b) =>
@@ -342,22 +348,29 @@ function replaceWeakestFiller(deck: string[], core: string[], replacement: strin
 
 function pickWinForArchetype(
   deck: string[],
+  core: string[],
   pool: Set<string>,
   archetype: string,
 ): string | undefined {
-  const preferred = ARCHETYPE_PRIMARY_WIN[archetype] ?? [];
-  const coreSet = new Set(deck);
+  const preferred = (ARCHETYPE_PRIMARY_WIN[archetype] ?? []).filter(isAttackWin);
   for (const win of preferred) {
-    if (pool.has(win) && !coreSet.has(win)) return win;
+    if (pool.has(win) && !deck.includes(win)) return win;
   }
   const candidates = [...pool].filter(
-    (c) => !deck.includes(c) && WIN_CONDITIONS.has(c) && !isSpellCard(c),
+    (c) => !deck.includes(c) && isAttackWin(c) && !isSpellCard(c),
   );
-  if (!candidates.length) return undefined;
+  if (!candidates.length) {
+    const fallback = preferred.length
+      ? preferred
+      : ["Hog Rider", "Miner", "Battle Ram", "Royal Giant", "Goblin Barrel", "Wall Breakers"];
+    return fallback.find((w) => !deck.includes(w));
+  }
   return candidates.sort(
     (a, b) =>
+      core.reduce((s, x) => s + pairSynergy(b, x), 0) * 3 +
       deck.reduce((s, x) => s + pairSynergy(b, x), 0) -
-      deck.reduce((s, x) => s + pairSynergy(a, x), 0),
+      (core.reduce((s, x) => s + pairSynergy(a, x), 0) * 3 +
+        deck.reduce((s, x) => s + pairSynergy(a, x), 0)),
   )[0];
 }
 
@@ -397,7 +410,7 @@ function trimExcessWins(deck: string[], core: string[]): string[] {
   let out = [...deck];
   const coreSet = new Set(core);
   while (countWins(out) > MAX_WINS) {
-    const extra = out.filter((c) => isWinCard(c) && !coreSet.has(c));
+    const extra = out.filter((c) => isAttackWin(c) && !coreSet.has(c));
     if (!extra.length) break;
     const drop = extra[0];
     out = out.filter((c, i) => !(c === drop && i === out.indexOf(drop)));
@@ -418,13 +431,15 @@ export function finalizeDeck(
   out = trimExcessSpells(out, core);
   out = trimExcessWins(out, core);
 
-  if (!out.some((c) => isWinCard(c))) {
-    const win = pickWinForArchetype(out, pool, archetype);
-    if (win) {
-      if (out.length >= 8) out = replaceWeakestFiller(out, core, win);
-      else out.push(win);
-    }
-  }
+  const ensureAttackWin = () => {
+    if (out.some(isAttackWin)) return;
+    const win = pickWinForArchetype(out, core, pool, archetype);
+    if (!win) return;
+    if (out.length >= 8) out = replaceWeakestFiller(out, core, win);
+    else out.push(win);
+  };
+
+  ensureAttackWin();
 
   while (out.length < 8) {
     const pick = pickBestFiller(out, core, pool, archetype);
@@ -434,9 +449,11 @@ export function finalizeDeck(
 
   out = trimExcessSpells(out, core);
   out = trimExcessWins(out, core);
+  ensureAttackWin();
 
   while (out.length > 8) {
-    const droppable = out.filter((c) => !coreSet.has(c));
+    let droppable = out.filter((c) => !coreSet.has(c) && !isAttackWin(c));
+    if (!droppable.length) droppable = out.filter((c) => !coreSet.has(c));
     if (!droppable.length) break;
     const drop = droppable.sort(
       (a, b) =>
@@ -460,6 +477,7 @@ export function finalizeDeck(
     }
   }
 
+  ensureAttackWin();
   return out.slice(0, 8);
 }
 
