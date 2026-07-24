@@ -13,7 +13,7 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { animate, motion, useMotionValue } from "framer-motion";
+import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { haptic } from "@/utils/hapticManager";
 
 /**
@@ -62,23 +62,10 @@ const MOVE_THRESHOLD_PX = 12;
 /** Stay on the current point until the finger clearly crosses into the next band. */
 const INDEX_HYSTERESIS = 0.45;
 
-const BUBBLE_MOVE_SPRING = {
-  type: "spring" as const,
-  // Near-tab dock feel: light follow, almost no overshoot
-  stiffness: 200,
-  damping: 36,
-  mass: 0.88,
-  restDelta: 0.4,
-  restSpeed: 0.4,
-};
-
-const BUBBLE_STRETCH_SPRING = {
-  type: "spring" as const,
-  stiffness: 260,
-  damping: 34,
-  mass: 0.8,
-  restDelta: 0.01,
-};
+/** Horizontal pull stretch while scrubbing — hard cap, never springs. */
+const STRETCH_MAX = 1.055;
+const POS_TWEEN = { type: "tween" as const, duration: 0.12, ease: [0.22, 0.08, 0.24, 1] as const };
+const STRETCH_RELEASE = { type: "tween" as const, duration: 0.22, ease: [0.22, 0.08, 0.24, 1] as const };
 
 function readDockTopPx(): number {
   const nav = document.querySelector(".bottom-nav");
@@ -474,6 +461,9 @@ function ChartTooltipBubbleShell({
   const mvOpacity = useMotionValue(0);
   const mvScaleX = useMotionValue(1);
   const mvScaleY = useMotionValue(1);
+  // Hard visual clamp — even if a value glitches, the tip cannot explode.
+  const scaleXSafe = useTransform(mvScaleX, (v) => Math.min(STRETCH_MAX, Math.max(0.97, v)));
+  const scaleYSafe = useTransform(mvScaleY, (v) => Math.min(1.02, Math.max(0.97, v)));
   const scrubbing = scrub?.scrubbing ?? false;
 
   const pinned = scrub?.pinned ?? false;
@@ -530,34 +520,48 @@ function ChartTooltipBubbleShell({
       return;
     }
 
-    const dx = Math.abs(position.left - mvLeft.get());
-    // Tiny dock-like squash — hard-capped so it cannot explode.
-    if (dx > 6 && (scrubbing || pinned)) {
-      const stretch = Math.min(1.025, 1 + dx / 900);
-      mvScaleX.set(stretch);
-      mvScaleY.set(Math.max(0.985, 2 - stretch));
+    const prevLeft = mvLeft.get();
+    const adx = Math.abs(position.left - prevLeft);
+
+    // No springs: follow with a short tween (or snap while dragging).
+    if (scrubbing) {
+      mvLeft.set(position.left);
+      mvTop.set(position.top);
+      if (adx > 2) {
+        const stretch = Math.min(STRETCH_MAX, 1 + adx / 220);
+        mvScaleX.set(stretch);
+        mvScaleY.set(Math.max(0.97, 1 / Math.sqrt(stretch)));
+      }
+    } else {
       moveControlsRef.current.push(
-        animate(mvScaleX, 1, BUBBLE_STRETCH_SPRING),
-        animate(mvScaleY, 1, BUBBLE_STRETCH_SPRING),
+        animate(mvLeft, position.left, POS_TWEEN),
+        animate(mvTop, position.top, POS_TWEEN),
+        animate(mvScaleX, 1, STRETCH_RELEASE),
+        animate(mvScaleY, 1, STRETCH_RELEASE),
       );
     }
-
-    moveControlsRef.current.push(
-      animate(mvLeft, position.left, BUBBLE_MOVE_SPRING),
-      animate(mvTop, position.top, BUBBLE_MOVE_SPRING),
-    );
   }, [
     position?.left,
     position?.top,
     shown,
     scrubbing,
-    pinned,
     mvLeft,
     mvTop,
     mvOpacity,
     mvScaleX,
     mvScaleY,
   ]);
+
+  // Finger up / stop scrubbing → ease stretch back (even if position didn't change).
+  useEffect(() => {
+    if (scrubbing || !shown || !seededRef.current) return;
+    const sx = animate(mvScaleX, 1, STRETCH_RELEASE);
+    const sy = animate(mvScaleY, 1, STRETCH_RELEASE);
+    return () => {
+      sx.stop();
+      sy.stop();
+    };
+  }, [scrubbing, shown, mvScaleX, mvScaleY]);
 
   if (!rendered) return null;
 
@@ -609,8 +613,8 @@ function ChartTooltipBubbleShell({
           left: mvLeft,
           top: mvTop,
           opacity: mvOpacity,
-          scaleX: mvScaleX,
-          scaleY: mvScaleY,
+          scaleX: scaleXSafe,
+          scaleY: scaleYSafe,
           pointerEvents: pinned && shown ? "auto" : "none",
           cursor: pinned ? "pointer" : "default",
         }}
