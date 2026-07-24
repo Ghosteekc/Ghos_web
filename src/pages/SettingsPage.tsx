@@ -192,7 +192,7 @@ export function SettingsPage() {
                     <p className="text-xs text-cr-muted">Тёмная, светлая или как на устройстве</p>
                   </div>
                 </div>
-                <div className="flex bg-cr-bg rounded-lg p-1 flex-shrink-0 border border-cr-border">
+                <div className="theme-segment-track">
                   <ThemeButton
                     active={settings.theme === "dark"}
                     label="Тёмная"

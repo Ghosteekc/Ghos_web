@@ -53,6 +53,29 @@ export const formatPlayerTag = (tag: string | null | undefined): string => {
   return clean ? `#${clean}` : "—";
 };
 
+/** Display name + optional tag line for battle list cards. */
+export function formatOpponentHeadline(name: string | null | undefined, tag: string | null | undefined): {
+  title: string;
+  tagLine: string | null;
+} {
+  const cleanTag = (tag ?? "").replace(/^#+/, "").trim();
+  const cleanName = (name ?? "").trim();
+  const generic = !cleanName || cleanName === "Соперник" || cleanName === "?";
+
+  if (!generic) {
+    return {
+      title: cleanName,
+      tagLine: cleanTag ? formatPlayerTag(cleanTag) : null,
+    };
+  }
+
+  if (cleanTag) {
+    return { title: formatPlayerTag(cleanTag), tagLine: null };
+  }
+
+  return { title: "Соперник", tagLine: null };
+}
+
 /** Stable battle URL — survives server restart (no session index). */
 export const battleDetailPath = (timestamp: string, fallbackIndex?: number): string => {
   if (timestamp) {

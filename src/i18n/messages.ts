@@ -4,7 +4,7 @@ export type AppLanguage = Settings["language"];
 
 const messages = {
   ru: {
-    "settings.haptic.title": "Haptic feedback",
+    "settings.haptic.title": "Вибрация интерфейса",
     "settings.haptic.enabled": "Включено",
     "settings.haptic.disabled": "Выключено",
     "settings.haptic.subtitleOn": "Тактильная отдача при действиях",

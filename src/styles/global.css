@@ -191,6 +191,9 @@
       inset 0 3px 7px rgba(0, 0, 0, 0.55),
       inset 0 1px 0 rgba(255, 255, 255, 0.06),
       inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+    --pb-glow-active:
+      0 0 12px rgba(251, 191, 36, 0.28),
+      0 0 4px rgba(251, 191, 36, 0.16);
     --pb-inner-ring:
       inset 0 0 0 2px rgba(140, 175, 255, 0.55),
       inset 0 0 14px rgba(88, 118, 210, 0.12);
@@ -227,7 +230,7 @@
   .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active {
     transform: translate(1px, 1px);
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed);
+    box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
     filter: var(--pb-filter-pressed);
   }
 
@@ -248,7 +251,7 @@
   .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) {
     transform: translate(1px, 2px);
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed);
+    box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
     filter: var(--pb-filter-pressed);
   }
 
@@ -461,7 +464,7 @@
   .filter-tab.filter-tab--active {
     transform: translate(1px, 1px);
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed);
+    box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
     filter: var(--pb-filter-pressed);
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-title);
@@ -474,7 +477,7 @@
   .filter-tab:active:not(:disabled) {
     transform: translate(1px, 2px);
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed);
+    box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
     filter: var(--pb-filter-pressed);
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-title);
@@ -508,6 +511,9 @@
 
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active,
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) {
+    --pb-glow-active:
+      0 0 10px rgba(180, 120, 8, 0.22),
+      0 0 3px rgba(180, 120, 8, 0.14);
     --pb-shadow-pressed:
       inset 0 3px 7px rgba(15, 23, 42, 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.65),
@@ -601,25 +607,42 @@
   }
 
   .segment-tab.segment-tab--active {
-    transform: translate(1px, 1px);
+    transform: none;
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed);
+    box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
     filter: var(--pb-filter-pressed);
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-title);
   }
 
   .segment-tab.segment-tab--active:active:not(:disabled) {
-    transform: translate(1px, 2px);
+    transform: translate(0, 1px);
   }
 
   .segment-tab:active:not(:disabled) {
-    transform: translate(1px, 2px);
+    transform: translate(0, 1px);
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed);
+    box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
     filter: var(--pb-filter-pressed);
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-title);
+  }
+
+  .theme-segment-track {
+    display: flex;
+    flex-shrink: 0;
+    align-items: stretch;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    background: rgb(var(--cr-bg));
+    border: 1px solid rgb(var(--cr-border));
+    border-radius: 0.875rem;
+  }
+
+  .theme-segment-track .segment-tab {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    border-radius: 0.75rem;
   }
 
   .sidebar-item {
@@ -631,7 +654,7 @@
   .sidebar-item.active {
     transform: translate(1px, 1px);
     background: var(--pb-bg-pressed);
-    box-shadow: var(--pb-shadow-pressed);
+    box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
     filter: var(--pb-filter-pressed);
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-title);
@@ -1383,6 +1406,9 @@
     inset 0 3px 7px rgba(0, 0, 0, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+  --pb-glow-active:
+    0 0 12px rgba(251, 191, 36, 0.28),
+    0 0 4px rgba(251, 191, 36, 0.16);
   box-shadow: var(--pb-shadow-raised);
   filter: var(--pb-filter-raised);
   background: linear-gradient(145deg, rgba(15, 20, 35, 0.95) 0%, rgba(30, 35, 55, 0.85) 100%);

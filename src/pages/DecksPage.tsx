@@ -196,7 +196,7 @@ export function DecksPage() {
         ) : filter === "top" ? (
           "Топ-10 игроков из глобального списка лидеров (Легендарный путь): колода, винрейт на ней и кубки."
         ) : filter === "arena" ? (
-          "Популярные колоды на вашем диапазоне кубков: лучший винрейт игроков арены + мета. «Сравнить» — разбор относительно вашей колоды."
+          "Колоды с лучшим винрейтом у топ-игроков вашей арены: сколько боёв сыграно и процент побед."
         ) : filter === "constructor" ? (
           "Выберите 4 карты — бот соберёт полные колоды с лучшей синергией. Ячейки 1 и 3 — эволюция, 2 — герой, 4 — обычная карта."
         ) : filter === "mine" ? (
@@ -344,23 +344,24 @@ function ArenaPanel({
 }) {
   const navigate = useNavigate();
   const [decks, setDecks] = useState<Deck[]>(() => {
-    const hit = cacheGet<ArenaDecksData>("arena-decks-v4");
+    const hit = cacheGet<ArenaDecksData>("arena-decks-v5");
     return hit?.decks ?? [];
   });
-  const [arenaName, setArenaName] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v4")?.arena_name ?? "");
-  const [trophies, setTrophies] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v4")?.trophies ?? 0);
-  const [loading, setLoading] = useState(() => !cacheHas("arena-decks-v4"));
+  const [arenaName, setArenaName] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v5")?.arena_name ?? "");
+  const [trophies, setTrophies] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v5")?.trophies ?? 0);
+  const [loading, setLoading] = useState(() => !cacheHas("arena-decks-v5"));
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const hasCache = cacheHas("arena-decks-v4");
+    const hasCache = cacheHas("arena-decks-v5");
     if (!hasCache) {
       setLoading(true);
     }
     setError(null);
     try {
       const data = await api.getArenaDecks();
-      setDecks(data.decks ?? []);
+      const liveDecks = (data.decks ?? []).filter((d) => (d.total_games ?? 0) > 0);
+      setDecks(liveDecks);
       setArenaName(data.arena_name ?? "");
       setTrophies(data.trophies ?? 0);
     } catch (e) {
