@@ -16,8 +16,8 @@ import { Card, FeatureNavGrid, Loader, ScrollToTopButton, Button } from "@/compo
 import { api } from "@/api/client";
 import { cacheGet, lsGet, TTL } from "@/api/cache";
 
-const STATS_MEM_KEY = "stats-v5";
-const STATS_LS_KEY = "stats-overview-v1";
+const STATS_MEM_KEY = "stats-v6";
+const STATS_LS_KEY = "stats-overview-v2";
 const STATS_STALE_GRACE_MS = 7 * 24 * 60 * 60_000;
 
 function bootstrapStats(): StatsOverview | null {
