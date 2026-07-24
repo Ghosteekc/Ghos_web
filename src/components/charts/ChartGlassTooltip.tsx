@@ -66,9 +66,9 @@ const INDEX_HYSTERESIS = 0.45;
 const STRETCH_MAX = 1.055;
 const POS_TWEEN = { type: "tween" as const, duration: 0.12, ease: [0.22, 0.08, 0.24, 1] as const };
 const STRETCH_RELEASE = { type: "tween" as const, duration: 0.22, ease: [0.22, 0.08, 0.24, 1] as const };
-const POP_IN = { type: "tween" as const, duration: 0.24, ease: [0.22, 0.08, 0.24, 1] as const };
-const POP_OUT = { type: "tween" as const, duration: 0.2, ease: [0.4, 0, 1, 1] as const };
-const POP_OUT_MS = 220;
+/** Fade-out only — appear is instant (no unfold) to avoid stuck partial scale. */
+const FADE_OUT = { type: "tween" as const, duration: 0.18, ease: [0.4, 0, 1, 1] as const };
+const FADE_OUT_MS = 200;
 
 function readDockTopPx(): number {
   const nav = document.querySelector(".bottom-nav");
@@ -466,25 +466,16 @@ function ChartTooltipBubbleShell({
   const lastKeyRef = useRef(contentKey);
   const seededRef = useRef(false);
   const moveControlsRef = useRef<{ stop: () => void }[]>([]);
-  const popControlsRef = useRef<{ stop: () => void }[]>([]);
+  const fadeControlsRef = useRef<{ stop: () => void }[]>([]);
+  const hideTimerRef = useRef<number | null>(null);
 
   const mvLeft = useMotionValue(0);
   const mvTop = useMotionValue(0);
   const mvOpacity = useMotionValue(0);
   const mvScaleX = useMotionValue(1);
   const mvScaleY = useMotionValue(1);
-  const mvPopX = useMotionValue(1);
-  const mvPopY = useMotionValue(1);
-  const scaleXSafe = useTransform([mvPopX, mvScaleX], (values) => {
-    const pop = Number(values[0]);
-    const stretch = Number(values[1]);
-    return pop * Math.min(STRETCH_MAX, Math.max(0.97, stretch));
-  });
-  const scaleYSafe = useTransform([mvPopY, mvScaleY], (values) => {
-    const pop = Number(values[0]);
-    const stretch = Number(values[1]);
-    return pop * Math.min(1.02, Math.max(0.97, stretch));
-  });
+  const scaleXSafe = useTransform(mvScaleX, (v) => Math.min(STRETCH_MAX, Math.max(0.97, v)));
+  const scaleYSafe = useTransform(mvScaleY, (v) => Math.min(1.02, Math.max(0.97, v)));
   const scrubbing = scrub?.scrubbing ?? false;
 
   const pinned = scrub?.pinned ?? false;
@@ -496,9 +487,16 @@ function ChartTooltipBubbleShell({
     moveControlsRef.current = [];
   }, []);
 
-  const stopPop = useCallback(() => {
-    popControlsRef.current.forEach((c) => c.stop());
-    popControlsRef.current = [];
+  const stopFade = useCallback(() => {
+    fadeControlsRef.current.forEach((c) => c.stop());
+    fadeControlsRef.current = [];
+  }, []);
+
+  const clearHideTimer = useCallback(() => {
+    if (hideTimerRef.current != null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
   }, []);
 
   const resetStretch = useCallback(() => {
@@ -506,54 +504,50 @@ function ChartTooltipBubbleShell({
     mvScaleY.set(1);
   }, [mvScaleX, mvScaleY]);
 
-  const playPopIn = useCallback(() => {
-    stopPop();
-    resetStretch();
-    mvPopX.set(0.14);
-    mvPopY.set(0.45);
-    mvOpacity.set(0);
-    popControlsRef.current = [
-      animate(mvPopX, 1, POP_IN),
-      animate(mvPopY, 1, POP_IN),
-      animate(mvOpacity, 1, POP_IN),
-    ];
-  }, [stopPop, resetStretch, mvPopX, mvPopY, mvOpacity]);
-
-  const playPopOut = useCallback(() => {
-    stopPop();
+  const showInstant = useCallback(() => {
+    clearHideTimer();
+    stopFade();
     stopMove();
     resetStretch();
-    popControlsRef.current = [
-      animate(mvPopX, 0.1, POP_OUT),
-      animate(mvPopY, 0.4, POP_OUT),
-      animate(mvOpacity, 0, POP_OUT),
-    ];
-  }, [stopPop, stopMove, resetStretch, mvPopX, mvPopY, mvOpacity]);
+    mvOpacity.set(1);
+    setShown(true);
+  }, [clearHideTimer, stopFade, stopMove, resetStretch, mvOpacity]);
+
+  const playFadeOut = useCallback(() => {
+    clearHideTimer();
+    stopFade();
+    stopMove();
+    resetStretch();
+    setShown(false);
+    seededRef.current = false;
+    fadeControlsRef.current = [animate(mvOpacity, 0, FADE_OUT)];
+    hideTimerRef.current = window.setTimeout(() => {
+      hideTimerRef.current = null;
+      stopFade();
+      mvOpacity.set(0);
+      resetStretch();
+      setRendered(false);
+    }, FADE_OUT_MS);
+  }, [clearHideTimer, stopFade, stopMove, resetStretch, mvOpacity]);
 
   useEffect(() => {
     if (wantVisible) {
+      clearHideTimer();
+      stopFade();
       setRendered(true);
       return;
     }
+    if (!rendered) return;
+    playFadeOut();
+  }, [wantVisible, rendered, playFadeOut, clearHideTimer, stopFade]);
 
-    setShown(false);
-    seededRef.current = false;
-    playPopOut();
-    const t = window.setTimeout(() => {
-      stopPop();
-      mvOpacity.set(0);
-      mvPopX.set(0.14);
-      mvPopY.set(0.45);
-      resetStretch();
-      setRendered(false);
-    }, POP_OUT_MS);
-
+  useEffect(() => {
     return () => {
-      window.clearTimeout(t);
-      // If a new show interrupts hide, leave values for playPopIn to hard-reset.
-      stopPop();
+      clearHideTimer();
+      stopFade();
+      stopMove();
     };
-  }, [wantVisible, playPopOut, stopPop, resetStretch, mvOpacity, mvPopX, mvPopY]);
+  }, [clearHideTimer, stopFade, stopMove]);
 
   useEffect(() => {
     if (!wantVisible) {
@@ -578,12 +572,10 @@ function ChartTooltipBubbleShell({
       seededRef.current = true;
       mvLeft.set(position.left);
       mvTop.set(position.top);
-      setShown(true);
-      playPopIn();
+      showInstant();
       return;
     }
 
-    // Position/stretch only — never stop or touch the unfold animation.
     stopMove();
     const prevLeft = mvLeft.get();
     const adx = Math.abs(position.left - prevLeft);
@@ -611,7 +603,7 @@ function ChartTooltipBubbleShell({
     position?.left,
     position?.top,
     scrubbing,
-    playPopIn,
+    showInstant,
     stopMove,
     mvLeft,
     mvTop,
