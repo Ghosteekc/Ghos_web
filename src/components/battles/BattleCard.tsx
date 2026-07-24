@@ -61,7 +61,9 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
                   {formatBattlePlayedAt(summary.timestamp, summary.played_at)}
                 </p>
               ) : null}
-              <p className="text-xs text-cr-muted">{formatTime(summary.duration ?? 0)}</p>
+              {(summary.duration ?? 0) > 0 ? (
+                <p className="text-xs text-cr-muted">{formatTime(summary.duration)}</p>
+              ) : null}
               <p className="text-xs text-cr-muted flex items-center gap-1 justify-end">
                 <ElixirIcon size={12} />
                 {(summary.avg_elixir ?? 0).toFixed(1)}

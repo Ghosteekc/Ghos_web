@@ -464,8 +464,12 @@
   .filter-tab.filter-tab--active {
     transform: translate(1px, 1px);
     background: var(--pb-bg-pressed);
+    /* Soft glow only — hard drop-shadow rings look clipped in overflow rows */
+    filter: none;
+    --pb-glow-active:
+      0 0 14px rgba(251, 191, 36, 0.32),
+      0 0 5px rgba(251, 191, 36, 0.2);
     box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
-    filter: var(--pb-filter-pressed);
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-title);
   }
@@ -477,14 +481,32 @@
   .filter-tab:active:not(:disabled) {
     transform: translate(1px, 2px);
     background: var(--pb-bg-pressed);
+    filter: none;
+    --pb-glow-active:
+      0 0 14px rgba(251, 191, 36, 0.32),
+      0 0 5px rgba(251, 191, 36, 0.2);
     box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
-    filter: var(--pb-filter-pressed);
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-title);
   }
 
   .filter-tab-row {
-    @apply flex gap-2 overflow-x-auto pb-1;
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    /* Room for soft gold glow — overflow clips box-shadow without padding */
+    padding: 0.75rem 0.375rem;
+    margin: -0.75rem -0.375rem 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .decks-tab-description {
+    min-height: 3.75rem;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
   }
 
   .feature-nav-btn {

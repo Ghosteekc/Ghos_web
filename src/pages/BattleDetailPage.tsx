@@ -135,8 +135,10 @@ export function BattleDetailPage() {
         </div>
         <div className="text-cr-muted text-sm flex items-center gap-1">
           <Clock className="w-4 h-4" />
-          {battle.played_at ? `${battle.played_at} · ` : ""}
-          {formatTime(battle.duration ?? 0)}
+          {battle.played_at ? battle.played_at : null}
+          {battle.played_at && (battle.duration ?? 0) > 0 ? " · " : null}
+          {(battle.duration ?? 0) > 0 ? formatTime(battle.duration) : null}
+          {!battle.played_at && !(battle.duration ?? 0) ? "—" : null}
         </div>
       </div>
 

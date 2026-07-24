@@ -25,11 +25,14 @@ function bootstrapStats(): StatsOverview | null {
 }
 import { usePageRefresh } from "@/hooks";
 import { OpponentsPanel, DeckToolsPanel, LossAnalysisPanel } from "@/components/analytics/AnalyticsExtras";
+import { ArenaDecksPanel } from "@/components/analytics/ArenaDecksPanel";
 import { RecommendationsPanel } from "@/components/analytics/recommendations";
+import { DeckCard } from "@/pages/DecksPage";
 import { ChartGlassTooltipShell, ChartTooltipAnchor } from "@/components/charts/ChartGlassTooltip";
 
 const ANALYTICS_NAV = [
   { id: "recommendations", label: "Рекомендации", emoji: "💡" },
+  { id: "arena", label: "Арена", emoji: "🏟️" },
   { id: "losses", label: "Разбор поражений", emoji: "🧠" },
   { id: "opponents", label: "Соперники", emoji: "⚔️" },
   { id: "tools", label: "Улучшения", emoji: "🔧" },
@@ -278,6 +281,13 @@ export function AnalyticsPage() {
       )}
 
       {section === "recommendations" && <RecommendationsPanel />}
+      {section === "arena" && (
+        <ArenaDecksPanel
+          renderDeck={(deck, i, onCompare) => (
+            <DeckCard deck={deck} index={i} showCompare onCompare={onCompare} onCopied={() => {}} />
+          )}
+        />
+      )}
       {section === "losses" && <LossAnalysisPanel />}
       {section === "opponents" && <OpponentsPanel />}
       {section === "tools" && <DeckToolsPanel />}

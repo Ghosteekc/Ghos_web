@@ -21,8 +21,8 @@ import { DeckWinratesPanel } from "@/components/analytics/AnalyticsExtras";
 import { DeckPassport } from "@/analytics/deckPassport";
 import { api, ApiError } from "@/api/client";
 import { cacheHas, cacheGet } from "@/api/cache";
-import type { ArenaDecksData, TopPlayersData } from "@/types";
-import type { Deck, DeckCard, RandomDeck, TopPlayer } from "@/types";
+import { ArenaDecksPanel } from "@/components/analytics/ArenaDecksPanel";
+import type { Deck, DeckCard, RandomDeck, TopPlayer, TopPlayersData } from "@/types";
 import { usePageRefresh, useTelegram } from "@/hooks";
 
 import { DECK_CATEGORY_LABELS, DECK_FILTER_LABELS, UI } from "@/constants/labels";
@@ -46,24 +46,6 @@ function filterFromTab(tab: string | null): string {
 }
 
 const CATEGORY_LABELS = DECK_CATEGORY_LABELS;
-
-function formatArenaSubtitle(arenaName: string, trophies: number): string {
-  if (!arenaName && trophies > 0) {
-    return `${trophies.toLocaleString("ru-RU")} 🏆`;
-  }
-  const compact = arenaName.replace(/\s/g, "");
-  const trophyStr = String(trophies);
-  if (
-    trophies > 0 &&
-    (arenaName.includes("🏆") || compact.includes(trophyStr))
-  ) {
-    return arenaName;
-  }
-  if (trophies > 0) {
-    return `${arenaName} · ${trophies.toLocaleString("ru-RU")} 🏆`;
-  }
-  return arenaName;
-}
 
 function formatUpdatedAt(iso: string | null | undefined) {
   if (!iso) return null;
@@ -188,7 +170,7 @@ export function DecksPage() {
         </span>
       </div>
 
-      <p className="text-xs text-cr-muted -mt-2">
+      <p className="decks-tab-description text-xs text-cr-muted -mt-2">
         {filter === DECK_HOME ? (
           "Винрейт, победы и поражения по каждой колоде из ваших боёв."
         ) : filter === "meta" ? (
@@ -274,12 +256,20 @@ export function DecksPage() {
       </div>
 
       <div className={filter === "arena" ? "" : "hidden"}>
-        <ArenaPanel
-          onCopied={(msg) => {
-            setCopyHint(msg);
-            setTimeout(() => setCopyHint(null), 3000);
-          }}
-          onAnalyze={setPassportDeck}
+        <ArenaDecksPanel
+          renderDeck={(deck, i, onCompare) => (
+            <DeckCard
+              deck={deck}
+              index={i}
+              showCompare
+              onCompare={onCompare}
+              onCopied={(msg) => {
+                setCopyHint(msg);
+                setTimeout(() => setCopyHint(null), 3000);
+              }}
+              onAnalyze={() => setPassportDeck(deck)}
+            />
+          )}
         />
       </div>
 
@@ -326,105 +316,6 @@ export function DecksPage() {
 }
 
 export { DecksPage as default };
-
-function buildComparePath(deck: Deck, fromTab = "arena"): string {
-  const names = deck.cards.map((c) => c.name);
-  if (names.length !== 8) return "";
-  const ref = names.map(encodeURIComponent).join("|");
-  const name = encodeURIComponent(deck.name ?? "Колода");
-  return `/decks/compare?ref=${ref}&name=${name}&from=${fromTab}`;
-}
-
-function ArenaPanel({
-  onCopied,
-  onAnalyze,
-}: {
-  onCopied: (msg: string) => void;
-  onAnalyze: (deck: Deck) => void;
-}) {
-  const navigate = useNavigate();
-  const [decks, setDecks] = useState<Deck[]>(() => {
-    const hit = cacheGet<ArenaDecksData>("arena-decks-v6");
-    return hit?.decks ?? [];
-  });
-  const [arenaName, setArenaName] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v6")?.arena_name ?? "");
-  const [trophies, setTrophies] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v6")?.trophies ?? 0);
-  const [loading, setLoading] = useState(() => !cacheHas("arena-decks-v6"));
-  const [error, setError] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    const hasCache = cacheHas("arena-decks-v6");
-    if (!hasCache) {
-      setLoading(true);
-    }
-    setError(null);
-    try {
-      const data = await api.getArenaDecks();
-      const liveDecks = (data.decks ?? []).filter((d) => (d.total_games ?? 0) > 0);
-      setDecks(liveDecks);
-      setArenaName(data.arena_name ?? "");
-      setTrophies(data.trophies ?? 0);
-    } catch (e) {
-      if (!hasCache) {
-        setDecks([]);
-      }
-      setError(e instanceof ApiError ? e.message : "Не удалось загрузить колоды арены");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  if (loading) return <Loader />;
-
-  if (error) {
-    return (
-      <Card className="text-center space-y-3">
-        <p className="text-cr-loss text-sm">{error}</p>
-        <Button onClick={() => void load()}>Попробовать снова</Button>
-      </Card>
-    );
-  }
-
-  if (!decks.length) {
-    return (
-      <Card className="text-center">
-        <p className="text-cr-muted">Нет данных по вашей арене</p>
-        <p className="text-xs text-cr-muted mt-1">
-          Собираем статистику с игроков вашей арены. Подождите или обновите через минуту.
-        </p>
-      </Card>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <p className="text-xs text-cr-muted text-center">
-        {formatArenaSubtitle(arenaName, trophies)}
-      </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full overflow-x-hidden">
-        {decks.map((deck, i) => (
-          <div key={`${deck.id}-${deck.name}`} className="w-full">
-            <DeckCard
-              deck={deck}
-              index={i}
-              onCopied={onCopied}
-              showCompare
-              onCompare={() => {
-                const path = buildComparePath(deck, "arena");
-                if (path) navigate(path);
-              }}
-              onAnalyze={() => onAnalyze(deck)}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function TopPlayersPanel({ onCopied }: { onCopied: (msg: string) => void }) {
   const { openLink } = useTelegram();
@@ -800,7 +691,7 @@ function RandomDeckPanel({
   );
 }
 
-function DeckCard({
+export function DeckCard({
   deck,
   index,
   onCopied,
@@ -911,19 +802,23 @@ function DeckCard({
           </>
         )}
 
-        {deck.type === "arena" && deck.total_games > 0 && (
-          <>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-cr-muted">{UI.winrate}</span>
-              <span className={"font-bold " + (winrate >= 50 ? "text-cr-win" : "text-cr-loss")}>
-                {winrate.toFixed(1)}%
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-sm mt-1 mb-3">
-              <span className="text-cr-muted">{UI.games}</span>
-              <span className="font-semibold text-cr-text">{deck.total_games ?? 0}</span>
-            </div>
-          </>
+        {deck.type === "arena" && (
+          deck.total_games > 0 ? (
+            <>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-cr-muted">{UI.winrate}</span>
+                <span className={"font-bold " + (winrate >= 50 ? "text-cr-win" : "text-cr-loss")}>
+                  {winrate.toFixed(1)}%
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm mt-1 mb-3">
+                <span className="text-cr-muted">{UI.games}</span>
+                <span className="font-semibold text-cr-text">{deck.total_games ?? 0}</span>
+              </div>
+            </>
+          ) : (
+            <p className="text-xs text-cr-muted mb-3">Винрейт по боям пока недоступен · текущая колода TV Royale</p>
+          )
         )}
 
         {deck.type === "mine" && onOpenStats ? (
