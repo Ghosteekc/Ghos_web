@@ -69,9 +69,9 @@ function ArenaBlock({
       ref={blockRef}
       id={`arena-block-${summary.arena}`}
       className={cn(
-        "scroll-mt-24 rounded-2xl border p-4 transition-colors duration-300",
+        "recommendation-arena-block scroll-mt-24 rounded-2xl border p-4 transition-colors duration-300",
         highlighted
-          ? "border-cr-gold/50 bg-cr-gold/10 shadow-[0_0_0_1px_rgba(251,191,36,0.25)]"
+          ? "is-highlighted border-cr-gold/50 bg-cr-gold/10 shadow-[0_0_0_1px_rgba(251,191,36,0.25)]"
           : "border-white/10 bg-white/[0.02]",
       )}
     >

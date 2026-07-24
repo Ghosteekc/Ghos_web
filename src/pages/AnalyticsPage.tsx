@@ -26,7 +26,7 @@ function bootstrapStats(): StatsOverview | null {
 import { usePageRefresh } from "@/hooks";
 import { OpponentsPanel, DeckToolsPanel, LossAnalysisPanel } from "@/components/analytics/AnalyticsExtras";
 import { RecommendationsPanel } from "@/components/analytics/recommendations";
-import { ChartGlassTooltipShell, ChartTooltipAnchor } from "@/components/charts/ChartGlassTooltip";
+import { ChartGlassTooltipShell, ChartTooltipAnchor, useChartScrub } from "@/components/charts/ChartGlassTooltip";
 
 const ANALYTICS_NAV = [
   { id: "recommendations", label: "Рекомендации", emoji: "💡" },
@@ -167,35 +167,12 @@ export function AnalyticsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <Card>
               <h3 className="text-sm font-semibold text-cr-text mb-2">Рост трофеев</h3>
-              <p className="text-[11px] text-cr-muted mb-3">Только рейтинговые 1v1 · наведите на точку для деталей</p>
-              <ChartTooltipAnchor className="h-[170px]">
+              <p className="text-[11px] text-cr-muted mb-3">
+                Только рейтинговые 1v1 · ведите пальцем для деталей, тап — закрепить
+              </p>
+              <ChartTooltipAnchor className="h-[170px]" pointCount={lastResults.length}>
                 {lastResults.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={lastResults} margin={CHART_MARGIN}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="index" hide />
-                      <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} width={CHART_YAXIS_WIDTH} />
-                      <Tooltip
-                        content={<TrophyGrowthTooltip />}
-                        wrapperStyle={{ outline: "none" }}
-                        contentStyle={{
-                          background: "transparent",
-                          border: "none",
-                          boxShadow: "none",
-                          padding: 0,
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="trophyChange"
-                        name="Кубки"
-                        stroke="#fbbf24"
-                        strokeWidth={2}
-                        dot={{ fill: "#fbbf24", r: 3 }}
-                        activeDot={{ r: 5 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  <TrophyGrowthChart data={lastResults} />
                 ) : (
                   <p className="text-cr-muted text-sm text-center pt-10">Недостаточно рейтинговых боёв</p>
                 )}
@@ -204,73 +181,15 @@ export function AnalyticsPage() {
 
             <Card className="lg:col-span-2">
               <h3 className="text-sm font-semibold text-cr-text mb-2">Винрейт по дням</h3>
-              <ChartTooltipAnchor className="h-[220px]">
+              <ChartTooltipAnchor className="h-[220px]" pointCount={winrateByDay.length}>
                 {winrateByDay.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart
-                      data={winrateByDay}
-                      margin={CHART_MARGIN}
-                      barCategoryGap="18%"
-                      barGap={2}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis
-                        dataKey="date"
-                        stroke="#9ca3af"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                        padding={{ left: 0, right: 0 }}
-                      />
-                      <YAxis
-                        yAxisId="left"
-                        stroke="#9ca3af"
-                        fontSize={10}
-                        tickLine={false}
-                        axisLine={false}
-                        width={CHART_YAXIS_WIDTH}
-                      />
-                      <YAxis
-                        yAxisId="right"
-                        orientation="right"
-                        domain={[0, 100]}
-                        stroke="#a78bfa"
-                        fontSize={10}
-                        tickLine={false}
-                        axisLine={false}
-                        width={28}
-                        tickFormatter={(v) => `${v}%`}
-                      />
-                      <Tooltip
-                        content={<WinrateDayTooltip />}
-                        cursor={{ stroke: "rgba(255,255,255,0.18)", strokeWidth: 1 }}
-                        wrapperStyle={{ outline: "none" }}
-                        contentStyle={{
-                          background: "transparent",
-                          border: "none",
-                          boxShadow: "none",
-                          padding: 0,
-                        }}
-                      />
-                      <Bar yAxisId="left" dataKey="wins" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                      <Bar yAxisId="left" dataKey="losses" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                      <Line
-                        yAxisId="right"
-                        type="monotone"
-                        dataKey="winrate"
-                        stroke="#a78bfa"
-                        strokeWidth={2}
-                        dot={{ fill: "#a78bfa", r: 3 }}
-                        name="winrate"
-                      />
-                    </ComposedChart>
-                  </ResponsiveContainer>
+                  <WinrateDayChart data={winrateByDay} />
                 ) : (
                   <p className="text-cr-muted text-sm text-center pt-16">Нет данных по дням</p>
                 )}
               </ChartTooltipAnchor>
               <p className="text-[11px] text-cr-muted mt-2 text-center">
-                Фиолетовая линия — процент побед за день
+                Фиолетовая линия — процент побед · ведите пальцем, тап — закрепить
               </p>
             </Card>
           </div>
@@ -289,86 +208,156 @@ export function AnalyticsPage() {
 
 export { AnalyticsPage as default };
 
+function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
+  const scrub = useChartScrub();
+  const point = scrub.activeIndex != null ? data[scrub.activeIndex] : null;
+
+  return (
+    <>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={data}
+          margin={CHART_MARGIN}
+          onMouseMove={scrub.chartHandlers.onMouseMove}
+          onMouseLeave={scrub.chartHandlers.onMouseLeave}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+          <XAxis dataKey="index" hide />
+          <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} width={CHART_YAXIS_WIDTH} />
+          <Tooltip
+            content={() => null}
+            active={scrub.isVisible}
+            cursor={scrub.isVisible}
+            wrapperStyle={{ outline: "none", visibility: "hidden" }}
+          />
+          <Line
+            type="monotone"
+            dataKey="trophyChange"
+            name="Кубки"
+            stroke="#fbbf24"
+            strokeWidth={2}
+            dot={{ fill: "#fbbf24", r: 3 }}
+            activeDot={{ r: 5 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+      {scrub.isVisible && point && scrub.coordinate ? (
+        <ChartGlassTooltipShell active coordinate={scrub.coordinate}>
+          <p className="font-semibold text-cr-text">против {point.opponentName}</p>
+          {(point.playedDate || point.playedTime) && (
+            <p className="text-cr-muted mt-0.5">
+              {point.playedDate}
+              {point.playedDate && point.playedTime ? " · " : ""}
+              {point.playedTime}
+            </p>
+          )}
+          <p className={point.trophyChange >= 0 ? "text-cr-win font-bold mt-1" : "text-cr-loss font-bold mt-1"}>
+            {point.trophyChange > 0 ? "+" : ""}
+            {point.trophyChange} кубков
+          </p>
+          <p className="text-cr-muted mt-0.5">{point.won ? "Победа" : "Поражение"}</p>
+        </ChartGlassTooltipShell>
+      ) : null}
+    </>
+  );
+}
+
+function WinrateDayChart({ data }: { data: WinrateDayPoint[] }) {
+  const scrub = useChartScrub();
+  const point = scrub.activeIndex != null ? data[scrub.activeIndex] : null;
+  const label =
+    typeof scrub.label === "string" || typeof scrub.label === "number"
+      ? String(scrub.label)
+      : point?.date;
+
+  return (
+    <>
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart
+          data={data}
+          margin={CHART_MARGIN}
+          barCategoryGap="18%"
+          barGap={2}
+          onMouseMove={scrub.chartHandlers.onMouseMove}
+          onMouseLeave={scrub.chartHandlers.onMouseLeave}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+          <XAxis
+            dataKey="date"
+            stroke="#9ca3af"
+            fontSize={11}
+            tickLine={false}
+            axisLine={false}
+            padding={{ left: 0, right: 0 }}
+          />
+          <YAxis
+            yAxisId="left"
+            stroke="#9ca3af"
+            fontSize={10}
+            tickLine={false}
+            axisLine={false}
+            width={CHART_YAXIS_WIDTH}
+          />
+          <YAxis
+            yAxisId="right"
+            orientation="right"
+            domain={[0, 100]}
+            stroke="#a78bfa"
+            fontSize={10}
+            tickLine={false}
+            axisLine={false}
+            width={28}
+            tickFormatter={(v) => `${v}%`}
+          />
+          <Tooltip
+            content={() => null}
+            active={scrub.isVisible}
+            cursor={
+              scrub.isVisible
+                ? { stroke: "rgba(255,255,255,0.18)", strokeWidth: 1 }
+                : false
+            }
+            wrapperStyle={{ outline: "none", visibility: "hidden" }}
+          />
+          <Bar yAxisId="left" dataKey="wins" fill="#22c55e" radius={[4, 4, 0, 0]} />
+          <Bar yAxisId="left" dataKey="losses" fill="#ef4444" radius={[4, 4, 0, 0]} />
+          <Line
+            yAxisId="right"
+            type="monotone"
+            dataKey="winrate"
+            stroke="#a78bfa"
+            strokeWidth={2}
+            dot={{ fill: "#a78bfa", r: 3 }}
+            name="winrate"
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+      {scrub.isVisible && point && scrub.coordinate ? (
+        <ChartGlassTooltipShell active coordinate={scrub.coordinate}>
+          {label ? <p className="font-semibold text-cr-text mb-1.5">{label}</p> : null}
+          <p className="font-semibold text-cr-win">Победы : {point.wins}</p>
+          <p className="font-semibold text-cr-loss mt-0.5">Поражения : {point.losses}</p>
+          <p className="font-semibold text-[#a78bfa] mt-0.5">
+            Винрейт : {Number(point.winrate).toFixed(1)}%
+          </p>
+        </ChartGlassTooltipShell>
+      ) : null}
+    </>
+  );
+}
+
+type WinrateDayPoint = {
+  date: string;
+  wins: number;
+  losses: number;
+  winrate: number;
+};
+
 type TrophyChartPoint = {
+  index: number;
   opponentName: string;
   playedDate: string;
   playedTime: string;
   trophyChange: number;
   won: boolean;
 };
-
-function TrophyGrowthTooltip({
-  active,
-  payload,
-  coordinate,
-}: {
-  active?: boolean;
-  payload?: { payload: TrophyChartPoint }[];
-  coordinate?: { x?: number; y?: number };
-}) {
-  if (!active || !payload?.[0]) return null;
-  const point = payload[0].payload;
-  const delta = point.trophyChange;
-  return (
-    <ChartGlassTooltipShell active={active} coordinate={coordinate}>
-      <p className="font-semibold text-cr-text">против {point.opponentName}</p>
-      {(point.playedDate || point.playedTime) && (
-        <p className="text-cr-muted mt-0.5">
-          {point.playedDate}
-          {point.playedDate && point.playedTime ? " · " : ""}
-          {point.playedTime}
-        </p>
-      )}
-      <p className={delta >= 0 ? "text-cr-win font-bold mt-1" : "text-cr-loss font-bold mt-1"}>
-        {delta > 0 ? "+" : ""}
-        {delta} кубков
-      </p>
-      <p className="text-cr-muted mt-0.5">{point.won ? "Победа" : "Поражение"}</p>
-    </ChartGlassTooltipShell>
-  );
-}
-
-type WinrateTooltipRow = {
-  name?: string;
-  value?: number;
-  dataKey?: string;
-};
-
-function WinrateDayTooltip({
-  active,
-  payload,
-  label,
-  coordinate,
-}: {
-  active?: boolean;
-  payload?: WinrateTooltipRow[];
-  label?: string;
-  coordinate?: { x?: number; y?: number };
-}) {
-  if (!active || !payload?.length) return null;
-
-  const wins = payload.find((item) => item.dataKey === "wins")?.value;
-  const losses = payload.find((item) => item.dataKey === "losses")?.value;
-  const winrate = payload.find((item) => item.dataKey === "winrate")?.value;
-
-  return (
-    <ChartGlassTooltipShell active={active} coordinate={coordinate}>
-      {label ? <p className="font-semibold text-cr-text mb-1.5">{label}</p> : null}
-      {wins != null ? (
-        <p className="font-semibold text-cr-win">
-          Победы : {wins}
-        </p>
-      ) : null}
-      {losses != null ? (
-        <p className="font-semibold text-cr-loss mt-0.5">
-          Поражения : {losses}
-        </p>
-      ) : null}
-      {winrate != null ? (
-        <p className="font-semibold text-[#a78bfa] mt-0.5">
-          Винрейт : {Number(winrate).toFixed(1)}%
-        </p>
-      ) : null}
-    </ChartGlassTooltipShell>
-  );
-}

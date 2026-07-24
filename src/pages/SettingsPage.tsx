@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import {
-  User,
   Palette,
   LogOut,
   Trash2,
@@ -259,25 +258,23 @@ export function SettingsPage() {
           <h3 className="text-sm font-semibold text-cr-muted mb-3 uppercase tracking-wider">Обо мне</h3>
           <Card>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cr-blue to-cr-gold p-[3px] shrink-0">
-                <div className="w-full h-full rounded-full bg-cr-surface flex items-center justify-center">
-                  <User className="w-7 h-7 text-cr-muted" />
-                </div>
-              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-cr-muted">Telegram ID</p>
-                <p className="text-cr-text font-mono font-semibold">{tg?.initDataUnsafe?.user?.id ?? "—"}</p>
-                <p className="text-sm font-semibold text-cr-muted mt-2">Username</p>
+                <p className="text-sm font-semibold text-cr-muted">Username</p>
                 <p className="text-cr-text font-semibold">@{tg?.initDataUnsafe?.user?.username ?? "—"}</p>
               </div>
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.95 }}
-                className="p-3 rounded-xl bg-cr-loss/10 transition-colors shrink-0"
-                aria-label="Выход"
+                className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-cr-loss/10 transition-colors shrink-0"
+                aria-label="Закрыть приложение"
                 onClick={() => tg?.close?.()}
               >
-                <LogOut className="w-5 h-5 text-cr-loss" />
+                <LogOut className="w-5 h-5 text-cr-loss shrink-0" />
+                <span className="text-xs font-semibold text-cr-loss leading-tight text-left">
+                  Закрыть
+                  <br />
+                  приложение
+                </span>
               </motion.button>
             </div>
           </Card>
