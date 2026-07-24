@@ -191,6 +191,49 @@ export function BottomNav() {
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [bubbleFocusIndex, setBubbleFocusIndex] = useState(activeIndex);
   const highlightedIndex = previewIndex ?? bubbleFocusIndex;
+  const dockPointerIdsRef = useRef<Set<number>>(new Set());
+
+  const lockPageForDockGesture = useCallback(() => {
+    document.documentElement.classList.add("dock-gesture-lock");
+  }, []);
+
+  const unlockPageForDockGesture = useCallback(() => {
+    if (dockPointerIdsRef.current.size > 0) return;
+    document.documentElement.classList.remove("dock-gesture-lock");
+  }, []);
+
+  const onDockPointerDownCapture = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      dockPointerIdsRef.current.add(event.pointerId);
+      lockPageForDockGesture();
+    },
+    [lockPageForDockGesture],
+  );
+
+  const onDockPointerEndCapture = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      dockPointerIdsRef.current.delete(event.pointerId);
+      unlockPageForDockGesture();
+    },
+    [unlockPageForDockGesture],
+  );
+
+  useEffect(() => {
+    const clearDockLock = (event: PointerEvent) => {
+      if (!dockPointerIdsRef.current.has(event.pointerId)) return;
+      dockPointerIdsRef.current.delete(event.pointerId);
+      unlockPageForDockGesture();
+    };
+    window.addEventListener("pointerup", clearDockLock);
+    window.addEventListener("pointercancel", clearDockLock);
+    return () => {
+      window.removeEventListener("pointerup", clearDockLock);
+      window.removeEventListener("pointercancel", clearDockLock);
+      dockPointerIdsRef.current.clear();
+      document.documentElement.classList.remove("dock-gesture-lock");
+    };
+  }, [unlockPageForDockGesture]);
 
   const setBubbleAnimating = useCallback((active: boolean) => {
     if (bubbleAnimatingRef.current === active) return;
@@ -420,7 +463,7 @@ export function BottomNav() {
 
     if (!isNearBubble(localX, localY, bubbleX.get(), rect.height)) return;
 
-    event.preventDefault();
+    if (event.cancelable) event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     isDraggingRef.current = true;
     dragStartX.current = event.clientX;
@@ -432,6 +475,7 @@ export function BottomNav() {
 
   const onTrackPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingRef.current || !trackRef.current) return;
+    if (event.cancelable) event.preventDefault();
 
     const centers = getTabCenters();
     const trackWidth = trackRef.current.offsetWidth;
@@ -501,7 +545,12 @@ export function BottomNav() {
 
   return (
     <nav className="bottom-nav" aria-label="Основная навигация">
-      <div className="bottom-nav-shell">
+      <div
+        className="bottom-nav-shell"
+        onPointerDownCapture={onDockPointerDownCapture}
+        onPointerUpCapture={onDockPointerEndCapture}
+        onPointerCancelCapture={onDockPointerEndCapture}
+      >
         <div className="bottom-nav-panel">
           <div className="bottom-nav-bar" aria-hidden>
             <span className="bottom-nav-bar-rim" />
