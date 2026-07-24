@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   ComposedChart,
   Bar,
+  ReferenceLine,
 } from "recharts";
 import { TrendingUp, TrendingDown, Flame, Clock } from "lucide-react";
 import { StatsOverview } from "@/types";
@@ -211,6 +212,7 @@ export { AnalyticsPage as default };
 function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
   const scrub = useChartScrub();
   const point = scrub.activeIndex != null ? data[scrub.activeIndex] : null;
+  const cursorX = point?.index;
 
   return (
     <>
@@ -218,26 +220,24 @@ function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
         <LineChart
           data={data}
           margin={CHART_MARGIN}
-          onMouseMove={scrub.chartHandlers.onMouseMove}
           onMouseLeave={scrub.chartHandlers.onMouseLeave}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
           <XAxis dataKey="index" hide />
           <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} width={CHART_YAXIS_WIDTH} />
-          <Tooltip
-            content={() => null}
-            active={scrub.isVisible}
-            cursor={scrub.isVisible}
-            wrapperStyle={{ outline: "none", visibility: "hidden" }}
-          />
+          <Tooltip content={() => null} cursor={false} wrapperStyle={{ display: "none" }} />
+          {scrub.isVisible && cursorX != null ? (
+            <ReferenceLine x={cursorX} stroke="rgba(255,255,255,0.22)" strokeWidth={1} ifOverflow="extendDomain" />
+          ) : null}
           <Line
             type="monotone"
             dataKey="trophyChange"
             name="Кубки"
             stroke="#fbbf24"
             strokeWidth={2}
+            isAnimationActive={false}
             dot={{ fill: "#fbbf24", r: 3 }}
-            activeDot={{ r: 5 }}
+            activeDot={false}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -265,10 +265,6 @@ function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
 function WinrateDayChart({ data }: { data: WinrateDayPoint[] }) {
   const scrub = useChartScrub();
   const point = scrub.activeIndex != null ? data[scrub.activeIndex] : null;
-  const label =
-    typeof scrub.label === "string" || typeof scrub.label === "number"
-      ? String(scrub.label)
-      : point?.date;
 
   return (
     <>
@@ -278,7 +274,6 @@ function WinrateDayChart({ data }: { data: WinrateDayPoint[] }) {
           margin={CHART_MARGIN}
           barCategoryGap="18%"
           barGap={2}
-          onMouseMove={scrub.chartHandlers.onMouseMove}
           onMouseLeave={scrub.chartHandlers.onMouseLeave}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -309,32 +304,34 @@ function WinrateDayChart({ data }: { data: WinrateDayPoint[] }) {
             width={28}
             tickFormatter={(v) => `${v}%`}
           />
-          <Tooltip
-            content={() => null}
-            active={scrub.isVisible}
-            cursor={
-              scrub.isVisible
-                ? { stroke: "rgba(255,255,255,0.18)", strokeWidth: 1 }
-                : false
-            }
-            wrapperStyle={{ outline: "none", visibility: "hidden" }}
-          />
-          <Bar yAxisId="left" dataKey="wins" fill="#22c55e" radius={[4, 4, 0, 0]} />
-          <Bar yAxisId="left" dataKey="losses" fill="#ef4444" radius={[4, 4, 0, 0]} />
+          <Tooltip content={() => null} cursor={false} wrapperStyle={{ display: "none" }} />
+          {scrub.isVisible && point ? (
+            <ReferenceLine
+              x={point.date}
+              yAxisId="left"
+              stroke="rgba(255,255,255,0.22)"
+              strokeWidth={1}
+              ifOverflow="extendDomain"
+            />
+          ) : null}
+          <Bar yAxisId="left" dataKey="wins" fill="#22c55e" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+          <Bar yAxisId="left" dataKey="losses" fill="#ef4444" radius={[4, 4, 0, 0]} isAnimationActive={false} />
           <Line
             yAxisId="right"
             type="monotone"
             dataKey="winrate"
             stroke="#a78bfa"
             strokeWidth={2}
+            isAnimationActive={false}
             dot={{ fill: "#a78bfa", r: 3 }}
+            activeDot={false}
             name="winrate"
           />
         </ComposedChart>
       </ResponsiveContainer>
       {scrub.isVisible && point && scrub.coordinate ? (
         <ChartGlassTooltipShell active coordinate={scrub.coordinate}>
-          {label ? <p className="font-semibold text-cr-text mb-1.5">{label}</p> : null}
+          <p className="font-semibold text-cr-text mb-1.5">{point.date}</p>
           <p className="font-semibold text-cr-win">Победы : {point.wins}</p>
           <p className="font-semibold text-cr-loss mt-0.5">Поражения : {point.losses}</p>
           <p className="font-semibold text-[#a78bfa] mt-0.5">

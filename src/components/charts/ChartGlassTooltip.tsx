@@ -16,12 +16,10 @@ import { createPortal } from "react-dom";
 export const ChartTooltipAnchorContext =
   createContext<RefObject<HTMLDivElement | null> | null>(null);
 
-type TooltipCoordinate = { x?: number; y?: number };
+type TooltipCoordinate = { x: number; y: number };
 
 type ScrubState = {
-  /** Finger is dragging across the chart — tooltip follows and hides on release. */
   scrubbing: boolean;
-  /** Tooltip stays open until the bubble is tapped again. */
   pinned: boolean;
   activeIndex: number | null;
 };
@@ -44,14 +42,16 @@ type ChartScrubApi = ScrubState & {
 export type ChartPointerState = {
   isTooltipActive?: boolean;
   activeTooltipIndex?: number | string | null;
-  activeCoordinate?: TooltipCoordinate;
+  activeCoordinate?: { x?: number; y?: number };
   activePayload?: unknown[];
   activeLabel?: unknown;
 };
 
 const ChartScrubContext = createContext<ChartScrubApi | null>(null);
 
-const MOVE_THRESHOLD_PX = 8;
+const MOVE_THRESHOLD_PX = 10;
+/** Stay on the current point until the finger clearly crosses into the next band. */
+const INDEX_HYSTERESIS = 0.42;
 
 function readDockTopPx(): number {
   const nav = document.querySelector(".bottom-nav");
@@ -62,66 +62,50 @@ function readDockTopPx(): number {
   return window.innerHeight - 112;
 }
 
-function resolveIndexFromClientX(
-  anchor: HTMLElement,
-  clientX: number,
-  pointCount: number,
-): number | null {
-  if (pointCount <= 0) return null;
+function getPlotRect(anchor: HTMLElement): DOMRect | null {
   const plot =
     (anchor.querySelector(".recharts-cartesian-grid") as SVGElement | null) ??
+    (anchor.querySelector(".recharts-surface") as SVGElement | null) ??
     (anchor.querySelector(".recharts-wrapper") as HTMLElement | null);
   if (!plot) return null;
   const rect = plot.getBoundingClientRect();
-  if (rect.width <= 0) return null;
-  const ratio = (clientX - rect.left) / rect.width;
-  const clamped = Math.min(1, Math.max(0, ratio));
-  if (pointCount === 1) return 0;
-  return Math.round(clamped * (pointCount - 1));
+  return rect.width > 0 && rect.height > 0 ? rect : null;
 }
 
+function continuousIndexFromClientX(
+  plot: DOMRect,
+  clientX: number,
+  pointCount: number,
+): number {
+  if (pointCount <= 1) return 0;
+  const ratio = (clientX - plot.left) / plot.width;
+  return Math.min(pointCount - 1, Math.max(0, ratio * (pointCount - 1)));
+}
+
+function resolveIndexWithHysteresis(
+  continuous: number,
+  previous: number | null,
+  pointCount: number,
+): number {
+  if (pointCount <= 1) return 0;
+  if (previous == null) return Math.round(continuous);
+  if (Math.abs(continuous - previous) < INDEX_HYSTERESIS) return previous;
+  return Math.round(continuous);
+}
+
+/** Stable chart-local coordinate: X on the category band, Y fixed near the plot top. */
 function coordinateForIndex(
   anchor: HTMLElement,
+  plot: DOMRect,
   index: number,
-  fallbackX: number,
+  pointCount: number,
 ): TooltipCoordinate {
   const anchorRect = anchor.getBoundingClientRect();
-  const dots = anchor.querySelectorAll<SVGElement>(".recharts-dot, .recharts-active-dot");
-  const dot = dots[index];
-  if (dot) {
-    const r = dot.getBoundingClientRect();
-    return {
-      x: r.left + r.width / 2 - anchorRect.left,
-      y: r.top + r.height / 2 - anchorRect.top,
-    };
-  }
-
-  const bars = anchor.querySelectorAll<SVGElement>(".recharts-bar-rectangle");
-  // Composed chart: wins+losses bars per category → two rects per index
-  const barGroupSize = bars.length > 0 && index * 2 < bars.length ? 2 : 1;
-  const bar = bars[index * barGroupSize] ?? bars[index];
-  if (bar) {
-    const r = bar.getBoundingClientRect();
-    return {
-      x: r.left + r.width / 2 - anchorRect.left,
-      y: r.top - anchorRect.top,
-    };
-  }
-
-  const plot =
-    (anchor.querySelector(".recharts-cartesian-grid") as SVGElement | null) ??
-    (anchor.querySelector(".recharts-wrapper") as HTMLElement | null);
-  if (plot) {
-    const rect = plot.getBoundingClientRect();
-    const count = Math.max(1, Number(anchor.dataset.pointCount) || 1);
-    const t = count === 1 ? 0.5 : index / (count - 1);
-    return {
-      x: rect.left + t * rect.width - anchorRect.left,
-      y: rect.top + rect.height * 0.35 - anchorRect.top,
-    };
-  }
-
-  return { x: fallbackX - anchorRect.left, y: anchorRect.height * 0.35 };
+  const t = pointCount <= 1 ? 0.5 : index / (pointCount - 1);
+  return {
+    x: plot.left + t * plot.width - anchorRect.left,
+    y: plot.top + 12 - anchorRect.top,
+  };
 }
 
 export function useChartScrub(): ChartScrubApi {
@@ -150,7 +134,6 @@ export function ChartTooltipAnchor({
   const [pinned, setPinned] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [coordinate, setCoordinate] = useState<TooltipCoordinate | null>(null);
-  const [label, setLabel] = useState<unknown>(null);
 
   const pointerIdRef = useRef<number | null>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
@@ -159,71 +142,76 @@ export function ChartTooltipAnchor({
   const pinnedRef = useRef(pinned);
   const activeIndexRef = useRef(activeIndex);
   const pointCountRef = useRef(pointCount);
+  const moveRafRef = useRef<number | null>(null);
+  const pendingClientXRef = useRef<number | null>(null);
+  const detachWindowListenersRef = useRef<(() => void) | null>(null);
+
   pinnedRef.current = pinned;
   activeIndexRef.current = activeIndex;
   pointCountRef.current = pointCount;
 
-  const detachWindowListenersRef = useRef<(() => void) | null>(null);
-
   const clearTransient = useCallback(() => {
     setActiveIndex(null);
     setCoordinate(null);
-    setLabel(null);
     setScrubbing(false);
   }, []);
 
-  const applyPointerPosition = useCallback(
-    (clientX: number, clientY: number, fromChart?: ChartPointerState | null): number | null => {
-      const anchor = anchorRef.current;
-      if (!anchor) return null;
+  const applyClientX = useCallback((clientX: number): number | null => {
+    const anchor = anchorRef.current;
+    if (!anchor) return null;
+    const count = pointCountRef.current;
+    if (count <= 0) return null;
+    const plot = getPlotRect(anchor);
+    if (!plot) return null;
 
-      if (fromChart?.isTooltipActive && fromChart.activeTooltipIndex != null) {
-        const next = Number(fromChart.activeTooltipIndex);
-        if (Number.isFinite(next)) {
-          activeIndexRef.current = next;
-          setActiveIndex(next);
-          if (fromChart.activeCoordinate) setCoordinate(fromChart.activeCoordinate);
-          if (fromChart.activeLabel !== undefined) setLabel(fromChart.activeLabel);
-          return next;
-        }
-      }
+    const continuous = continuousIndexFromClientX(plot, clientX, count);
+    const idx = resolveIndexWithHysteresis(continuous, activeIndexRef.current, count);
+    const nextCoord = coordinateForIndex(anchor, plot, idx, count);
 
-      const idx = resolveIndexFromClientX(anchor, clientX, pointCountRef.current);
-      if (idx == null) return null;
+    if (activeIndexRef.current !== idx) {
       activeIndexRef.current = idx;
       setActiveIndex(idx);
-      setCoordinate(coordinateForIndex(anchor, idx, clientY));
-      return idx;
+    }
+    setCoordinate((prev) => {
+      if (prev && Math.abs(prev.x - nextCoord.x) < 0.5 && Math.abs(prev.y - nextCoord.y) < 0.5) {
+        return prev;
+      }
+      return nextCoord;
+    });
+    return idx;
+  }, []);
+
+  const scheduleApplyClientX = useCallback(
+    (clientX: number) => {
+      pendingClientXRef.current = clientX;
+      if (moveRafRef.current != null) return;
+      moveRafRef.current = requestAnimationFrame(() => {
+        moveRafRef.current = null;
+        const x = pendingClientXRef.current;
+        pendingClientXRef.current = null;
+        if (x != null) applyClientX(x);
+      });
     },
-    [],
+    [applyClientX],
   );
 
-  const setActiveFromChart = useCallback((state: ChartPointerState | null) => {
-    // Only follow Recharts while a finger/mouse button interaction is active or already pinned.
-    // Ignore leftover hover/ghost mouse events after touch — they caused sticky tooltips.
-    if (pointerIdRef.current == null && !pinnedRef.current) return;
-    if (!state?.isTooltipActive || state.activeTooltipIndex == null) return;
-    const next = Number(state.activeTooltipIndex);
-    if (!Number.isFinite(next)) return;
-    activeIndexRef.current = next;
-    setActiveIndex(next);
-    if (state.activeCoordinate) setCoordinate(state.activeCoordinate);
-    if (state.activeLabel !== undefined) setLabel(state.activeLabel);
+  // Recharts mouse handlers kept for cursor line sync only — we own index/coords.
+  const setActiveFromChart = useCallback((_state: ChartPointerState | null) => {
+    // Intentionally ignored: dual updates from Recharts caused tip jitter.
   }, []);
 
   const chartHandlers = useMemo(
     () => ({
-      onMouseMove: (state: ChartPointerState | null) => {
-        setActiveFromChart(state);
+      onMouseMove: (_state: ChartPointerState | null) => {
+        // Cursor visibility is driven by scrub.isVisible; index comes from pointer scrub.
       },
       onMouseLeave: () => {
-        // Desktop mouse leave: hide unless pinned or still scrubbing via pointer capture.
         if (!pinnedRef.current && pointerIdRef.current == null) {
           clearTransient();
         }
       },
     }),
-    [setActiveFromChart, clearTransient],
+    [clearTransient],
   );
 
   const surfaceHandlers = useMemo(
@@ -232,13 +220,17 @@ export function ChartTooltipAnchor({
         if (event.button !== 0 && event.pointerType === "mouse") return;
 
         detachWindowListenersRef.current?.();
+        if (moveRafRef.current != null) {
+          cancelAnimationFrame(moveRafRef.current);
+          moveRafRef.current = null;
+        }
 
         pointerIdRef.current = event.pointerId;
         startRef.current = { x: event.clientX, y: event.clientY };
         movedRef.current = false;
         indexAtPointerDownRef.current = activeIndexRef.current;
         setScrubbing(true);
-        applyPointerPosition(event.clientX, event.clientY);
+        applyClientX(event.clientX);
 
         const onMove = (moveEvent: PointerEvent) => {
           if (pointerIdRef.current !== moveEvent.pointerId || !startRef.current) return;
@@ -246,18 +238,20 @@ export function ChartTooltipAnchor({
           const dy = moveEvent.clientY - startRef.current.y;
           if (Math.hypot(dx, dy) >= MOVE_THRESHOLD_PX) {
             movedRef.current = true;
-            if (pinnedRef.current) {
-              // Temporary scrub while pinned: unpin visually follows finger; release keeps last point pinned.
-            }
-            setScrubbing(true);
           }
-          applyPointerPosition(moveEvent.clientX, moveEvent.clientY);
+          scheduleApplyClientX(moveEvent.clientX);
         };
 
         const onUp = (upEvent: PointerEvent) => {
           if (pointerIdRef.current !== upEvent.pointerId) return;
           const wasMoved = movedRef.current;
           const indexAtStart = indexAtPointerDownRef.current;
+
+          if (moveRafRef.current != null) {
+            cancelAnimationFrame(moveRafRef.current);
+            moveRafRef.current = null;
+          }
+          pendingClientXRef.current = null;
 
           pointerIdRef.current = null;
           startRef.current = null;
@@ -274,11 +268,7 @@ export function ChartTooltipAnchor({
             return;
           }
 
-          // Tap: pin current point; close only by tapping the tooltip bubble again.
-          const indexToPin =
-            applyPointerPosition(upEvent.clientX, upEvent.clientY) ??
-            activeIndexRef.current ??
-            indexAtStart;
+          const indexToPin = applyClientX(upEvent.clientX) ?? activeIndexRef.current ?? indexAtStart;
           if (indexToPin == null) {
             setScrubbing(false);
             return;
@@ -300,7 +290,7 @@ export function ChartTooltipAnchor({
         };
       },
     }),
-    [applyPointerPosition, clearTransient],
+    [applyClientX, scheduleApplyClientX, clearTransient],
   );
 
   const onTooltipPress = useCallback(() => {
@@ -316,7 +306,7 @@ export function ChartTooltipAnchor({
       pinned,
       activeIndex,
       coordinate,
-      label,
+      label: null,
       isVisible: activeIndex != null && (scrubbing || pinned),
       chartHandlers,
       surfaceHandlers,
@@ -328,7 +318,6 @@ export function ChartTooltipAnchor({
       pinned,
       activeIndex,
       coordinate,
-      label,
       chartHandlers,
       surfaceHandlers,
       onTooltipPress,
@@ -343,7 +332,7 @@ export function ChartTooltipAnchor({
           ref={anchorRef}
           className={className}
           data-point-count={pointCount}
-          style={{ touchAction: "none" }}
+          style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
           {...surfaceHandlers}
         >
           {children}
@@ -357,7 +346,6 @@ export function ChartGlassTooltipShell({
   active,
   coordinate,
   children,
-  offsetY = 10,
 }: {
   active?: boolean;
   coordinate?: TooltipCoordinate | null;
@@ -368,12 +356,13 @@ export function ChartGlassTooltipShell({
   const scrub = useOptionalChartScrub();
   const shellRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
+  const measuredSizeRef = useRef({ w: 168, h: 88 });
 
   const pinned = scrub?.pinned ?? false;
   const visible = scrub ? scrub.isVisible && Boolean(active) : Boolean(active);
 
   useLayoutEffect(() => {
-    if (!visible || !anchorRef?.current || coordinate?.x == null || coordinate?.y == null) {
+    if (!visible || !anchorRef?.current || coordinate == null) {
       setPosition(null);
       return;
     }
@@ -383,31 +372,36 @@ export function ChartGlassTooltipShell({
       const shell = shellRef.current;
       if (!anchor) return;
 
+      if (shell) {
+        measuredSizeRef.current = {
+          w: shell.offsetWidth || measuredSizeRef.current.w,
+          h: shell.offsetHeight || measuredSizeRef.current.h,
+        };
+      }
+
       const rect = anchor.getBoundingClientRect();
-      const pointX = rect.left + coordinate.x!;
-      const pointY = rect.top + coordinate.y!;
-      const tipW = shell?.offsetWidth ?? 160;
-      const tipH = shell?.offsetHeight ?? 72;
+      const tipW = measuredSizeRef.current.w;
+      const tipH = measuredSizeRef.current.h;
       const margin = 8;
       const dockTop = readDockTopPx();
 
-      let left = pointX;
+      let left = rect.left + coordinate.x;
       left = Math.min(window.innerWidth - margin - tipW / 2, Math.max(margin + tipW / 2, left));
 
-      // Keep the bubble fully above the bottom dock.
-      let top = pointY - tipH - offsetY;
+      // Sticky to the chart top — only left moves while scrubbing.
+      let top = rect.top + 6;
       const maxTop = dockTop - tipH - margin;
-      if (top > maxTop) top = maxTop;
-      if (top < margin) {
-        top = Math.min(pointY + offsetY, maxTop);
-      }
       top = Math.max(margin, Math.min(top, maxTop));
 
-      setPosition({ left, top });
+      setPosition((prev) => {
+        if (prev && Math.abs(prev.left - left) < 0.5 && Math.abs(prev.top - top) < 0.5) {
+          return prev;
+        }
+        return { left, top };
+      });
     };
 
     updatePosition();
-    // Second pass after tip mounts with real size.
     const raf = requestAnimationFrame(updatePosition);
     window.addEventListener("scroll", updatePosition, true);
     window.addEventListener("resize", updatePosition);
@@ -417,9 +411,8 @@ export function ChartGlassTooltipShell({
       window.removeEventListener("scroll", updatePosition, true);
       window.removeEventListener("resize", updatePosition);
     };
-  }, [visible, anchorRef, coordinate?.x, coordinate?.y, offsetY, children]);
+  }, [visible, anchorRef, coordinate?.x, coordinate?.y, pinned]);
 
-  // Always mount while visible so we can measure tip size; hide via opacity until positioned.
   if (!visible) return null;
 
   return createPortal(
@@ -429,6 +422,14 @@ export function ChartGlassTooltipShell({
       role={pinned ? "button" : undefined}
       tabIndex={pinned ? 0 : undefined}
       aria-label={pinned ? "Закрыть подсказку" : undefined}
+      onPointerDown={
+        pinned
+          ? (event) => {
+              event.stopPropagation();
+              event.preventDefault();
+            }
+          : undefined
+      }
       onClick={
         pinned
           ? (event) => {
@@ -456,12 +457,18 @@ export function ChartGlassTooltipShell({
         pointerEvents: pinned ? "auto" : "none",
         cursor: pinned ? "pointer" : "default",
         visibility: position ? "visible" : "hidden",
+        minWidth: 148,
+        willChange: "left",
       }}
     >
       {children}
       {pinned ? (
-        <p className="text-[10px] text-cr-muted mt-1.5 text-center">Нажмите, чтобы закрыть</p>
-      ) : null}
+        <p className="text-[10px] text-cr-muted mt-1.5 text-center opacity-80">Нажмите, чтобы закрыть</p>
+      ) : (
+        <p className="text-[10px] text-transparent mt-1.5 text-center select-none" aria-hidden>
+          Нажмите, чтобы закрыть
+        </p>
+      )}
     </div>,
     document.body,
   );
