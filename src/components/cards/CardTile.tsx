@@ -12,7 +12,7 @@ const sizeClasses: Record<CardTileSize, string> = {
   md: "w-14 h-16",
   grid: "w-14 h-[4.25rem] max-w-[4.5rem]",
   lg: "w-full max-w-[4.25rem] aspect-[4/5] mx-auto",
-  deck: "w-full max-w-[3rem] aspect-[4/5] mx-auto",
+  deck: "w-full max-w-[3.45rem] aspect-[4/5] mx-auto",
   collection: "w-full max-w-[4.75rem] aspect-[4/5] mx-auto",
 };
 
