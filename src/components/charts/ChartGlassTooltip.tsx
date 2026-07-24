@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -49,9 +50,9 @@ export type ChartPointerState = {
 
 const ChartScrubContext = createContext<ChartScrubApi | null>(null);
 
-const MOVE_THRESHOLD_PX = 10;
+const MOVE_THRESHOLD_PX = 12;
 /** Stay on the current point until the finger clearly crosses into the next band. */
-const INDEX_HYSTERESIS = 0.42;
+const INDEX_HYSTERESIS = 0.45;
 
 function readDockTopPx(): number {
   const nav = document.querySelector(".bottom-nav");
@@ -195,16 +196,13 @@ export function ChartTooltipAnchor({
     [applyClientX],
   );
 
-  // Recharts mouse handlers kept for cursor line sync only — we own index/coords.
   const setActiveFromChart = useCallback((_state: ChartPointerState | null) => {
     // Intentionally ignored: dual updates from Recharts caused tip jitter.
   }, []);
 
   const chartHandlers = useMemo(
     () => ({
-      onMouseMove: (_state: ChartPointerState | null) => {
-        // Cursor visibility is driven by scrub.isVisible; index comes from pointer scrub.
-      },
+      onMouseMove: (_state: ChartPointerState | null) => {},
       onMouseLeave: () => {
         if (!pinnedRef.current && pointerIdRef.current == null) {
           clearTransient();
@@ -268,6 +266,7 @@ export function ChartTooltipAnchor({
             return;
           }
 
+          // Tap on a point/period → pin until the tip is tapped again.
           const indexToPin = applyClientX(upEvent.clientX) ?? activeIndexRef.current ?? indexAtStart;
           if (indexToPin == null) {
             setScrubbing(false);
@@ -346,24 +345,57 @@ export function ChartGlassTooltipShell({
   active,
   coordinate,
   children,
+  contentKey,
 }: {
   active?: boolean;
   coordinate?: TooltipCoordinate | null;
   children: ReactNode;
+  /** Stable key for the selected point — drives content crossfade. */
+  contentKey?: string | number | null;
   offsetY?: number;
 }) {
   const anchorRef = useContext(ChartTooltipAnchorContext);
   const scrub = useOptionalChartScrub();
   const shellRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
-  const measuredSizeRef = useRef({ w: 168, h: 88 });
+  const measuredSizeRef = useRef({ w: 168, h: 96 });
+  const [rendered, setRendered] = useState(false);
+  const [shown, setShown] = useState(false);
+  const [displayChildren, setDisplayChildren] = useState(children);
+  const [displayKey, setDisplayKey] = useState(contentKey);
+  const [bodyOpaque, setBodyOpaque] = useState(true);
 
   const pinned = scrub?.pinned ?? false;
-  const visible = scrub ? scrub.isVisible && Boolean(active) : Boolean(active);
+  const wantVisible = scrub ? scrub.isVisible && Boolean(active) : Boolean(active);
+
+  useEffect(() => {
+    if (wantVisible) {
+      setRendered(true);
+      const id = requestAnimationFrame(() => setShown(true));
+      return () => cancelAnimationFrame(id);
+    }
+    setShown(false);
+    const t = window.setTimeout(() => setRendered(false), 180);
+    return () => window.clearTimeout(t);
+  }, [wantVisible]);
+
+  useEffect(() => {
+    if (!wantVisible) return;
+    if (contentKey === displayKey) {
+      setDisplayChildren(children);
+      return;
+    }
+    setBodyOpaque(false);
+    const t = window.setTimeout(() => {
+      setDisplayKey(contentKey);
+      setDisplayChildren(children);
+      setBodyOpaque(true);
+    }, 90);
+    return () => window.clearTimeout(t);
+  }, [children, contentKey, displayKey, wantVisible]);
 
   useLayoutEffect(() => {
-    if (!visible || !anchorRef?.current || coordinate == null) {
-      setPosition(null);
+    if (!rendered || !anchorRef?.current || coordinate == null) {
       return;
     }
 
@@ -388,17 +420,11 @@ export function ChartGlassTooltipShell({
       let left = rect.left + coordinate.x;
       left = Math.min(window.innerWidth - margin - tipW / 2, Math.max(margin + tipW / 2, left));
 
-      // Sticky to the chart top — only left moves while scrubbing.
       let top = rect.top + 6;
       const maxTop = dockTop - tipH - margin;
       top = Math.max(margin, Math.min(top, maxTop));
 
-      setPosition((prev) => {
-        if (prev && Math.abs(prev.left - left) < 0.5 && Math.abs(prev.top - top) < 0.5) {
-          return prev;
-        }
-        return { left, top };
-      });
+      setPosition({ left, top });
     };
 
     updatePosition();
@@ -411,14 +437,14 @@ export function ChartGlassTooltipShell({
       window.removeEventListener("scroll", updatePosition, true);
       window.removeEventListener("resize", updatePosition);
     };
-  }, [visible, anchorRef, coordinate?.x, coordinate?.y, pinned]);
+  }, [rendered, anchorRef, coordinate?.x, coordinate?.y, pinned]);
 
-  if (!visible) return null;
+  if (!rendered) return null;
 
   return createPortal(
     <div
       ref={shellRef}
-      className="chart-tooltip-glass px-3 py-2 text-xs shadow-lg"
+      className={`chart-tooltip-glass px-3 py-2 text-xs shadow-lg${shown && position ? " is-shown" : ""}`}
       role={pinned ? "button" : undefined}
       tabIndex={pinned ? 0 : undefined}
       aria-label={pinned ? "Закрыть подсказку" : undefined}
@@ -454,21 +480,27 @@ export function ChartGlassTooltipShell({
         top: position?.top ?? 0,
         transform: "translate(-50%, 0)",
         zIndex: 40,
-        pointerEvents: pinned ? "auto" : "none",
+        pointerEvents: pinned && shown ? "auto" : "none",
         cursor: pinned ? "pointer" : "default",
-        visibility: position ? "visible" : "hidden",
-        minWidth: 148,
-        willChange: "left",
+        minWidth: 156,
       }}
     >
-      {children}
-      {pinned ? (
-        <p className="text-[10px] text-cr-muted mt-1.5 text-center opacity-80">Нажмите, чтобы закрыть</p>
-      ) : (
-        <p className="text-[10px] text-transparent mt-1.5 text-center select-none" aria-hidden>
-          Нажмите, чтобы закрыть
-        </p>
-      )}
+      <div
+        className="chart-tooltip-body"
+        style={{
+          opacity: bodyOpaque ? 1 : 0,
+          transition: "opacity 90ms ease",
+        }}
+      >
+        {displayChildren}
+      </div>
+      <p
+        className="chart-tooltip-hint"
+        style={{ opacity: pinned ? 1 : 0 }}
+        aria-hidden={!pinned}
+      >
+        Нажмите, чтобы закрыть
+      </p>
     </div>,
     document.body,
   );

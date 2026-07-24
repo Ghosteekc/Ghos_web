@@ -47,8 +47,8 @@ const API_BASE = (import.meta.env.VITE_API_URL ?? "").trim();
 const DEFAULT_UNAVAILABLE =
   "В данный момент сервер не отвечает. Подождите или зайдите позже.";
 
-const STATS_MEM_KEY = "stats-v5";
-const STATS_LS_KEY = "stats-overview-v1";
+const STATS_MEM_KEY = "stats-v7";
+const STATS_LS_KEY = "stats-overview-v3";
 const STATS_STALE_GRACE_MS = 7 * 24 * 60 * 60_000;
 
 function apiUrl(path: string): string {

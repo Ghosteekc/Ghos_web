@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -17,8 +17,8 @@ import { Card, FeatureNavGrid, Loader, ScrollToTopButton, Button } from "@/compo
 import { api } from "@/api/client";
 import { cacheGet, lsGet, TTL } from "@/api/cache";
 
-const STATS_MEM_KEY = "stats-v6";
-const STATS_LS_KEY = "stats-overview-v2";
+const STATS_MEM_KEY = "stats-v7";
+const STATS_LS_KEY = "stats-overview-v3";
 const STATS_STALE_GRACE_MS = 7 * 24 * 60 * 60_000;
 
 function bootstrapStats(): StatsOverview | null {
@@ -169,7 +169,7 @@ export function AnalyticsPage() {
             <Card>
               <h3 className="text-sm font-semibold text-cr-text mb-2">Рост трофеев</h3>
               <p className="text-[11px] text-cr-muted mb-3">
-                Только рейтинговые 1v1 · ведите пальцем для деталей, тап — закрепить
+                Только рейтинговые 1v1 · ведите пальцем, тап по точке — закрепить
               </p>
               <ChartTooltipAnchor className="h-[170px]" pointCount={lastResults.length}>
                 {lastResults.length > 0 ? (
@@ -213,6 +213,12 @@ function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
   const scrub = useChartScrub();
   const point = scrub.activeIndex != null ? data[scrub.activeIndex] : null;
   const cursorX = point?.index;
+  const stickyPointRef = useRef(point);
+  const stickyCoordRef = useRef(scrub.coordinate);
+  if (point) stickyPointRef.current = point;
+  if (scrub.coordinate) stickyCoordRef.current = scrub.coordinate;
+  const tipPoint = point ?? stickyPointRef.current;
+  const tipCoord = scrub.coordinate ?? stickyCoordRef.current;
 
   return (
     <>
@@ -241,21 +247,25 @@ function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
           />
         </LineChart>
       </ResponsiveContainer>
-      {scrub.isVisible && point && scrub.coordinate ? (
-        <ChartGlassTooltipShell active coordinate={scrub.coordinate}>
-          <p className="font-semibold text-cr-text">против {point.opponentName}</p>
-          {(point.playedDate || point.playedTime) && (
+      {tipPoint && tipCoord ? (
+        <ChartGlassTooltipShell
+          active={scrub.isVisible}
+          coordinate={tipCoord}
+          contentKey={`${tipPoint.index}-${tipPoint.opponentName}-${tipPoint.trophyChange}`}
+        >
+          <p className="font-semibold text-cr-text">против {tipPoint.opponentName}</p>
+          {(tipPoint.playedDate || tipPoint.playedTime) && (
             <p className="text-cr-muted mt-0.5">
-              {point.playedDate}
-              {point.playedDate && point.playedTime ? " · " : ""}
-              {point.playedTime}
+              {tipPoint.playedDate}
+              {tipPoint.playedDate && tipPoint.playedTime ? " · " : ""}
+              {tipPoint.playedTime}
             </p>
           )}
-          <p className={point.trophyChange >= 0 ? "text-cr-win font-bold mt-1" : "text-cr-loss font-bold mt-1"}>
-            {point.trophyChange > 0 ? "+" : ""}
-            {point.trophyChange} кубков
+          <p className={tipPoint.trophyChange >= 0 ? "text-cr-win font-bold mt-1" : "text-cr-loss font-bold mt-1"}>
+            {tipPoint.trophyChange > 0 ? "+" : ""}
+            {tipPoint.trophyChange} кубков
           </p>
-          <p className="text-cr-muted mt-0.5">{point.won ? "Победа" : "Поражение"}</p>
+          <p className="text-cr-muted mt-0.5">{tipPoint.won ? "Победа" : "Поражение"}</p>
         </ChartGlassTooltipShell>
       ) : null}
     </>
@@ -265,6 +275,12 @@ function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
 function WinrateDayChart({ data }: { data: WinrateDayPoint[] }) {
   const scrub = useChartScrub();
   const point = scrub.activeIndex != null ? data[scrub.activeIndex] : null;
+  const stickyPointRef = useRef(point);
+  const stickyCoordRef = useRef(scrub.coordinate);
+  if (point) stickyPointRef.current = point;
+  if (scrub.coordinate) stickyCoordRef.current = scrub.coordinate;
+  const tipPoint = point ?? stickyPointRef.current;
+  const tipCoord = scrub.coordinate ?? stickyCoordRef.current;
 
   return (
     <>
@@ -329,13 +345,17 @@ function WinrateDayChart({ data }: { data: WinrateDayPoint[] }) {
           />
         </ComposedChart>
       </ResponsiveContainer>
-      {scrub.isVisible && point && scrub.coordinate ? (
-        <ChartGlassTooltipShell active coordinate={scrub.coordinate}>
-          <p className="font-semibold text-cr-text mb-1.5">{point.date}</p>
-          <p className="font-semibold text-cr-win">Победы : {point.wins}</p>
-          <p className="font-semibold text-cr-loss mt-0.5">Поражения : {point.losses}</p>
+      {tipPoint && tipCoord ? (
+        <ChartGlassTooltipShell
+          active={scrub.isVisible}
+          coordinate={tipCoord}
+          contentKey={`${tipPoint.date}-${tipPoint.wins}-${tipPoint.losses}`}
+        >
+          <p className="font-semibold text-cr-text mb-1.5">{tipPoint.date}</p>
+          <p className="font-semibold text-cr-win">Победы : {tipPoint.wins}</p>
+          <p className="font-semibold text-cr-loss mt-0.5">Поражения : {tipPoint.losses}</p>
           <p className="font-semibold text-[#a78bfa] mt-0.5">
-            Винрейт : {Number(point.winrate).toFixed(1)}%
+            Винрейт : {Number(tipPoint.winrate).toFixed(1)}%
           </p>
         </ChartGlassTooltipShell>
       ) : null}
