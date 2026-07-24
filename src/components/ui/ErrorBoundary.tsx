@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { Card, Button } from "@/components/ui";
+import { toUserFacingError } from "@/utils/userError";
 
 interface Props {
   children: ReactNode;
@@ -22,10 +23,14 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.error) {
+      const { message, code } = toUserFacingError(
+        this.state.error,
+        "Нет соединения с ботом, попробуйте позже",
+      );
       return (
         <Card className="text-center my-8">
-          <p className="text-cr-loss mb-2">Ошибка отображения страницы</p>
-          <p className="text-xs text-cr-muted mb-4">{this.state.error.message}</p>
+          <p className="text-cr-loss mb-2 font-semibold">{message}</p>
+          <p className="text-xs text-cr-muted mb-4">Код ошибки: {code}</p>
           <Button onClick={() => this.setState({ error: null })}>Попробовать снова</Button>
         </Card>
       );

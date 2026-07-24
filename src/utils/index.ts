@@ -118,3 +118,8 @@ export {
   withHaptic,
 } from "./haptics";
 export type { HapticEvent, HapticImpact, HapticNotify } from "./haptics";
+export {
+  formatUserFacingError,
+  toUserFacingError,
+} from "./userError";
+export type { UserFacingError } from "./userError";

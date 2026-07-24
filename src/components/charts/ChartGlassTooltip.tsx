@@ -58,7 +58,7 @@ export type ChartPointerState = {
 
 const ChartScrubContext = createContext<ChartScrubApi | null>(null);
 
-const MOVE_THRESHOLD_PX = 12;
+const MOVE_THRESHOLD_PX = 14;
 /** Stay on the current point until the finger clearly crosses into the next band. */
 const INDEX_HYSTERESIS = 0.45;
 
@@ -235,6 +235,8 @@ export function ChartTooltipAnchor({
     () => ({
       onPointerDown: (event: ReactPointerEvent) => {
         if (event.button !== 0 && event.pointerType === "mouse") return;
+        // Keep the gesture on the chart — vertical scroll must not steal a tap.
+        if (event.cancelable) event.preventDefault();
 
         detachWindowListenersRef.current?.();
         if (moveRafRef.current != null) {
@@ -253,15 +255,16 @@ export function ChartTooltipAnchor({
 
         const onMove = (moveEvent: PointerEvent) => {
           if (pointerIdRef.current !== moveEvent.pointerId || !startRef.current) return;
+          // Only horizontal scrub counts as a drag. Vertical jitter on the top
+          // of the chart (or slight scroll intent) must not cancel a tap-to-pin.
           const dx = moveEvent.clientX - startRef.current.x;
-          const dy = moveEvent.clientY - startRef.current.y;
-          if (Math.hypot(dx, dy) >= MOVE_THRESHOLD_PX) {
+          if (Math.abs(dx) >= MOVE_THRESHOLD_PX) {
             movedRef.current = true;
           }
           scheduleApplyClientX(moveEvent.clientX);
         };
 
-        const onUp = (upEvent: PointerEvent) => {
+        const finishPointer = (upEvent: PointerEvent) => {
           if (pointerIdRef.current !== upEvent.pointerId) return;
           const wasMoved = movedRef.current;
           const indexAtStart = indexAtPointerDownRef.current;
@@ -279,6 +282,7 @@ export function ChartTooltipAnchor({
           detachWindowListenersRef.current?.();
           detachWindowListenersRef.current = null;
 
+          // Horizontal drag → show only while finger was down, then hide.
           if (wasMoved) {
             setScrubbing(false);
             if (!pinnedRef.current) {
@@ -287,10 +291,11 @@ export function ChartTooltipAnchor({
             return;
           }
 
-          // Tap on a point/period → pin until the tip is tapped again.
+          // Clean tap (ignore vertical jitter) → pin until the tip is tapped again.
           const indexToPin = applyClientX(upEvent.clientX) ?? activeIndexRef.current ?? indexAtStart;
           if (indexToPin == null) {
             setScrubbing(false);
+            clearTransient();
             return;
           }
           pinnedRef.current = true;
@@ -301,13 +306,16 @@ export function ChartTooltipAnchor({
           if (CHART_TIP_DOCK_BUBBLE) haptic.selection();
         };
 
+        const onUp = (upEvent: PointerEvent) => finishPointer(upEvent);
+        const onCancel = (upEvent: PointerEvent) => finishPointer(upEvent);
+
         window.addEventListener("pointermove", onMove, { passive: true });
         window.addEventListener("pointerup", onUp);
-        window.addEventListener("pointercancel", onUp);
+        window.addEventListener("pointercancel", onCancel);
         detachWindowListenersRef.current = () => {
           window.removeEventListener("pointermove", onMove);
           window.removeEventListener("pointerup", onUp);
-          window.removeEventListener("pointercancel", onUp);
+          window.removeEventListener("pointercancel", onCancel);
         };
       },
     }),

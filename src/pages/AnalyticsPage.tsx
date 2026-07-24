@@ -270,14 +270,16 @@ function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
           coordinate={tipCoord}
           contentKey={`${tipPoint.index}-${tipPoint.opponentName}-${tipPoint.trophyChange}`}
         >
-          <p className="font-semibold text-cr-text">против {tipPoint.opponentName}</p>
           {(tipPoint.playedDate || tipPoint.playedTime) && (
-            <p className="text-cr-muted mt-0.5">
+            <p className="text-cr-muted">
               {tipPoint.playedDate}
               {tipPoint.playedDate && tipPoint.playedTime ? " · " : ""}
               {tipPoint.playedTime}
             </p>
           )}
+          <p className="font-semibold text-cr-text mt-1 px-0.5 break-words [overflow-wrap:anywhere] max-w-full">
+            Против {tipPoint.opponentName}
+          </p>
           <p className={tipPoint.trophyChange >= 0 ? "text-cr-win font-bold mt-1" : "text-cr-loss font-bold mt-1"}>
             {tipPoint.trophyChange > 0 ? "+" : ""}
             {tipPoint.trophyChange} кубков

@@ -41,11 +41,12 @@ import {
 
 import { cacheGet, cacheSet, cacheInvalidate, cacheHas, inflight, TTL, sleep, lsGet, lsSet } from "./cache";
 import { setLastSyncAt } from "@/utils/lastSync";
+import { toUserFacingError } from "@/utils/userError";
 
 const API_BASE = (import.meta.env.VITE_API_URL ?? "").trim();
 
 const DEFAULT_UNAVAILABLE =
-  "В данный момент сервер не отвечает. Подождите или зайдите позже.";
+  "Нет соединения с ботом, попробуйте позже";
 
 const STATS_MEM_KEY = "stats-v7";
 const STATS_LS_KEY = "stats-overview-v3";
@@ -70,8 +71,11 @@ function requestTimeoutMs(path: string): number {
 }
 
 function formatApiError(message: string, code?: string): string {
-  const base = message || DEFAULT_UNAVAILABLE;
-  return code ? `${base}\n\nКод ошибки: ${code}` : base;
+  const friendly = toUserFacingError(
+    { message: message || DEFAULT_UNAVAILABLE, code: code || "E100" },
+    DEFAULT_UNAVAILABLE,
+  );
+  return `${friendly.message}\n\nКод ошибки: ${friendly.code}`;
 }
 
 function parseErrorBody(body: unknown, status: number): { message: string; code: string } {
