@@ -1718,7 +1718,7 @@
 
 .collection-stat-champion {
   color: #fbbf24;
-  text-shadow: var(--cr-stroke-title);
+  text-shadow: none;
 }
 
 .collection-stat-epic {
