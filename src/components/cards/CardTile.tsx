@@ -243,6 +243,8 @@ export function CardTile({
 interface CardDeckGridProps {
   cards: string[];
   icons?: string[];
+  levels?: Array<string | number | null | undefined>;
+  levelWarnings?: boolean[];
   size?: CardTileSize;
   showLabels?: boolean;
   maxVisible?: number;
@@ -252,6 +254,8 @@ interface CardDeckGridProps {
 export function CardDeckGrid({
   cards,
   icons,
+  levels,
+  levelWarnings,
   size = "sm",
   showLabels = false,
   maxVisible = 8,
@@ -273,6 +277,8 @@ export function CardDeckGrid({
                 icon={icons?.[index]}
                 size={size}
                 showLabel={showLabels}
+                levelBadge={levels?.[index] ?? undefined}
+                className={levelWarnings?.[index] ? "ring-1 ring-cr-loss/70 rounded-lg" : undefined}
               />
             ) : null}
           </div>

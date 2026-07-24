@@ -374,12 +374,45 @@ export interface CounterDeckData {
   preferred_cards: string[];
 }
 
+export interface CustomizeCardInfo {
+  id: string;
+  name: string;
+  name_ru?: string;
+  icon?: string;
+  cost?: number;
+  level?: number | null;
+  recommended_level?: number;
+  needs_upgrade?: boolean;
+  deficit?: number;
+  slot?: number;
+}
+
+export interface CustomizeUpgradePriority {
+  name: string;
+  name_ru?: string;
+  level?: number | null;
+  recommended_level?: number;
+  deficit?: number;
+  icon?: string;
+}
+
 export interface CustomizeData {
   original: string[];
   customized: string[];
   issues: string[];
   avg_elixir: number;
   deck_link?: string | null;
+  recommended_level?: number;
+  original_cards?: CustomizeCardInfo[];
+  customized_cards?: CustomizeCardInfo[];
+  upgrade_priority?: CustomizeUpgradePriority[];
+  level_alt_deck?: string[];
+  level_alt_cards?: CustomizeCardInfo[];
+  level_alt_needed?: boolean;
+  level_alt_avg_elixir?: number;
+  level_alt_deck_link?: string | null;
+  synergy_needed?: boolean;
+  balanced?: boolean;
 }
 
 export interface SynergyData {

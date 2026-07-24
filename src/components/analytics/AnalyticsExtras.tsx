@@ -221,18 +221,27 @@ export function OpponentsPanel() {
   );
 }
 
+function deckLevels(cards?: CustomizeData["original_cards"]) {
+  return cards?.map((c) => c.level ?? null) ?? [];
+}
+
+function deckLevelWarnings(cards?: CustomizeData["original_cards"]) {
+  return cards?.map((c) => Boolean(c.needs_upgrade)) ?? [];
+}
+
 export function DeckToolsPanel() {
   const [customize, setCustomize] = useState<CustomizeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showIssues, setShowIssues] = useState(false);
+  const { nameRu } = useCardCatalog();
 
   const load = useCallback(async (force = false) => {
     try {
       setError(null);
       if (force) {
-        cacheInvalidate("customize-v5");
+        cacheInvalidate("customize-v6");
       }
       const custom = await api.getCustomizeDeck().catch(() => null);
       setCustomize(custom);
@@ -249,6 +258,17 @@ export function DeckToolsPanel() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const synergyNeeded = Boolean(
+    customize &&
+      (customize.synergy_needed ?? !decksEqual(customize.original, customize.customized)),
+  );
+  const levelAltNeeded = Boolean(customize?.level_alt_needed);
+  const upgrades = customize?.upgrade_priority ?? [];
+  const balanced = Boolean(
+    customize?.balanced ??
+      (customize && !synergyNeeded && !levelAltNeeded && upgrades.length === 0),
+  );
 
   if (loading) return <Loader />;
   if (error && !customize) return <ErrorCard message={error} />;
@@ -275,17 +295,97 @@ export function DeckToolsPanel() {
             <Wand2 className="w-5 h-5 text-cr-gold" />
             <h3 className="font-semibold text-cr-text">Улучшение колоды</h3>
           </div>
-          <p className="text-xs text-cr-muted mb-3">Ср. эликсир: {customize.avg_elixir.toFixed(1)}</p>
-          <p className="text-xs text-cr-muted mb-2">Было</p>
-          <CardDeckGrid cards={customize.original} size="sm" showLabels maxVisible={8} />
-          {!decksEqual(customize.original, customize.customized) ? (
-            <>
-              <p className="text-xs text-cr-muted mb-2 mt-4">Стало</p>
-              <CardDeckGrid cards={customize.customized} size="sm" showLabels maxVisible={8} />
-            </>
-          ) : (
-            <p className="text-xs text-cr-muted mt-4">Колода подходит для вашей арены — обязательных замен нет</p>
+          <p className="text-xs text-cr-muted mb-1">
+            Ср. эликсир: {customize.avg_elixir.toFixed(1)}
+            {customize.recommended_level ? (
+              <> · рекоменд. ур. для арены: {customize.recommended_level}</>
+            ) : null}
+          </p>
+          <p className="text-xs text-cr-muted mb-2 mt-3">Было</p>
+          <CardDeckGrid
+            cards={customize.original}
+            icons={customize.original_cards?.map((c) => c.icon)}
+            levels={deckLevels(customize.original_cards)}
+            levelWarnings={deckLevelWarnings(customize.original_cards)}
+            size="sm"
+            showLabels
+            maxVisible={8}
+          />
+
+          {upgrades.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs text-cr-gold mb-2">Прокачать в первую очередь</p>
+              <ul className="space-y-1.5">
+                {upgrades.map((u) => (
+                  <li
+                    key={`${u.name}-${u.level}`}
+                    className="flex items-center gap-2 text-xs text-cr-text"
+                  >
+                    {u.icon ? (
+                      <img src={u.icon} alt="" className="h-7 w-7 rounded object-cover" />
+                    ) : (
+                      <span className="flex h-7 w-7 items-center justify-center rounded bg-cr-surface text-[10px] font-bold">
+                        {(u.name_ru || u.name).charAt(0)}
+                      </span>
+                    )}
+                    <span className="min-w-0 flex-1 truncate">
+                      {u.name_ru || nameRu(u.name)}
+                    </span>
+                    <span className="shrink-0 text-cr-loss">
+                      ур. {u.level ?? "?"} → {u.recommended_level}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
+
+          {synergyNeeded ? (
+            <>
+              <p className="text-xs text-cr-muted mb-2 mt-4">По синергии</p>
+              <CardDeckGrid
+                cards={customize.customized}
+                icons={customize.customized_cards?.map((c) => c.icon)}
+                levels={deckLevels(customize.customized_cards)}
+                levelWarnings={deckLevelWarnings(customize.customized_cards)}
+                size="sm"
+                showLabels
+                maxVisible={8}
+              />
+              <DeckImportButton deckLink={customize.deck_link} label="Импорт улучшенной колоды" />
+            </>
+          ) : null}
+
+          {levelAltNeeded && customize.level_alt_deck?.length ? (
+            <>
+              <p className="text-xs text-cr-muted mb-1 mt-4">Сильнее по уровням (тот же стиль)</p>
+              {typeof customize.level_alt_avg_elixir === "number" ? (
+                <p className="text-[11px] text-cr-muted mb-2">
+                  Ср. эликсир: {customize.level_alt_avg_elixir.toFixed(1)}
+                </p>
+              ) : null}
+              <CardDeckGrid
+                cards={customize.level_alt_deck}
+                icons={customize.level_alt_cards?.map((c) => c.icon)}
+                levels={deckLevels(customize.level_alt_cards)}
+                levelWarnings={deckLevelWarnings(customize.level_alt_cards)}
+                size="sm"
+                showLabels
+                maxVisible={8}
+              />
+              <DeckImportButton
+                deckLink={customize.level_alt_deck_link}
+                label="Импорт колоды по уровням"
+              />
+            </>
+          ) : null}
+
+          {balanced ? (
+            <p className="text-xs text-cr-muted mt-4">
+              Колода подходит для вашей арены — обязательных замен нет
+            </p>
+          ) : null}
+
           {customize.issues.length > 0 && (
             <button
               type="button"
@@ -302,9 +402,6 @@ export function DeckToolsPanel() {
                 <li key={i}>· {issue}</li>
               ))}
             </ul>
-          )}
-          {!decksEqual(customize.original, customize.customized) && (
-            <DeckImportButton deckLink={customize.deck_link} label="Импорт улучшенной колоды" />
           )}
         </Card>
       )}

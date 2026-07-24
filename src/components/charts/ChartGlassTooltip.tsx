@@ -466,21 +466,23 @@ function ChartTooltipBubbleShell({
   const lastKeyRef = useRef(contentKey);
   const seededRef = useRef(false);
   const moveControlsRef = useRef<{ stop: () => void }[]>([]);
+  const popControlsRef = useRef<{ stop: () => void }[]>([]);
 
   const mvLeft = useMotionValue(0);
   const mvTop = useMotionValue(0);
   const mvOpacity = useMotionValue(0);
   const mvScaleX = useMotionValue(1);
   const mvScaleY = useMotionValue(1);
-  // Presence unfold/fold (separate from scrub stretch).
-  const mvPopX = useMotionValue(0.14);
-  const mvPopY = useMotionValue(0.45);
+  const mvPopX = useMotionValue(1);
+  const mvPopY = useMotionValue(1);
   const scaleXSafe = useTransform([mvPopX, mvScaleX], (values) => {
-    const [pop, stretch] = values as number[];
+    const pop = Number(values[0]);
+    const stretch = Number(values[1]);
     return pop * Math.min(STRETCH_MAX, Math.max(0.97, stretch));
   });
   const scaleYSafe = useTransform([mvPopY, mvScaleY], (values) => {
-    const [pop, stretch] = values as number[];
+    const pop = Number(values[0]);
+    const stretch = Number(values[1]);
     return pop * Math.min(1.02, Math.max(0.97, stretch));
   });
   const scrubbing = scrub?.scrubbing ?? false;
@@ -488,6 +490,45 @@ function ChartTooltipBubbleShell({
   const pinned = scrub?.pinned ?? false;
   const wantVisible = scrub ? scrub.isVisible && Boolean(active) : Boolean(active);
   const position = useTooltipPlacement(rendered, coordinate, children, pinned, bubbleRef, anchorRef);
+
+  const stopMove = useCallback(() => {
+    moveControlsRef.current.forEach((c) => c.stop());
+    moveControlsRef.current = [];
+  }, []);
+
+  const stopPop = useCallback(() => {
+    popControlsRef.current.forEach((c) => c.stop());
+    popControlsRef.current = [];
+  }, []);
+
+  const resetStretch = useCallback(() => {
+    mvScaleX.set(1);
+    mvScaleY.set(1);
+  }, [mvScaleX, mvScaleY]);
+
+  const playPopIn = useCallback(() => {
+    stopPop();
+    resetStretch();
+    mvPopX.set(0.14);
+    mvPopY.set(0.45);
+    mvOpacity.set(0);
+    popControlsRef.current = [
+      animate(mvPopX, 1, POP_IN),
+      animate(mvPopY, 1, POP_IN),
+      animate(mvOpacity, 1, POP_IN),
+    ];
+  }, [stopPop, resetStretch, mvPopX, mvPopY, mvOpacity]);
+
+  const playPopOut = useCallback(() => {
+    stopPop();
+    stopMove();
+    resetStretch();
+    popControlsRef.current = [
+      animate(mvPopX, 0.1, POP_OUT),
+      animate(mvPopY, 0.4, POP_OUT),
+      animate(mvOpacity, 0, POP_OUT),
+    ];
+  }, [stopPop, stopMove, resetStretch, mvPopX, mvPopY, mvOpacity]);
 
   useEffect(() => {
     if (wantVisible) {
@@ -497,22 +538,22 @@ function ChartTooltipBubbleShell({
 
     setShown(false);
     seededRef.current = false;
-    moveControlsRef.current.forEach((c) => c.stop());
-    moveControlsRef.current = [];
+    playPopOut();
+    const t = window.setTimeout(() => {
+      stopPop();
+      mvOpacity.set(0);
+      mvPopX.set(0.14);
+      mvPopY.set(0.45);
+      resetStretch();
+      setRendered(false);
+    }, POP_OUT_MS);
 
-    const controls = [
-      animate(mvPopX, 0.1, POP_OUT),
-      animate(mvPopY, 0.4, POP_OUT),
-      animate(mvOpacity, 0, POP_OUT),
-      animate(mvScaleX, 1, { duration: 0.12 }),
-      animate(mvScaleY, 1, { duration: 0.12 }),
-    ];
-    const t = window.setTimeout(() => setRendered(false), POP_OUT_MS);
     return () => {
-      controls.forEach((c) => c.stop());
       window.clearTimeout(t);
+      // If a new show interrupts hide, leave values for playPopIn to hard-reset.
+      stopPop();
     };
-  }, [wantVisible, mvOpacity, mvPopX, mvPopY, mvScaleX, mvScaleY]);
+  }, [wantVisible, playPopOut, stopPop, resetStretch, mvOpacity, mvPopX, mvPopY]);
 
   useEffect(() => {
     if (!wantVisible) {
@@ -537,28 +578,16 @@ function ChartTooltipBubbleShell({
       seededRef.current = true;
       mvLeft.set(position.left);
       mvTop.set(position.top);
-      mvScaleX.set(1);
-      mvScaleY.set(1);
-      mvPopX.set(0.14);
-      mvPopY.set(0.45);
-      mvOpacity.set(0);
       setShown(true);
-      moveControlsRef.current.forEach((c) => c.stop());
-      moveControlsRef.current = [
-        animate(mvPopX, 1, POP_IN),
-        animate(mvPopY, 1, POP_IN),
-        animate(mvOpacity, 1, POP_IN),
-      ];
+      playPopIn();
       return;
     }
 
-    moveControlsRef.current.forEach((c) => c.stop());
-    moveControlsRef.current = [];
-
+    // Position/stretch only — never stop or touch the unfold animation.
+    stopMove();
     const prevLeft = mvLeft.get();
     const adx = Math.abs(position.left - prevLeft);
 
-    // No springs: follow with a short tween (or snap while dragging).
     if (scrubbing) {
       mvLeft.set(position.left);
       mvTop.set(position.top);
@@ -567,30 +596,29 @@ function ChartTooltipBubbleShell({
         mvScaleX.set(stretch);
         mvScaleY.set(Math.max(0.97, 1 / Math.sqrt(stretch)));
       }
-    } else {
-      moveControlsRef.current.push(
-        animate(mvLeft, position.left, POS_TWEEN),
-        animate(mvTop, position.top, POS_TWEEN),
-        animate(mvScaleX, 1, STRETCH_RELEASE),
-        animate(mvScaleY, 1, STRETCH_RELEASE),
-      );
+      return;
     }
+
+    moveControlsRef.current = [
+      animate(mvLeft, position.left, POS_TWEEN),
+      animate(mvTop, position.top, POS_TWEEN),
+      animate(mvScaleX, 1, STRETCH_RELEASE),
+      animate(mvScaleY, 1, STRETCH_RELEASE),
+    ];
   }, [
     wantVisible,
     rendered,
     position?.left,
     position?.top,
     scrubbing,
+    playPopIn,
+    stopMove,
     mvLeft,
     mvTop,
-    mvOpacity,
     mvScaleX,
     mvScaleY,
-    mvPopX,
-    mvPopY,
   ]);
 
-  // Finger up / stop scrubbing → ease stretch back (even if position didn't change).
   useEffect(() => {
     if (scrubbing || !shown || !seededRef.current || !wantVisible) return;
     const sx = animate(mvScaleX, 1, STRETCH_RELEASE);
