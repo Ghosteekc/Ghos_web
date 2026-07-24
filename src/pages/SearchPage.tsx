@@ -89,7 +89,7 @@ export function SearchPage() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Введите тег игрока, например #ABC123"
+          placeholder="#TAG1234"
           className="w-full pl-12 pr-12 py-4 bg-cr-card border border-cr-border rounded-cr text-cr-text placeholder:text-cr-muted focus:outline-none focus:border-cr-gold/50 focus:ring-2 focus:ring-cr-gold/20 transition-all"
         />
         {query && (

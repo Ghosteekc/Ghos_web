@@ -62,8 +62,14 @@ const MOVE_THRESHOLD_PX = 12;
 /** Stay on the current point until the finger clearly crosses into the next band. */
 const INDEX_HYSTERESIS = 0.45;
 
-const BUBBLE_MOVE_SPRING = { type: "spring" as const, stiffness: 240, damping: 28, mass: 0.78 };
-const BUBBLE_STRETCH_SPRING = { type: "spring" as const, stiffness: 290, damping: 22, mass: 0.7 };
+const BUBBLE_MOVE_SPRING = {
+  type: "spring" as const,
+  stiffness: 118,
+  damping: 28,
+  mass: 1.05,
+  restDelta: 0.35,
+  restSpeed: 0.35,
+};
 
 function readDockTopPx(): number {
   const nav = document.querySelector(".bottom-nav");
@@ -367,7 +373,7 @@ function useTooltipPlacement(
   coordinate: TooltipCoordinate | null | undefined,
   children: ReactNode,
   pinned: boolean,
-  shellRef: RefObject<HTMLDivElement | null>,
+  measureRef: RefObject<HTMLElement | null>,
   anchorRef: RefObject<HTMLDivElement | null> | null,
 ) {
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
@@ -380,14 +386,19 @@ function useTooltipPlacement(
 
     const updatePosition = () => {
       const anchor = anchorRef.current;
-      const shell = shellRef.current;
+      const measureEl = measureRef.current;
       if (!anchor) return;
 
-      if (shell) {
-        measuredSizeRef.current = {
-          w: shell.offsetWidth || measuredSizeRef.current.w,
-          h: shell.offsetHeight || measuredSizeRef.current.h,
-        };
+      if (measureEl) {
+        // Layout size only — ignore visual transforms so the tip cannot grow itself.
+        const w = measureEl.offsetWidth;
+        const h = measureEl.offsetHeight;
+        if (w > 0 && h > 0) {
+          measuredSizeRef.current = {
+            w: Math.min(w, window.innerWidth - 16),
+            h: Math.min(h, Math.round(window.innerHeight * 0.42)),
+          };
+        }
       }
 
       const rect = anchor.getBoundingClientRect();
@@ -403,7 +414,12 @@ function useTooltipPlacement(
       const maxTop = dockTop - tipH - margin;
       top = Math.max(margin, Math.min(top, maxTop));
 
-      setPosition({ left, top });
+      setPosition((prev) => {
+        if (prev && Math.abs(prev.left - left) < 0.5 && Math.abs(prev.top - top) < 0.5) {
+          return prev;
+        }
+        return { left, top };
+      });
     };
 
     updatePosition();
@@ -416,7 +432,7 @@ function useTooltipPlacement(
       window.removeEventListener("scroll", updatePosition, true);
       window.removeEventListener("resize", updatePosition);
     };
-  }, [rendered, anchorRef, coordinate?.x, coordinate?.y, pinned, children, shellRef]);
+  }, [rendered, anchorRef, coordinate?.x, coordinate?.y, pinned, children, measureRef]);
 
   return position;
 }
@@ -434,23 +450,21 @@ function ChartTooltipBubbleShell({
 }) {
   const anchorRef = useContext(ChartTooltipAnchorContext);
   const scrub = useOptionalChartScrub();
-  const shellRef = useRef<HTMLDivElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
   const [rendered, setRendered] = useState(false);
   const [shown, setShown] = useState(false);
   const [nudge, setNudge] = useState(false);
   const lastKeyRef = useRef(contentKey);
   const seededRef = useRef(false);
+  const moveControlsRef = useRef<{ stop: () => void }[]>([]);
 
   const mvLeft = useMotionValue(0);
   const mvTop = useMotionValue(0);
   const mvOpacity = useMotionValue(0);
-  const mvScaleX = useMotionValue(1);
-  const mvScaleY = useMotionValue(1);
 
   const pinned = scrub?.pinned ?? false;
-  const scrubbing = scrub?.scrubbing ?? false;
   const wantVisible = scrub ? scrub.isVisible && Boolean(active) : Boolean(active);
-  const position = useTooltipPlacement(rendered, coordinate, children, pinned, shellRef, anchorRef);
+  const position = useTooltipPlacement(rendered, coordinate, children, pinned, bubbleRef, anchorRef);
 
   useEffect(() => {
     if (wantVisible) {
@@ -460,7 +474,9 @@ function ChartTooltipBubbleShell({
     }
     setShown(false);
     seededRef.current = false;
-    const fade = animate(mvOpacity, 0, { duration: 0.14, ease: "easeOut" });
+    moveControlsRef.current.forEach((c) => c.stop());
+    moveControlsRef.current = [];
+    const fade = animate(mvOpacity, 0, { duration: 0.16, ease: "easeOut" });
     const t = window.setTimeout(() => setRendered(false), 180);
     return () => {
       fade.stop();
@@ -487,46 +503,29 @@ function ChartTooltipBubbleShell({
   useEffect(() => {
     if (!position || !shown) return;
 
+    moveControlsRef.current.forEach((c) => c.stop());
+    moveControlsRef.current = [];
+
     if (!seededRef.current) {
       seededRef.current = true;
       mvLeft.set(position.left);
       mvTop.set(position.top);
-      mvScaleX.set(1);
-      mvScaleY.set(1);
-      void animate(mvOpacity, 1, { duration: 0.16, ease: "easeOut" });
+      void animate(mvOpacity, 1, { duration: 0.18, ease: "easeOut" });
       return;
     }
 
-    const dx = Math.abs(position.left - mvLeft.get());
-    if (dx > 3 && (scrubbing || pinned)) {
-      const stretch = Math.min(1.1, 1 + dx / 260);
-      mvScaleX.set(stretch);
-      mvScaleY.set(Math.max(0.92, 2 - stretch));
-      void animate(mvScaleX, 1, BUBBLE_STRETCH_SPRING);
-      void animate(mvScaleY, 1, BUBBLE_STRETCH_SPRING);
-    }
-
-    void animate(mvLeft, position.left, BUBBLE_MOVE_SPRING);
-    void animate(mvTop, position.top, BUBBLE_MOVE_SPRING);
-  }, [
-    position?.left,
-    position?.top,
-    shown,
-    scrubbing,
-    pinned,
-    mvLeft,
-    mvTop,
-    mvOpacity,
-    mvScaleX,
-    mvScaleY,
-  ]);
+    // Soft follow only — no scale/stretch (that blew the tip up).
+    moveControlsRef.current = [
+      animate(mvLeft, position.left, BUBBLE_MOVE_SPRING),
+      animate(mvTop, position.top, BUBBLE_MOVE_SPRING),
+    ];
+  }, [position?.left, position?.top, shown, mvLeft, mvTop, mvOpacity]);
 
   if (!rendered) return null;
 
   return createPortal(
     <motion.div
-      ref={shellRef}
-      className={`chart-tooltip-bubble${shown && position ? " is-shown" : ""}${scrubbing ? " is-scrubbing" : ""}`}
+      className={`chart-tooltip-bubble-anchor${shown && position ? " is-shown" : ""}`}
       role={pinned ? "button" : undefined}
       tabIndex={pinned ? 0 : undefined}
       aria-label={pinned ? "Закрыть подсказку" : undefined}
@@ -560,31 +559,30 @@ function ChartTooltipBubbleShell({
         position: "fixed",
         left: mvLeft,
         top: mvTop,
-        x: "-50%",
-        scaleX: mvScaleX,
-        scaleY: mvScaleY,
         opacity: mvOpacity,
         zIndex: 40,
         pointerEvents: pinned && shown ? "auto" : "none",
         cursor: pinned ? "pointer" : "default",
       }}
     >
-      <span className="chart-tooltip-bubble-glass" aria-hidden />
-      <span className="chart-tooltip-bubble-ring" aria-hidden />
-      <div className="chart-tooltip-bubble-content">
-        <div
-          className={`chart-tooltip-body${nudge ? " chart-tooltip-body--nudge" : ""}`}
-          onAnimationEnd={() => setNudge(false)}
-        >
-          {children}
+      <div ref={bubbleRef} className="chart-tooltip-bubble">
+        <span className="chart-tooltip-bubble-glass" aria-hidden />
+        <span className="chart-tooltip-bubble-ring" aria-hidden />
+        <div className="chart-tooltip-bubble-content">
+          <div
+            className={`chart-tooltip-body${nudge ? " chart-tooltip-body--nudge" : ""}`}
+            onAnimationEnd={() => setNudge(false)}
+          >
+            {children}
+          </div>
+          <p
+            className="chart-tooltip-hint"
+            style={{ opacity: pinned ? 1 : 0 }}
+            aria-hidden={!pinned}
+          >
+            Нажмите, чтобы закрыть
+          </p>
         </div>
-        <p
-          className="chart-tooltip-hint"
-          style={{ opacity: pinned ? 1 : 0 }}
-          aria-hidden={!pinned}
-        >
-          Нажмите, чтобы закрыть
-        </p>
       </div>
     </motion.div>,
     document.body,

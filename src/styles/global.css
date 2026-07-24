@@ -618,24 +618,29 @@
     opacity: 1;
   }
 
+  .chart-tooltip-bubble-anchor {
+    transform: translateX(-50%);
+    transform-origin: center top;
+    will-change: left, top, opacity;
+    z-index: 40;
+  }
+
   .chart-tooltip-bubble {
-    --chart-tip-pad-x: 1.05rem;
-    --chart-tip-pad-y: 0.7rem;
-    min-width: 10.25rem;
-    max-width: min(17.5rem, calc(100vw - 1.25rem));
-    border-radius: 999px;
+    --chart-tip-pad-x: 0.95rem;
+    --chart-tip-pad-y: 0.55rem;
+    position: relative;
+    box-sizing: border-box;
+    width: max-content;
+    max-width: min(15.5rem, calc(100vw - 1.5rem));
+    max-height: min(38vh, 11.5rem);
+    overflow: hidden;
+    border-radius: 1.35rem;
     color: rgba(255, 255, 255, 0.95);
     text-shadow: none !important;
     isolation: isolate;
-    transform-origin: center center;
-    backface-visibility: hidden;
-    will-change: transform, opacity, left, top;
     font-size: 0.75rem;
     line-height: 1.25;
-  }
-
-  .chart-tooltip-bubble.is-scrubbing {
-    will-change: transform, left, top;
+    transform: none !important;
   }
 
   .chart-tooltip-bubble-glass {
