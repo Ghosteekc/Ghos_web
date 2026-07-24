@@ -180,10 +180,10 @@ export function CardTile({
         )}
         title={nameRu(name)}
       >
-        {!isCollection && <div className="card-tile-glow" aria-hidden />}
+        {!isCollection && <span className="card-tile-rim" aria-hidden />}
         <div
           className={cn(
-            "relative h-full w-full",
+            "relative z-10 h-full w-full",
             isCollection && cardFrameClass(displayMode, rarity),
           )}
         >
