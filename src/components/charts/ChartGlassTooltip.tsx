@@ -13,6 +13,14 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
+import { animate, motion, useMotionValue } from "framer-motion";
+import { haptic } from "@/utils/hapticManager";
+
+/**
+ * Dock-style spring bubble tip (glass + stretch + haptics).
+ * Set to `false` to instantly restore the previous flat glass tip.
+ */
+export const CHART_TIP_DOCK_BUBBLE = true;
 
 export const ChartTooltipAnchorContext =
   createContext<RefObject<HTMLDivElement | null> | null>(null);
@@ -53,6 +61,9 @@ const ChartScrubContext = createContext<ChartScrubApi | null>(null);
 const MOVE_THRESHOLD_PX = 12;
 /** Stay on the current point until the finger clearly crosses into the next band. */
 const INDEX_HYSTERESIS = 0.45;
+
+const BUBBLE_MOVE_SPRING = { type: "spring" as const, stiffness: 240, damping: 28, mass: 0.78 };
+const BUBBLE_STRETCH_SPRING = { type: "spring" as const, stiffness: 290, damping: 22, mass: 0.7 };
 
 function readDockTopPx(): number {
   const nav = document.querySelector(".bottom-nav");
@@ -146,6 +157,7 @@ export function ChartTooltipAnchor({
   const moveRafRef = useRef<number | null>(null);
   const pendingClientXRef = useRef<number | null>(null);
   const detachWindowListenersRef = useRef<(() => void) | null>(null);
+  const lastHapticIndexRef = useRef<number | null>(null);
 
   pinnedRef.current = pinned;
   activeIndexRef.current = activeIndex;
@@ -155,6 +167,7 @@ export function ChartTooltipAnchor({
     setActiveIndex(null);
     setCoordinate(null);
     setScrubbing(false);
+    lastHapticIndexRef.current = null;
   }, []);
 
   const applyClientX = useCallback((clientX: number): number | null => {
@@ -172,6 +185,10 @@ export function ChartTooltipAnchor({
     if (activeIndexRef.current !== idx) {
       activeIndexRef.current = idx;
       setActiveIndex(idx);
+      if (CHART_TIP_DOCK_BUBBLE && pointerIdRef.current != null && lastHapticIndexRef.current !== idx) {
+        lastHapticIndexRef.current = idx;
+        haptic.selection();
+      }
     }
     setCoordinate((prev) => {
       if (prev && Math.abs(prev.x - nextCoord.x) < 0.5 && Math.abs(prev.y - nextCoord.y) < 0.5) {
@@ -227,7 +244,9 @@ export function ChartTooltipAnchor({
         startRef.current = { x: event.clientX, y: event.clientY };
         movedRef.current = false;
         indexAtPointerDownRef.current = activeIndexRef.current;
+        lastHapticIndexRef.current = activeIndexRef.current;
         setScrubbing(true);
+        if (CHART_TIP_DOCK_BUBBLE) haptic.light();
         applyClientX(event.clientX);
 
         const onMove = (moveEvent: PointerEvent) => {
@@ -277,6 +296,7 @@ export function ChartTooltipAnchor({
           setScrubbing(false);
           activeIndexRef.current = indexToPin;
           setActiveIndex(indexToPin);
+          if (CHART_TIP_DOCK_BUBBLE) haptic.selection();
         };
 
         window.addEventListener("pointermove", onMove, { passive: true });
@@ -296,6 +316,7 @@ export function ChartTooltipAnchor({
     if (!pinnedRef.current) return;
     pinnedRef.current = false;
     setPinned(false);
+    if (CHART_TIP_DOCK_BUBBLE) haptic.light();
     clearTransient();
   }, [clearTransient]);
 
@@ -341,58 +362,16 @@ export function ChartTooltipAnchor({
   );
 }
 
-export function ChartGlassTooltipShell({
-  active,
-  coordinate,
-  children,
-  contentKey,
-}: {
-  active?: boolean;
-  coordinate?: TooltipCoordinate | null;
-  children: ReactNode;
-  /** Stable key for the selected point — drives content crossfade. */
-  contentKey?: string | number | null;
-  offsetY?: number;
-}) {
-  const anchorRef = useContext(ChartTooltipAnchorContext);
-  const scrub = useOptionalChartScrub();
-  const shellRef = useRef<HTMLDivElement>(null);
+function useTooltipPlacement(
+  rendered: boolean,
+  coordinate: TooltipCoordinate | null | undefined,
+  children: ReactNode,
+  pinned: boolean,
+  shellRef: RefObject<HTMLDivElement | null>,
+  anchorRef: RefObject<HTMLDivElement | null> | null,
+) {
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
   const measuredSizeRef = useRef({ w: 168, h: 96 });
-  const [rendered, setRendered] = useState(false);
-  const [shown, setShown] = useState(false);
-  const [displayChildren, setDisplayChildren] = useState(children);
-  const [displayKey, setDisplayKey] = useState(contentKey);
-  const [bodyOpaque, setBodyOpaque] = useState(true);
-
-  const pinned = scrub?.pinned ?? false;
-  const wantVisible = scrub ? scrub.isVisible && Boolean(active) : Boolean(active);
-
-  useEffect(() => {
-    if (wantVisible) {
-      setRendered(true);
-      const id = requestAnimationFrame(() => setShown(true));
-      return () => cancelAnimationFrame(id);
-    }
-    setShown(false);
-    const t = window.setTimeout(() => setRendered(false), 180);
-    return () => window.clearTimeout(t);
-  }, [wantVisible]);
-
-  useEffect(() => {
-    if (!wantVisible) return;
-    if (contentKey === displayKey) {
-      setDisplayChildren(children);
-      return;
-    }
-    setBodyOpaque(false);
-    const t = window.setTimeout(() => {
-      setDisplayKey(contentKey);
-      setDisplayChildren(children);
-      setBodyOpaque(true);
-    }, 90);
-    return () => window.clearTimeout(t);
-  }, [children, contentKey, displayKey, wantVisible]);
 
   useLayoutEffect(() => {
     if (!rendered || !anchorRef?.current || coordinate == null) {
@@ -437,7 +416,230 @@ export function ChartGlassTooltipShell({
       window.removeEventListener("scroll", updatePosition, true);
       window.removeEventListener("resize", updatePosition);
     };
-  }, [rendered, anchorRef, coordinate?.x, coordinate?.y, pinned]);
+  }, [rendered, anchorRef, coordinate?.x, coordinate?.y, pinned, children, shellRef]);
+
+  return position;
+}
+
+function ChartTooltipBubbleShell({
+  active,
+  coordinate,
+  children,
+  contentKey,
+}: {
+  active?: boolean;
+  coordinate?: TooltipCoordinate | null;
+  children: ReactNode;
+  contentKey?: string | number | null;
+}) {
+  const anchorRef = useContext(ChartTooltipAnchorContext);
+  const scrub = useOptionalChartScrub();
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [rendered, setRendered] = useState(false);
+  const [shown, setShown] = useState(false);
+  const [nudge, setNudge] = useState(false);
+  const lastKeyRef = useRef(contentKey);
+  const seededRef = useRef(false);
+
+  const mvLeft = useMotionValue(0);
+  const mvTop = useMotionValue(0);
+  const mvOpacity = useMotionValue(0);
+  const mvScaleX = useMotionValue(1);
+  const mvScaleY = useMotionValue(1);
+
+  const pinned = scrub?.pinned ?? false;
+  const scrubbing = scrub?.scrubbing ?? false;
+  const wantVisible = scrub ? scrub.isVisible && Boolean(active) : Boolean(active);
+  const position = useTooltipPlacement(rendered, coordinate, children, pinned, shellRef, anchorRef);
+
+  useEffect(() => {
+    if (wantVisible) {
+      setRendered(true);
+      const id = requestAnimationFrame(() => setShown(true));
+      return () => cancelAnimationFrame(id);
+    }
+    setShown(false);
+    seededRef.current = false;
+    const fade = animate(mvOpacity, 0, { duration: 0.14, ease: "easeOut" });
+    const t = window.setTimeout(() => setRendered(false), 180);
+    return () => {
+      fade.stop();
+      window.clearTimeout(t);
+    };
+  }, [wantVisible, mvOpacity]);
+
+  useEffect(() => {
+    if (!wantVisible) {
+      lastKeyRef.current = contentKey;
+      setNudge(false);
+      return;
+    }
+    if (contentKey == null || contentKey === lastKeyRef.current) {
+      lastKeyRef.current = contentKey;
+      return;
+    }
+    lastKeyRef.current = contentKey;
+    setNudge(false);
+    const id = requestAnimationFrame(() => setNudge(true));
+    return () => cancelAnimationFrame(id);
+  }, [contentKey, wantVisible]);
+
+  useEffect(() => {
+    if (!position || !shown) return;
+
+    if (!seededRef.current) {
+      seededRef.current = true;
+      mvLeft.set(position.left);
+      mvTop.set(position.top);
+      mvScaleX.set(1);
+      mvScaleY.set(1);
+      void animate(mvOpacity, 1, { duration: 0.16, ease: "easeOut" });
+      return;
+    }
+
+    const dx = Math.abs(position.left - mvLeft.get());
+    if (dx > 3 && (scrubbing || pinned)) {
+      const stretch = Math.min(1.1, 1 + dx / 260);
+      mvScaleX.set(stretch);
+      mvScaleY.set(Math.max(0.92, 2 - stretch));
+      void animate(mvScaleX, 1, BUBBLE_STRETCH_SPRING);
+      void animate(mvScaleY, 1, BUBBLE_STRETCH_SPRING);
+    }
+
+    void animate(mvLeft, position.left, BUBBLE_MOVE_SPRING);
+    void animate(mvTop, position.top, BUBBLE_MOVE_SPRING);
+  }, [
+    position?.left,
+    position?.top,
+    shown,
+    scrubbing,
+    pinned,
+    mvLeft,
+    mvTop,
+    mvOpacity,
+    mvScaleX,
+    mvScaleY,
+  ]);
+
+  if (!rendered) return null;
+
+  return createPortal(
+    <motion.div
+      ref={shellRef}
+      className={`chart-tooltip-bubble${shown && position ? " is-shown" : ""}${scrubbing ? " is-scrubbing" : ""}`}
+      role={pinned ? "button" : undefined}
+      tabIndex={pinned ? 0 : undefined}
+      aria-label={pinned ? "Закрыть подсказку" : undefined}
+      onPointerDown={
+        pinned
+          ? (event) => {
+              event.stopPropagation();
+              event.preventDefault();
+            }
+          : undefined
+      }
+      onClick={
+        pinned
+          ? (event) => {
+              event.stopPropagation();
+              scrub?.onTooltipPress();
+            }
+          : undefined
+      }
+      onKeyDown={
+        pinned
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                scrub?.onTooltipPress();
+              }
+            }
+          : undefined
+      }
+      style={{
+        position: "fixed",
+        left: mvLeft,
+        top: mvTop,
+        x: "-50%",
+        scaleX: mvScaleX,
+        scaleY: mvScaleY,
+        opacity: mvOpacity,
+        zIndex: 40,
+        pointerEvents: pinned && shown ? "auto" : "none",
+        cursor: pinned ? "pointer" : "default",
+      }}
+    >
+      <span className="chart-tooltip-bubble-glass" aria-hidden />
+      <span className="chart-tooltip-bubble-ring" aria-hidden />
+      <div className="chart-tooltip-bubble-content">
+        <div
+          className={`chart-tooltip-body${nudge ? " chart-tooltip-body--nudge" : ""}`}
+          onAnimationEnd={() => setNudge(false)}
+        >
+          {children}
+        </div>
+        <p
+          className="chart-tooltip-hint"
+          style={{ opacity: pinned ? 1 : 0 }}
+          aria-hidden={!pinned}
+        >
+          Нажмите, чтобы закрыть
+        </p>
+      </div>
+    </motion.div>,
+    document.body,
+  );
+}
+
+function ChartTooltipLegacyShell({
+  active,
+  coordinate,
+  children,
+  contentKey,
+}: {
+  active?: boolean;
+  coordinate?: TooltipCoordinate | null;
+  children: ReactNode;
+  contentKey?: string | number | null;
+}) {
+  const anchorRef = useContext(ChartTooltipAnchorContext);
+  const scrub = useOptionalChartScrub();
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [rendered, setRendered] = useState(false);
+  const [shown, setShown] = useState(false);
+  const [nudge, setNudge] = useState(false);
+  const lastKeyRef = useRef(contentKey);
+
+  const pinned = scrub?.pinned ?? false;
+  const wantVisible = scrub ? scrub.isVisible && Boolean(active) : Boolean(active);
+  const position = useTooltipPlacement(rendered, coordinate, children, pinned, shellRef, anchorRef);
+
+  useEffect(() => {
+    if (wantVisible) {
+      setRendered(true);
+      const id = requestAnimationFrame(() => setShown(true));
+      return () => cancelAnimationFrame(id);
+    }
+    setShown(false);
+    const t = window.setTimeout(() => setRendered(false), 180);
+    return () => window.clearTimeout(t);
+  }, [wantVisible]);
+
+  useEffect(() => {
+    if (!wantVisible) {
+      lastKeyRef.current = contentKey;
+      setNudge(false);
+      return;
+    }
+    if (contentKey == null || contentKey === lastKeyRef.current) {
+      lastKeyRef.current = contentKey;
+      return;
+    }
+    lastKeyRef.current = contentKey;
+    setNudge(false);
+    const id = requestAnimationFrame(() => setNudge(true));
+    return () => cancelAnimationFrame(id);
+  }, [contentKey, wantVisible]);
 
   if (!rendered) return null;
 
@@ -486,13 +688,10 @@ export function ChartGlassTooltipShell({
       }}
     >
       <div
-        className="chart-tooltip-body"
-        style={{
-          opacity: bodyOpaque ? 1 : 0,
-          transition: "opacity 90ms ease",
-        }}
+        className={`chart-tooltip-body${nudge ? " chart-tooltip-body--nudge" : ""}`}
+        onAnimationEnd={() => setNudge(false)}
       >
-        {displayChildren}
+        {children}
       </div>
       <p
         className="chart-tooltip-hint"
@@ -503,6 +702,33 @@ export function ChartGlassTooltipShell({
       </p>
     </div>,
     document.body,
+  );
+}
+
+export function ChartGlassTooltipShell({
+  active,
+  coordinate,
+  children,
+  contentKey,
+}: {
+  active?: boolean;
+  coordinate?: TooltipCoordinate | null;
+  children: ReactNode;
+  /** Stable key for the selected point — soft content nudge, never blanks the tip. */
+  contentKey?: string | number | null;
+  offsetY?: number;
+}) {
+  if (CHART_TIP_DOCK_BUBBLE) {
+    return (
+      <ChartTooltipBubbleShell active={active} coordinate={coordinate} contentKey={contentKey}>
+        {children}
+      </ChartTooltipBubbleShell>
+    );
+  }
+  return (
+    <ChartTooltipLegacyShell active={active} coordinate={coordinate} contentKey={contentKey}>
+      {children}
+    </ChartTooltipLegacyShell>
   );
 }
 

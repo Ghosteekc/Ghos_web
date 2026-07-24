@@ -479,10 +479,13 @@ function RoflModeBar({
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3 px-0.5">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-sm font-medium text-cr-text">Рофл-режим</span>
+          <span className="text-sm font-medium text-cr-text flex items-center gap-1.5">
+            <span aria-hidden>🤡</span>
+            Рофл
+          </span>
           <button
             type="button"
-            aria-label="Что такое рофл-режим"
+            aria-label="Что такое режим Рофл"
             aria-expanded={showHelp}
             onClick={() => setShowHelp((v) => !v)}
             className="w-6 h-6 shrink-0 rounded-full border border-cr-border bg-cr-card/60 text-xs font-bold text-cr-muted transition-colors"
@@ -494,7 +497,7 @@ function RoflModeBar({
           type="button"
           role="switch"
           aria-checked={rofl}
-          aria-label="Рофл-режим"
+          aria-label="Режим Рофл"
           onClick={() => onRoflChange(!rofl)}
           className={
             "relative w-11 h-6 rounded-full transition-colors shrink-0 " +
@@ -511,9 +514,14 @@ function RoflModeBar({
       </div>
       {showHelp ? (
         <p className="text-xs text-cr-muted leading-snug px-0.5">
-          На, поугарай. Случайная тупая колода — не для рейтинга.
+          Готовые абсурдные колоды. Не мета. Не скилл. Просто рофл.
           <br />
-          Не зашло — жми «Заново» и катай дальше.
+          Обычный рандом рядом не трогали — выключи тумблер и всё как было.
+        </p>
+      ) : null}
+      {rofl ? (
+        <p className="text-[11px] text-cr-gold/90 leading-snug px-0.5">
+          Режим «Рофл» · жми «Заново», если не смешно
         </p>
       ) : null}
     </div>
@@ -605,8 +613,15 @@ function RandomDeckPanel({
       <RoflModeBar rofl={rofl} onRoflChange={setRofl} />
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between mb-2 gap-2">
-          <span className="text-xs font-medium text-cr-gold bg-cr-gold/10 px-2.5 py-1 rounded-full border border-cr-gold/20 flex items-center gap-1 shrink-0">
-            <Shuffle className="w-3 h-3" />
+          <span
+            className={
+              "text-xs font-medium px-2.5 py-1 rounded-full border flex items-center gap-1 shrink-0 " +
+              (deck.rofl
+                ? "text-cr-gold bg-cr-gold/15 border-cr-gold/35"
+                : "text-cr-gold bg-cr-gold/10 border-cr-gold/20")
+            }
+          >
+            {deck.rofl ? <span aria-hidden>🤡</span> : <Shuffle className="w-3 h-3" />}
             {deck.rofl ? (deck.rofl_name ?? "Рофл") : "Случайная колода"}
           </span>
           <div className="flex items-center gap-1 text-xs shrink-0">
@@ -617,7 +632,7 @@ function RandomDeckPanel({
 
         <p className="text-xs text-cr-muted mb-4">
           {deck.rofl
-            ? (deck.rofl_tagline ?? "На, поугарай. В рейтинг не лезь.")
+            ? (deck.rofl_tagline ?? "не задавай вопросов")
             : "8 случайных карт, как в игре. Нажмите «Заново», если колода не нравится."}
         </p>
 

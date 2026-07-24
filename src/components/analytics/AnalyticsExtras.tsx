@@ -388,7 +388,11 @@ export function LossAnalysisPanel() {
           <button
             key={item.battle_index}
             type="button"
-            onClick={() => navigate(battleDetailPath(item.timestamp, item.battle_index))}
+            onClick={() =>
+              navigate(battleDetailPath(item.timestamp, item.battle_index), {
+                state: { from: "/analytics?section=losses" },
+              })
+            }
             className="w-full text-left rounded-xl border p-3 transition-colors border-cr-loss/25 bg-cr-loss/5"
           >
             <div className="flex items-start gap-2 mb-1.5">

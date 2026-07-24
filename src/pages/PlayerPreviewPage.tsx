@@ -1,18 +1,44 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Trophy, User, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Crown,
+  ExternalLink,
+  Flame,
+  MapPinned,
+  Trophy,
+  TrendingUp,
+  User,
+  Users,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { api, ApiError } from "@/api/client";
 import { SearchResult } from "@/types";
-import { Card, Button, Loader } from "@/components/ui";
-import { formatPlayerTag } from "@/utils";
-import { usePageRefresh } from "@/hooks";
+import { Button, Card, ElixirIcon, Loader } from "@/components/ui";
+import { CardTile } from "@/components/cards/CardTile";
+import { FavoriteDeckButton } from "@/components/decks/FavoriteDeckButton";
+import { formatNumber, formatPlayerTag, getWinColor } from "@/utils";
+import { useCardCatalog, usePageRefresh, useTelegram } from "@/hooks";
+import { UI } from "@/constants/labels";
+
+interface StatTile {
+  label: string;
+  value: string;
+  valueClass?: string;
+  icon: LucideIcon;
+  iconClass: string;
+  span?: boolean;
+}
 
 export function PlayerPreviewPage() {
   const { tag } = useParams();
   const navigate = useNavigate();
+  const { openLink } = useTelegram();
+  const { nameRu } = useCardCatalog();
   const [player, setPlayer] = useState<SearchResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hint, setHint] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!tag) return;
@@ -34,13 +60,86 @@ export function PlayerPreviewPage() {
     void load();
   }, [load]);
 
+  const importDeck = async (deckLink: string) => {
+    if (openLink) {
+      openLink(deckLink);
+      setHint("Открываем Clash Royale для импорта колоды…");
+      setTimeout(() => setHint(null), 3000);
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(deckLink);
+      setHint("Ссылка на колоду скопирована");
+    } catch {
+      setHint("Откройте приложение из Telegram для импорта колоды");
+    }
+    setTimeout(() => setHint(null), 3000);
+  };
+
+  const cards = player?.cards ?? [];
+  const hasDeck = cards.length === 8;
+
+  const stats: StatTile[] = player
+    ? [
+        {
+          label: "Кубки",
+          value: formatNumber(player.trophies),
+          icon: Trophy,
+          iconClass: "text-cr-gold",
+        },
+        {
+          label: "Макс.",
+          value:
+            player.max_trophies != null ? formatNumber(player.max_trophies) : "—",
+          icon: Crown,
+          iconClass: "text-cr-gold",
+        },
+        {
+          label: UI.winrate,
+          value:
+            player.winrate != null ? `${player.winrate.toFixed(1)}%` : "н/д",
+          valueClass:
+            player.winrate != null ? getWinColor(player.winrate) : "text-cr-muted",
+          icon: TrendingUp,
+          iconClass:
+            player.winrate != null && player.winrate >= 50
+              ? "text-cr-win"
+              : "text-cr-muted",
+        },
+        {
+          label: "Уровень",
+          value: player.exp_level != null ? String(player.exp_level) : "—",
+          icon: User,
+          iconClass: "text-cr-blue",
+        },
+        {
+          label: "Арена",
+          value: player.arena || "—",
+          icon: MapPinned,
+          iconClass: "text-cr-blue",
+          span: true,
+        },
+        ...(player.clan_name
+          ? [
+              {
+                label: "Клан",
+                value: player.clan_name,
+                icon: Users,
+                iconClass: "text-cr-muted",
+                span: true,
+              } satisfies StatTile,
+            ]
+          : []),
+      ]
+    : [];
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="!p-2">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="!p-2 shrink-0">
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <h1 className="text-xl font-bold text-cr-text">Игрок</h1>
+        <h1 className="page-title !mb-0">Игрок</h1>
       </div>
 
       {loading ? (
@@ -48,55 +147,158 @@ export function PlayerPreviewPage() {
       ) : error || !player ? (
         <Card className="text-center text-cr-loss text-sm">{error ?? "Не найден"}</Card>
       ) : (
-        <Card>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-full bg-cr-surface flex items-center justify-center text-xl font-bold text-cr-gold">
-              {player.player_name.charAt(0).toUpperCase()}
+        <>
+          <Card className="overflow-hidden relative !p-3">
+            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-cr-blue/20 to-transparent pointer-events-none" />
+            <div className="relative flex items-center gap-4">
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cr-blue to-cr-gold p-[2px] shadow-glow overflow-hidden">
+                  {player.avatar_url ? (
+                    <img
+                      src={player.avatar_url}
+                      alt={player.player_name}
+                      className="w-full h-full rounded-full object-contain bg-cr-surface p-1.5"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-cr-surface flex items-center justify-center text-2xl font-extrabold text-cr-gold">
+                      {player.player_name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-xl font-extrabold text-cr-text truncate">
+                  {player.player_name}
+                </h2>
+                <p className="text-cr-accent text-sm font-bold font-mono mt-1">
+                  {formatPlayerTag(player.player_tag)}
+                </p>
+                <span className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-cr-blue/10 border border-cr-blue/20 text-cr-blue text-xs font-medium max-w-full">
+                  {player.arena_icon ? (
+                    <img src={player.arena_icon} alt="" className="w-3.5 h-3.5 object-contain" />
+                  ) : (
+                    <Flame className="w-3 h-3 shrink-0" />
+                  )}
+                  <span className="truncate">{player.arena || "Арена неизвестна"}</span>
+                </span>
+                {player.favorite_card ? (
+                  <p className="text-xs text-cr-gold font-bold mt-2 truncate">
+                    ★ {nameRu(player.favorite_card)}
+                  </p>
+                ) : null}
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-lg font-bold text-cr-text truncate">{player.player_name}</p>
-              <p className="text-sm text-cr-muted font-mono">{formatPlayerTag(player.player_tag)}</p>
-            </div>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-1.5">
+            {stats.map((item, index) => (
+              <Card
+                key={item.label}
+                delay={index * 0.04}
+                className={
+                  "!py-2.5 !px-2 text-center flex flex-col items-center justify-center gap-0.5 min-h-[3.75rem] min-w-0 " +
+                  (item.span ? "col-span-2" : "")
+                }
+              >
+                <item.icon className={`w-5 h-5 shrink-0 ${item.iconClass}`} />
+                <p
+                  className={
+                    "text-base font-bold tabular-nums leading-tight truncate max-w-full px-1 " +
+                    (item.valueClass ?? "text-cr-text")
+                  }
+                >
+                  {item.value}
+                </p>
+                <p className="text-[10px] text-cr-muted leading-tight">{item.label}</p>
+              </Card>
+            ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-xl bg-cr-bg/60 p-3 border border-cr-border/40">
-              <div className="flex items-center gap-1 text-cr-gold mb-1">
-                <Trophy className="w-4 h-4" />
-                <span className="text-xs text-cr-muted">Кубки</span>
+          {player.recent_games && player.recent_games > 0 && player.recent_winrate != null ? (
+            <p className="text-[11px] text-cr-muted text-center -mt-3">
+              Из последних {player.recent_games} боёв на лестнице:{" "}
+              <span className={"font-semibold " + getWinColor(player.recent_winrate)}>
+                {player.recent_winrate.toFixed(0)}%
+              </span>
+            </p>
+          ) : null}
+
+          <Card className="!p-3">
+            <div className="flex items-start justify-between gap-2 mb-3">
+              <div className="min-w-0">
+                <h3 className="text-sm font-semibold text-cr-text">Любимая колода</h3>
+                <p className="text-[11px] text-cr-muted mt-0.5">
+                  {hasDeck
+                    ? "Текущая колода из профиля Clash Royale"
+                    : "Колода пока недоступна"}
+                </p>
               </div>
-              <p className="font-bold text-cr-text">{player.trophies}</p>
-            </div>
-            {player.max_trophies != null && (
-              <div className="rounded-xl bg-cr-bg/60 p-3 border border-cr-border/40">
-                <p className="text-xs text-cr-muted mb-1">Макс.</p>
-                <p className="font-bold text-cr-text">{player.max_trophies}</p>
-              </div>
-            )}
-            <div className="rounded-xl bg-cr-bg/60 p-3 border border-cr-border/40 col-span-2">
-              <p className="text-xs text-cr-muted mb-1">Арена</p>
-              <p className="font-semibold text-cr-text">{player.arena}</p>
-            </div>
-            {player.clan_name && (
-              <div className="rounded-xl bg-cr-bg/60 p-3 border border-cr-border/40 col-span-2">
-                <div className="flex items-center gap-1 text-cr-muted mb-1">
-                  <Users className="w-4 h-4" />
-                  <span className="text-xs">Клан</span>
+              {hasDeck ? (
+                <div className="text-right shrink-0 space-y-0.5">
+                  <div className="flex items-center justify-end gap-1 text-xs">
+                    <ElixirIcon size={14} />
+                    <span className="font-semibold text-cr-text">
+                      {(player.avg_elixir ?? 0).toFixed(1)}
+                    </span>
+                  </div>
+                  {(player.deck_games ?? 0) > 0 && player.deck_winrate != null ? (
+                    <p className={"text-xs font-bold " + getWinColor(player.deck_winrate)}>
+                      {UI.winrateShort} {player.deck_winrate.toFixed(0)}% · {player.deck_games}{" "}
+                      {UI.battles}
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-cr-muted">Винрейт колоды: н/д</p>
+                  )}
                 </div>
-                <p className="font-semibold text-cr-text">{player.clan_name}</p>
-              </div>
-            )}
-            {player.exp_level != null && (
-              <div className="rounded-xl bg-cr-bg/60 p-3 border border-cr-border/40">
-                <div className="flex items-center gap-1 text-cr-muted mb-1">
-                  <User className="w-4 h-4" />
-                  <span className="text-xs">Уровень</span>
+              ) : null}
+            </div>
+
+            {hasDeck ? (
+              <>
+                <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-3">
+                  {[...cards]
+                    .sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0))
+                    .map((card, i) => (
+                      <div key={`${card.id}-${i}`} className="min-w-0 overflow-hidden">
+                        <CardTile name={card.name} icon={card.icon} size="deck" />
+                      </div>
+                    ))}
                 </div>
-                <p className="font-bold text-cr-text">{player.exp_level}</p>
-              </div>
+                <div className="flex gap-2">
+                  {player.deck_link ? (
+                    <Button
+                      variant="secondary"
+                      className="flex-1 !py-2 text-sm flex items-center justify-center gap-2"
+                      onClick={() => void importDeck(player.deck_link!)}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Импорт колоды
+                    </Button>
+                  ) : (
+                    <p className="flex-1 text-xs text-cr-muted text-center self-center">
+                      Импорт недоступен
+                    </p>
+                  )}
+                  <FavoriteDeckButton
+                    cards={cards.map((c) => c.name)}
+                    onMessage={(msg) => {
+                      setHint(msg);
+                      setTimeout(() => setHint(null), 3000);
+                    }}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-cr-muted text-center py-4">
+                Не удалось загрузить текущую колоду игрока
+              </p>
             )}
-          </div>
-        </Card>
+          </Card>
+
+          {hint ? (
+            <p className="text-center text-xs text-cr-gold font-medium">{hint}</p>
+          ) : null}
+        </>
       )}
     </div>
   );

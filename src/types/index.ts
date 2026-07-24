@@ -319,6 +319,20 @@ export interface SearchResult {
   max_trophies?: number | null;
   clan_name?: string | null;
   exp_level?: number | null;
+  arena_icon?: string | null;
+  winrate?: number | null;
+  total_wins?: number | null;
+  total_losses?: number | null;
+  recent_winrate?: number | null;
+  recent_games?: number;
+  favorite_card?: string | null;
+  favorite_card_icon?: string | null;
+  avatar_url?: string | null;
+  cards?: DeckCard[];
+  avg_elixir?: number;
+  deck_link?: string | null;
+  deck_winrate?: number | null;
+  deck_games?: number;
 }
 
 export interface Settings {

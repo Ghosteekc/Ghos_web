@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   Trophy,
@@ -58,9 +58,22 @@ function KeyCardsBlock({
 export function BattleDetailPage() {
   const { index, battleTime } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const backTo =
+    typeof (location.state as { from?: unknown } | null)?.from === "string"
+      ? (location.state as { from: string }).from
+      : null;
   const [battle, setBattle] = useState<BattleDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const goBack = () => {
+    if (backTo) {
+      navigate(backTo);
+      return;
+    }
+    navigate(-1);
+  };
 
   const load = useCallback(async () => {
     try {
@@ -104,7 +117,7 @@ export function BattleDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="!p-2">
+        <Button variant="ghost" onClick={goBack} className="!p-2">
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   LineChart,
   Line,
@@ -38,11 +39,22 @@ const ANALYTICS_NAV = [
 
 type AnalyticsSection = (typeof ANALYTICS_NAV)[number]["id"] | null;
 
+const ANALYTICS_SECTION_IDS = new Set<string>(ANALYTICS_NAV.map((item) => item.id));
+
+function sectionFromParam(raw: string | null): AnalyticsSection {
+  if (raw && ANALYTICS_SECTION_IDS.has(raw)) {
+    return raw as NonNullable<AnalyticsSection>;
+  }
+  return null;
+}
+
 const CHART_MARGIN = { top: 8, right: 8, left: 4, bottom: 4 };
 const CHART_YAXIS_WIDTH = 32;
 
 export function AnalyticsPage() {
-  const [section, setSection] = useState<AnalyticsSection>(null);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const section = sectionFromParam(searchParams.get("section"));
   const [stats, setStats] = useState<StatsOverview | null>(() => bootstrapStats());
   const [loading, setLoading] = useState(() => !bootstrapStats());
   const [error, setError] = useState<string | null>(null);
@@ -116,7 +128,12 @@ export function AnalyticsPage() {
   }, [stats?.winrate_by_day]);
 
   const handleNavSelect = (id: string) => {
-    setSection((prev) => (prev === id ? null : (id as AnalyticsSection)));
+    const next = section === id ? null : id;
+    if (next) {
+      navigate(`/analytics?section=${encodeURIComponent(next)}`, { replace: true });
+    } else {
+      navigate("/analytics", { replace: true });
+    }
   };
 
   if (loading && section === null) {
