@@ -344,16 +344,16 @@ function ArenaPanel({
 }) {
   const navigate = useNavigate();
   const [decks, setDecks] = useState<Deck[]>(() => {
-    const hit = cacheGet<ArenaDecksData>("arena-decks-v5");
+    const hit = cacheGet<ArenaDecksData>("arena-decks-v6");
     return hit?.decks ?? [];
   });
-  const [arenaName, setArenaName] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v5")?.arena_name ?? "");
-  const [trophies, setTrophies] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v5")?.trophies ?? 0);
-  const [loading, setLoading] = useState(() => !cacheHas("arena-decks-v5"));
+  const [arenaName, setArenaName] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v6")?.arena_name ?? "");
+  const [trophies, setTrophies] = useState(() => cacheGet<ArenaDecksData>("arena-decks-v6")?.trophies ?? 0);
+  const [loading, setLoading] = useState(() => !cacheHas("arena-decks-v6"));
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const hasCache = cacheHas("arena-decks-v5");
+    const hasCache = cacheHas("arena-decks-v6");
     if (!hasCache) {
       setLoading(true);
     }
@@ -393,7 +393,9 @@ function ArenaPanel({
     return (
       <Card className="text-center">
         <p className="text-cr-muted">Нет данных по вашей арене</p>
-        <p className="text-xs text-cr-muted mt-1">Сыграйте несколько боёв и обновите страницу</p>
+        <p className="text-xs text-cr-muted mt-1">
+          Собираем статистику с игроков вашей арены. Подождите или обновите через минуту.
+        </p>
       </Card>
     );
   }

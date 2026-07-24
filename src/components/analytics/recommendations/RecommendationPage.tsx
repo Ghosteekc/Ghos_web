@@ -141,7 +141,7 @@ export function RecommendationsPanel() {
     void load();
   }, [load]);
 
-  const arenaDecks = cacheGet<ArenaDecksData>("arena-decks-v5");
+  const arenaDecks = cacheGet<ArenaDecksData>("arena-decks-v6");
 
   const playerArena = useMemo(() => {
     if (!profile) return null;
