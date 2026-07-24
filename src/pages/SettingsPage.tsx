@@ -5,6 +5,7 @@ import {
   Palette,
   LogOut,
   Trash2,
+  Eraser,
   Moon,
   Sun,
   Smartphone,
@@ -316,41 +317,41 @@ export function SettingsPage() {
 
         <section>
           <h3 className="text-sm font-semibold text-cr-muted mb-3 uppercase tracking-wider">Данные</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="!p-0 overflow-hidden">
-              <button
-                type="button"
-                className="settings-data-btn h-full"
-                onClick={() => void handleClearCache()}
-                disabled={clearing}
-              >
-                <Trash2 className="w-6 h-6 text-cr-loss" />
-                <span>{clearing ? "Сброс…" : "Сбросить кеш"}</span>
-              </button>
-            </Card>
-            <Card className="!p-0 overflow-hidden">
-              <button
-                type="button"
-                className="settings-data-btn h-full"
-                onClick={() => void handleSyncData()}
-                disabled={syncing}
-              >
-                <RefreshCw className={"w-6 h-6 text-cr-blue " + (syncing ? "animate-spin" : "")} />
-                <span>{syncing ? "Синхронизация…" : "Синхронизировать"}</span>
-              </button>
-            </Card>
-          </div>
-          <Card className="!p-0 overflow-hidden mt-3">
+          <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              className="settings-data-btn w-full"
-              onClick={() => void handleClearBattleHistory()}
-              disabled={clearingHistory}
+              className="settings-data-btn h-full"
+              onClick={() => void handleClearCache()}
+              disabled={clearing}
             >
-              <Trash2 className="w-6 h-6 text-cr-loss" />
-              <span>{clearingHistory ? "Удаление…" : "Удалить историю боёв"}</span>
+              <span className="pixel-btn-icon-slot" aria-hidden>
+                <Eraser className="w-5 h-5 text-cr-gold" />
+              </span>
+              <span>{clearing ? "Сброс…" : "Сбросить кеш"}</span>
             </button>
-          </Card>
+            <button
+              type="button"
+              className="settings-data-btn h-full"
+              onClick={() => void handleSyncData()}
+              disabled={syncing}
+            >
+              <span className="pixel-btn-icon-slot" aria-hidden>
+                <RefreshCw className={"w-5 h-5 text-cr-blue " + (syncing ? "animate-spin" : "")} />
+              </span>
+              <span>{syncing ? "Синхронизация…" : "Синхронизировать"}</span>
+            </button>
+          </div>
+          <button
+            type="button"
+            className="settings-data-btn w-full mt-2"
+            onClick={() => void handleClearBattleHistory()}
+            disabled={clearingHistory}
+          >
+            <span className="pixel-btn-icon-slot" aria-hidden>
+              <Trash2 className="w-5 h-5 text-cr-loss" />
+            </span>
+            <span>{clearingHistory ? "Удаление…" : "Удалить историю боёв"}</span>
+          </button>
           {lastSyncLabel ? (
             <p className="text-center text-sm font-semibold text-cr-win mt-3">{lastSyncLabel}</p>
           ) : null}

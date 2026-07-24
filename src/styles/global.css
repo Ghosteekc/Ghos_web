@@ -184,9 +184,9 @@
       drop-shadow(0 1px 0 rgba(0, 0, 0, 0.22))
       drop-shadow(0 0 0 1px rgba(80, 110, 190, 0.25));
     --pb-shadow-raised:
-      inset 2px 2px 0 0 var(--pb-light),
-      inset -2px -2px 0 0 var(--pb-dark),
-      inset 0 0 0 1px rgba(130, 165, 240, 0.12);
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.38),
+      inset 0 0 0 1px rgba(130, 165, 240, 0.14);
     --pb-shadow-pressed:
       inset 0 3px 8px rgba(0, 0, 0, 0.45),
       inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -268,20 +268,24 @@
     align-items: center;
     width: 100%;
     aspect-ratio: 1;
-    max-height: 7.25rem;
-    padding: 0.55rem 0.45rem;
-    gap: 0.35rem;
+    max-height: 6.5rem;
+    padding: 0.4rem 0.35rem;
+    gap: 0.2rem;
     text-align: center;
   }
 
   .pixel-btn--tile .pixel-btn-text {
     align-items: center;
+    justify-content: center;
     width: 100%;
+    flex: 0 0 auto;
+    min-height: 0;
   }
 
   .pixel-btn--tile .pixel-btn-label {
-    font-size: 0.6875rem;
-    line-height: 1.15;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    line-height: 1.2;
     white-space: normal;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -291,12 +295,13 @@
   }
 
   .pixel-btn--tile .pixel-btn-icon-slot {
-    width: 2.35rem;
-    height: 2.35rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
   }
 
   .pixel-btn--tile .pixel-btn-emoji {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
 
   .pixel-btn--nav-row {
@@ -1201,9 +1206,19 @@
   }
 
   .settings-data-btn {
-    @apply pixel-btn pixel-bevel w-full flex-col items-center justify-center gap-2 py-4 px-4;
-    @apply font-semibold text-sm min-h-[4.5rem];
+    @apply pixel-btn pixel-bevel w-full flex-col items-center justify-center gap-2;
+    @apply font-semibold text-sm min-h-[5.25rem] px-3 py-3;
     color: rgb(var(--cr-text));
+    text-align: center;
+  }
+
+  .settings-data-btn .pixel-btn-icon-slot {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .settings-data-btn > span:last-child {
+    line-height: 1.25;
   }
 
   .settings-data-btn:disabled {
