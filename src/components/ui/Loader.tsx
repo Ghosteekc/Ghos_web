@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const DEFAULT_LOADING_ITEMS = [
   "колод",
@@ -20,33 +21,25 @@ interface LoaderProps {
   intervalMs?: number;
 }
 
+const LABEL_EASE = [0.22, 0.08, 0.24, 1] as const;
+
 const Loader = ({
   compact = false,
   showLabel = true,
   className = "",
   items = [...DEFAULT_LOADING_ITEMS],
-  intervalMs = 900,
+  intervalMs = 1200,
 }: LoaderProps) => {
   const [index, setIndex] = useState(0);
-  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     if (!showLabel || items.length <= 1) return;
 
-    let fadeTimer: ReturnType<typeof setTimeout> | undefined;
-
     const tick = setInterval(() => {
-      setVisible(false);
-      fadeTimer = setTimeout(() => {
-        setIndex((prev) => (prev + 1) % items.length);
-        setVisible(true);
-      }, 120);
+      setIndex((prev) => (prev + 1) % items.length);
     }, intervalMs);
 
-    return () => {
-      clearInterval(tick);
-      if (fadeTimer) clearTimeout(fadeTimer);
-    };
+    return () => clearInterval(tick);
   }, [showLabel, items, intervalMs]);
 
   const current = items[index] ?? items[0];
@@ -68,13 +61,26 @@ const Loader = ({
       {showLabel && (
         <div className={`text-center ${compact ? "mt-2" : "mt-4"}`}>
           <p className={`text-cr-muted ${compact ? "text-xs" : "text-sm"}`}>Загрузка</p>
-          <p
-            className={`text-cr-gold/90 font-medium transition-all duration-150 ease-in-out ${
-              compact ? "mt-0.5 text-[11px] min-h-[1rem]" : "mt-1 text-xs min-h-[1.125rem]"
-            } ${visible ? "opacity-100 translate-y-0 scale-100" : "opacity-40 translate-y-0 scale-[0.98]"}`}
+          <div
+            className={`relative overflow-hidden ${
+              compact ? "mt-0.5 min-h-[1.05rem]" : "mt-1 min-h-[1.35rem]"
+            }`}
           >
-            {current}
-          </p>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.p
+                key={current}
+                className={`text-cr-gold/90 font-medium origin-center ${
+                  compact ? "text-[11px]" : "text-xs"
+                }`}
+                initial={{ opacity: 0, scaleY: 0.12, scaleX: 0.78 }}
+                animate={{ opacity: 1, scaleY: 1, scaleX: 1 }}
+                exit={{ opacity: 0, scaleY: 0.08, scaleX: 0.82 }}
+                transition={{ duration: 0.32, ease: LABEL_EASE }}
+              >
+                {current}
+              </motion.p>
+            </AnimatePresence>
+          </div>
         </div>
       )}
     </div>
