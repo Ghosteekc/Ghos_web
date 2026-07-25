@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Swords, Wand2, ChevronDown, ChevronUp, RefreshCw, ExternalLink, Brain, ChevronRight } from "lucide-react";
+import { Shield, Swords, Wand2, ChevronDown, ChevronUp, RefreshCw, ExternalLink, Brain, ChevronRight, ScanSearch } from "lucide-react";
 import { api, ApiError } from "@/api/client";
 import { cacheGet, cacheHas, cacheInvalidate } from "@/api/cache";
 import { Card, Button, Loader } from "@/components/ui";
 import { CardDeckGrid } from "@/components/cards";
 import { useCardCatalog, usePageRefresh, useTelegram } from "@/hooks";
 import { battleDetailPath, cn } from "@/utils";
-import type { CounterDeckData, CustomizeData, InsightsData, OpponentEntry, WinrateEntry } from "@/types";
+import type { CounterDeckData, CustomizeData, Deck, InsightsData, OpponentEntry, WinrateEntry } from "@/types";
 
 function decksEqual(a: string[], b: string[]) {
   return a.length === b.length && a.every((card, i) => card === b[i]);
@@ -54,7 +54,8 @@ function ErrorCard({ message }: { message: string }) {
   return <Card className="text-center text-cr-loss text-sm">{message}</Card>;
 }
 
-export function DeckWinratesPanel() {
+export function DeckWinratesPanel({ onAnalyze }: { onAnalyze?: (deck: Deck) => void }) {
+  const { iconUrl } = useCardCatalog();
   const [rows, setRows] = useState<WinrateEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,22 +84,53 @@ export function DeckWinratesPanel() {
 
   return (
     <div className="space-y-3">
-      {rows.map((row, i) => (
-        <Card key={i} delay={i * 0.03}>
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold text-cr-text">
-              <span className="text-cr-win">{row.wins} побед</span>
-              <span className="text-cr-muted"> · </span>
-              <span className="text-cr-loss">{row.losses} поражений</span>
-              <span className="text-cr-muted"> · {row.total} игр</span>
-            </span>
-            <span className={`text-sm font-bold ${row.winrate >= 50 ? "text-cr-win" : "text-cr-loss"}`}>
-              {row.winrate.toFixed(1)}%
-            </span>
-          </div>
-          <CardDeckGrid cards={row.cards} size="lg" showLabels maxVisible={8} />
-        </Card>
-      ))}
+      {rows.map((row, i) => {
+        const canAnalyze = Boolean(onAnalyze) && row.cards.length === 8;
+        return (
+          <Card key={i} delay={i * 0.03}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-cr-text">
+                <span className="text-cr-win">{row.wins} побед</span>
+                <span className="text-cr-muted"> · </span>
+                <span className="text-cr-loss">{row.losses} поражений</span>
+                <span className="text-cr-muted"> · {row.total} игр</span>
+              </span>
+              <span className={`text-sm font-bold ${row.winrate >= 50 ? "text-cr-win" : "text-cr-loss"}`}>
+                {row.winrate.toFixed(1)}%
+              </span>
+            </div>
+            <CardDeckGrid cards={row.cards} size="lg" showLabels maxVisible={8} />
+            {canAnalyze ? (
+              <Button
+                variant="secondary"
+                className="w-full !py-2 text-sm flex items-center justify-center gap-2 mt-3"
+                onClick={() =>
+                  onAnalyze?.({
+                    id: i + 1,
+                    name: `Моя колода · ${row.winrate.toFixed(1)}%`,
+                    cards: row.cards.map((name, slot) => ({
+                      id: `${name}-${slot}`,
+                      name,
+                      icon: iconUrl(name) || "",
+                      cost: 0,
+                      slot,
+                    })),
+                    winrate: row.winrate,
+                    total_games: row.total,
+                    avg_elixir: 0,
+                    best_matchups: [],
+                    worst_matchups: [],
+                    type: "mine",
+                  })
+                }
+              >
+                <ScanSearch className="w-4 h-4" />
+                Анализ
+              </Button>
+            ) : null}
+          </Card>
+        );
+      })}
     </div>
   );
 }

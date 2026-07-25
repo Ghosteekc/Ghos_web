@@ -211,7 +211,7 @@ export function DecksPage() {
       ) : null}
 
       <div className={filter === DECK_HOME ? "" : "hidden"}>
-        <DeckWinratesPanel />
+        <DeckWinratesPanel onAnalyze={setPassportDeck} />
       </div>
 
       <div className={filter === "favorites" ? "" : "hidden"}>
