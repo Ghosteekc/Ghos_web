@@ -66,7 +66,7 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
       <div
         className={cn(
           "deck-passport-sheet relative w-full sm:max-w-lg max-h-[min(92vh,calc(100dvh-3.5rem))] sm:max-h-[88vh]",
-          "bg-cr-bg border border-cr-border rounded-t-2xl sm:rounded-2xl",
+          "border border-cr-border rounded-t-2xl sm:rounded-2xl",
           "shadow-2xl flex flex-col overflow-hidden transition-opacity duration-300",
         )}
       >

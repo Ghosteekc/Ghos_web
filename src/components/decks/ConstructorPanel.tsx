@@ -469,7 +469,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
               placeholder="Поиск карты…"
 
-              className="w-full rounded-xl border border-cr-border/60 bg-cr-bg/60 py-2.5 pl-10 pr-3 text-sm text-cr-text placeholder:text-cr-muted focus:border-cr-gold/50 focus:outline-none"
+              className="w-full rounded-xl border border-cr-border/60 info-glass py-2.5 pl-10 pr-3 text-sm text-cr-text placeholder:text-cr-muted focus:border-cr-gold/50 focus:outline-none"
 
             />
 
