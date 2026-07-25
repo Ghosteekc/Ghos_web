@@ -21,7 +21,7 @@
     --cr-bg-top: #0b122c;
     --cr-bg-bottom: #0b122c;
     --cr-bg-pattern: url("/bg-dark.png");
-    --cr-bg-pattern-size: cover;
+    --cr-bg-pattern-size: 12.5rem 12.5rem;
     --cr-glass-bg: rgb(var(--cr-card) / 0.42);
     --cr-glass-bg-strong: rgb(var(--cr-card) / 0.55);
     --cr-glass-blur: blur(18px) saturate(150%);
@@ -62,15 +62,13 @@
     --cr-bg-top: #d9d8d6;
     --cr-bg-bottom: #d9d8d6;
     --cr-bg-pattern: url("/bg-light.png");
-    --cr-bg-pattern-size: cover;
+    --cr-bg-pattern-size: 12.5rem 12.5rem;
     --cr-glass-bg: rgb(255 255 255 / 0.48);
     --cr-glass-bg-strong: rgb(255 255 255 / 0.62);
     --cr-glass-blur: blur(18px) saturate(140%);
     --cr-chart-grid: rgba(100, 116, 139, 0.32);
-    --cr-stroke-title:
-      -1px 1px 0 rgba(15, 23, 42, 0.22),
-      0 1px 0 rgba(15, 23, 42, 0.18),
-      1px 1px 0 rgba(15, 23, 42, 0.12);
+    /* No CR stroke on light — dark outlines muddy text on pale cards */
+    --cr-stroke-title: none;
     --cr-stroke-body: none;
   }
 
@@ -129,7 +127,7 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Fixed wallpaper: one cover frame — source tiles are not seamless when repeated */
+  /* Fixed seamless wallpaper tile */
   body::before {
     content: "";
     position: fixed;
@@ -138,8 +136,8 @@
     pointer-events: none;
     background-color: var(--cr-bg-top);
     background-image: var(--cr-bg-pattern);
-    background-repeat: no-repeat;
-    background-position: center top;
+    background-repeat: repeat;
+    background-position: top center;
     background-size: var(--cr-bg-pattern-size);
   }
 
@@ -1451,10 +1449,51 @@
 
   [data-theme="light"] .page-title {
     color: rgb(15 23 42);
+    text-shadow: none;
   }
 
   [data-theme="light"] .shadow-glow {
     box-shadow: 0 0 18px rgb(37 99 235 / 0.22);
+  }
+
+  /* Kill leftover strokes / hard halos on light surfaces */
+  [data-theme="light"] .text-cr-gold,
+  [data-theme="light"] .text-cr-win,
+  [data-theme="light"] .text-cr-loss,
+  [data-theme="light"] .text-cr-blue,
+  [data-theme="light"] .text-cr-accent,
+  [data-theme="light"] .text-cr-text,
+  [data-theme="light"] .text-cr-muted,
+  [data-theme="light"] .filter-tab,
+  [data-theme="light"] .filter-tab.filter-tab--active,
+  [data-theme="light"] .filter-tab:active:not(:disabled),
+  [data-theme="light"] .collection-filter-tab,
+  [data-theme="light"] .collection-filter-tab.collection-filter-tab--active,
+  [data-theme="light"] .card-name-glow,
+  [data-theme="light"] .card-name-deck,
+  [data-theme="light"] .card-name-deck-overlay,
+  [data-theme="light"] .card-name-caption,
+  [data-theme="light"] .page-subtitle,
+  [data-theme="light"] .text-label,
+  [data-theme="light"] h1,
+  [data-theme="light"] h2,
+  [data-theme="light"] h3,
+  [data-theme="light"] h4,
+  [data-theme="light"] h5,
+  [data-theme="light"] h6,
+  [data-theme="light"] .pixel-btn,
+  [data-theme="light"] .btn-gold,
+  [data-theme="light"] .btn-blue {
+    text-shadow: none !important;
+  }
+
+  [data-theme="light"] .filter-tab.filter-tab--active,
+  [data-theme="light"] .filter-tab:active:not(:disabled),
+  [data-theme="light"] .collection-filter-tab.collection-filter-tab--active {
+    color: rgb(146 104 12);
+    --pb-glow-active:
+      0 0 10px rgba(196, 140, 18, 0.18),
+      0 0 3px rgba(196, 140, 18, 0.12);
   }
 
   /* Keep rarity chip colors like dark theme (fade / stroke to dark). */
@@ -1463,21 +1502,16 @@
   [data-theme="light"] .collection-stat-epic,
   [data-theme="light"] .collection-stat-common,
   [data-theme="light"] .collection-stat-rare {
-    text-shadow:
-      -1px 1px 0 #000,
-      0 1px 0 #000,
-      1px 1px 0 #000,
-      -1px 0 0 #000,
-      1px 0 0 #000;
+    text-shadow: none !important;
   }
 
   [data-theme="light"] .collection-stat-champion {
-    color: #fbbf24;
+    color: #b45309;
   }
 
   [data-theme="light"] .collection-stat-hero,
   [data-theme="light"] .collection-stat-legendary {
-    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.85));
+    filter: none;
   }
 
   [data-theme="light"] .chart-section-title,
@@ -1624,7 +1658,7 @@
   }
 
   [data-theme="light"] .card-name-glow {
-    text-shadow: var(--cr-stroke-body);
+    text-shadow: none !important;
   }
 
   .card-name-deck {

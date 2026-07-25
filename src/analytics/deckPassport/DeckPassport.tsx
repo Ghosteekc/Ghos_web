@@ -86,12 +86,12 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
         </div>
 
         <div className="overflow-y-auto overscroll-contain flex-1 px-4 py-4 space-y-5">
-          <div className="text-center rounded-xl border border-cr-gold/30 bg-cr-gold/5 py-5 px-4">
+          <Card className="!p-5 text-center">
             <p className="text-xs text-cr-muted mb-1">Ghøsteek Score</p>
             <p className="text-4xl font-bold text-cr-gold tabular-nums">{analysis.score}</p>
-            <p className="text-lg text-yellow-300 tracking-widest mt-1">{analysis.starsDisplay}</p>
+            <p className="text-lg text-cr-gold tracking-widest mt-1">{analysis.starsDisplay}</p>
             <p className="text-xs text-cr-muted mt-2">{analysis.archetype} · {analysis.playStyle}</p>
-          </div>
+          </Card>
 
           <Card className="!p-3">
             <h3 className="text-sm font-semibold text-cr-text mb-3">Характеристики</h3>
