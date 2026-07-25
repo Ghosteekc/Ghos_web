@@ -337,6 +337,7 @@ export interface SearchResult {
   max_trophies?: number | null;
   clan_name?: string | null;
   exp_level?: number | null;
+  collection_level?: number | null;
   arena_icon?: string | null;
   winrate?: number | null;
   total_wins?: number | null;

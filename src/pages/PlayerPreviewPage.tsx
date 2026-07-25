@@ -5,10 +5,10 @@ import {
   Crown,
   ExternalLink,
   Flame,
+  Layers,
   MapPinned,
   Trophy,
   TrendingUp,
-  User,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -108,9 +108,13 @@ export function PlayerPreviewPage() {
               : "text-cr-muted",
         },
         {
-          label: "Уровень",
-          value: player.exp_level != null ? String(player.exp_level) : "—",
-          icon: User,
+          label: "Коллекция",
+          value:
+            player.collection_level != null
+              ? formatNumber(player.collection_level)
+              : "—",
+          valueClass: "text-cr-gold",
+          icon: Layers,
           iconClass: "text-cr-blue",
         },
         {

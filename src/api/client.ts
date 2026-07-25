@@ -415,7 +415,7 @@ export const api = {
 
   getPlayerPreview: (tag: string) => {
     const clean = tag.replace(/^#/, "");
-    return cachedGet<SearchResult>(`player-v3:${clean}`, `/api/players/${encodeURIComponent(clean)}`, TTL.profile);
+    return cachedGet<SearchResult>(`player-v4:${clean}`, `/api/players/${encodeURIComponent(clean)}`, TTL.profile);
   },
 
   removeFavoriteDeck: (deck: string[]) => {
