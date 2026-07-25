@@ -1516,8 +1516,12 @@
 
   [data-theme="light"] .chart-section-title,
   [data-theme="light"] .profile-stat-label {
-    color: rgb(15 23 42) !important;
+    color: #000 !important;
     text-shadow: none !important;
+  }
+
+  [data-theme="light"] .profile-stat-winrate {
+    color: #000 !important;
   }
 
   [data-theme="light"] .collection-level-value,

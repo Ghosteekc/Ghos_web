@@ -49,7 +49,7 @@ export function ProfileStatGrid({ profile }: ProfileStatGridProps) {
     {
       label: UI.winrate,
       value: profile.winrate != null ? `${profile.winrate.toFixed(1)}%` : "—",
-      valueClass: getWinColor(profile.winrate ?? 50),
+      valueClass: `${getWinColor(profile.winrate ?? 50)} profile-stat-winrate`,
       icon: TrendingUp,
       iconClass: "text-cr-win",
     },
