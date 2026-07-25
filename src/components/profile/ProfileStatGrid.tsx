@@ -76,7 +76,7 @@ export function ProfileStatGrid({ profile }: ProfileStatGridProps) {
         profile.collection_level != null
           ? formatNumber(profile.collection_level)
           : "—",
-      valueClass: "text-cr-gold",
+      valueClass: "text-cr-gold profile-stat-collection",
       icon: Layers,
       iconClass: "text-cr-blue",
     },
@@ -94,7 +94,7 @@ export function ProfileStatGrid({ profile }: ProfileStatGridProps) {
           <p className={`text-lg font-bold tabular-nums leading-none ${item.valueClass}`}>
             {item.value}
           </p>
-          <p className="text-[10px] text-cr-muted leading-tight px-0.5">{item.label}</p>
+          <p className={`text-[10px] text-cr-muted leading-tight px-0.5 profile-stat-label`}>{item.label}</p>
         </Card>
       ))}
     </div>

@@ -90,7 +90,7 @@ export function CollectionStatsGrid({
     <div className="space-y-3">
       <div className="flex items-baseline justify-between gap-2">
         <p className="text-xs text-cr-muted uppercase tracking-wide">Уровень коллекции</p>
-        <p className="text-lg font-bold text-cr-gold tabular-nums">{stats.collection_level}</p>
+        <p className="text-lg font-bold text-cr-gold tabular-nums collection-level-value">{stats.collection_level}</p>
       </div>
       <div className="grid grid-cols-2 gap-2">
         {STAT_ITEMS.map(({ key, filter, label, tone, activeClass }) => {

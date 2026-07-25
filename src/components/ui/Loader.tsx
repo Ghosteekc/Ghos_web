@@ -60,7 +60,7 @@ const Loader = ({
       />
       {showLabel && (
         <div className={`text-center ${compact ? "mt-2" : "mt-4"}`}>
-          <p className={`text-cr-muted ${compact ? "text-xs" : "text-sm"}`}>Загрузка</p>
+          <p className={`text-cr-muted loader-title ${compact ? "text-xs" : "text-sm"}`}>Загрузка</p>
           <div
             className={`relative overflow-hidden ${
               compact ? "mt-0.5 min-h-[1.05rem]" : "mt-1 min-h-[1.35rem]"
@@ -69,7 +69,7 @@ const Loader = ({
             <AnimatePresence mode="wait" initial={false}>
               <motion.p
                 key={current}
-                className={`text-cr-gold/90 font-medium origin-center ${
+                className={`text-cr-gold/90 font-medium origin-center loader-item ${
                   compact ? "text-[11px]" : "text-xs"
                 }`}
                 initial={{ opacity: 0, scaleY: 0.12, scaleX: 0.78 }}

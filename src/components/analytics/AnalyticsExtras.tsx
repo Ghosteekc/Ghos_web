@@ -197,7 +197,7 @@ export function OpponentsPanel() {
                 ))}
               </div>
             )}
-            <CardDeckGrid cards={opp.deck} size="sm" showLabels maxVisible={8} />
+            <CardDeckGrid cards={opp.deck} size="lg" showLabels maxVisible={8} />
 
             {isOpen && (
               <div className="mt-3 pt-3 border-t border-cr-win/20 rounded-lg bg-cr-win/5 px-3 pb-3 -mx-1">
@@ -209,7 +209,7 @@ export function OpponentsPanel() {
                       Контр-колода vs {counter.opponent_name}
                     </h3>
                     <p className="text-xs text-cr-muted mb-3">Под ваш арсенал и арену</p>
-                    <CardDeckGrid cards={counter.counter_deck} size="sm" showLabels maxVisible={8} />
+                    <CardDeckGrid cards={counter.counter_deck} size="lg" showLabels maxVisible={8} />
                   </>
                 ) : null}
               </div>
@@ -306,14 +306,14 @@ export function DeckToolsPanel() {
             cards={customize.original}
             icons={deckIcons(customize.original_cards)}
             levels={deckLevels(customize.original_cards)}
-            size="sm"
+            size="lg"
             showLabels
             maxVisible={8}
           />
 
           {upgrades.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs text-cr-gold mb-2">Рекомендуемый уровень карт</p>
+              <p className="text-xs text-cr-gold mb-2 recommendation-accent">Рекомендуемый уровень карт</p>
               <ul className="space-y-1.5">
                 {upgrades.map((u) => (
                   <li
@@ -346,7 +346,7 @@ export function DeckToolsPanel() {
                 cards={customize.customized}
                 icons={deckIcons(customize.customized_cards)}
                 levels={deckLevels(customize.customized_cards)}
-                size="sm"
+                size="lg"
                 showLabels
                 maxVisible={8}
               />
@@ -366,7 +366,7 @@ export function DeckToolsPanel() {
                 cards={customize.level_alt_deck}
                 icons={deckIcons(customize.level_alt_cards)}
                 levels={deckLevels(customize.level_alt_cards)}
-                size="sm"
+                size="lg"
                 showLabels
                 maxVisible={8}
               />

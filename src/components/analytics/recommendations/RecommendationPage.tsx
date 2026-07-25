@@ -26,7 +26,7 @@ function ArenaProgressHeader({ summary }: { summary: ArenaProgressSummary }) {
       <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
           <p className="text-[11px] text-cr-muted">Ваш прогресс</p>
-          <p className="text-xl font-bold text-cr-gold tabular-nums">{summary.progressPercent}%</p>
+          <p className="text-xl font-bold text-cr-gold tabular-nums recommendation-accent">{summary.progressPercent}%</p>
         </div>
         <div>
           <p className="text-[11px] text-cr-muted">Соответствуют арене</p>
@@ -36,7 +36,7 @@ function ArenaProgressHeader({ summary }: { summary: ArenaProgressSummary }) {
         </div>
         <div>
           <p className="text-[11px] text-cr-muted">Требуют улучшения</p>
-          <p className="text-xl font-bold text-cr-gold tabular-nums">{summary.needsUpgradeCount}</p>
+          <p className="text-xl font-bold text-cr-gold tabular-nums recommendation-accent">{summary.needsUpgradeCount}</p>
         </div>
         <div>
           <p className="text-[11px] text-cr-muted">Рекомендуемый уровень</p>
@@ -190,7 +190,7 @@ export function RecommendationsPanel() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 recommendations-panel">
       <Card className="border-cr-gold/20 bg-cr-gold/5">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
           <div>
@@ -199,7 +199,7 @@ export function RecommendationsPanel() {
               Приоритетные карты для каждой арены с учётом вашей коллекции
             </p>
             {playerArena != null && myArenaSummary ? (
-              <p className="text-xs text-cr-gold mt-2">
+              <p className="text-xs text-cr-gold mt-2 recommendation-accent">
                 Ваша арена: {myArenaSummary.arenaName} · {profile.trophies?.toLocaleString("ru-RU") ?? "—"} 🏆
               </p>
             ) : null}

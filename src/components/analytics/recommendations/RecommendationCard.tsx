@@ -11,7 +11,7 @@ export function RecommendationCard({ card }: RecommendationCardProps) {
     card.status === "ok"
       ? "text-cr-win"
       : card.status === "upgrade"
-        ? "text-cr-gold"
+        ? "text-cr-gold recommendation-accent"
         : "text-cr-muted";
 
   return (
@@ -39,7 +39,7 @@ export function RecommendationCard({ card }: RecommendationCardProps) {
         </p>
         <p className="text-xs text-cr-muted">
           Рекомендуемый:{" "}
-          <span className="text-cr-gold tabular-nums">{card.recommendedLevel}</span>
+          <span className="text-cr-gold tabular-nums recommendation-accent">{card.recommendedLevel}</span>
         </p>
         <p className={cn("text-xs font-medium mt-1.5 leading-snug", statusClass)}>
           {statusLabel(card.status)}

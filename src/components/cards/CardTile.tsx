@@ -214,7 +214,7 @@ export function CardTile({
         {isCollection && levelBadge != null && <LevelBadge level={levelBadge} />}
         {isCollection && elixirCost != null && <ElixirCostBadge cost={elixirCost} />}
         {!isCollection && levelBadge != null && (
-          <span className="absolute top-0 right-0 z-50 min-w-[1.1rem] rounded-md border border-cr-gold/40 bg-cr-bg/95 px-1 py-0.5 text-[10px] font-sans font-extrabold leading-none text-white pointer-events-none">
+          <span className="absolute top-0 right-0 z-50 min-w-[1.1rem] rounded-md border border-cr-gold/40 bg-cr-bg/95 px-1 py-0.5 text-[10px] font-sans font-extrabold leading-none text-white pointer-events-none card-level-chip">
             {levelBadge}
           </span>
         )}

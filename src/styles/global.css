@@ -1412,21 +1412,70 @@
     box-shadow: 0 0 18px rgb(37 99 235 / 0.22);
   }
 
+  /* Keep rarity chip colors like dark theme (fade / stroke to dark). */
   [data-theme="light"] .collection-stat-evo,
   [data-theme="light"] .collection-stat-champion,
   [data-theme="light"] .collection-stat-epic,
   [data-theme="light"] .collection-stat-common,
   [data-theme="light"] .collection-stat-rare {
-    text-shadow: none;
+    text-shadow:
+      -1px 1px 0 #000,
+      0 1px 0 #000,
+      1px 1px 0 #000,
+      -1px 0 0 #000,
+      1px 0 0 #000;
   }
 
   [data-theme="light"] .collection-stat-champion {
-    color: rgb(180 120 8);
+    color: #fbbf24;
   }
 
   [data-theme="light"] .collection-stat-hero,
   [data-theme="light"] .collection-stat-legendary {
-    filter: none;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.85));
+  }
+
+  [data-theme="light"] .chart-section-title,
+  [data-theme="light"] .profile-stat-label {
+    color: rgb(15 23 42) !important;
+    text-shadow: none !important;
+  }
+
+  [data-theme="light"] .collection-level-value,
+  [data-theme="light"] .profile-stat-collection,
+  [data-theme="light"] .recommendation-accent,
+  [data-theme="light"] .recommendations-panel .text-cr-gold {
+    color: rgb(37 99 235) !important;
+    text-shadow: none !important;
+  }
+
+  [data-theme="light"] .loader-title,
+  [data-theme="light"] .loader-item {
+    color: rgb(15 23 42) !important;
+    text-shadow: none !important;
+  }
+
+  [data-theme="light"] .card-name-glow,
+  [data-theme="light"] .card-name-deck,
+  [data-theme="light"] .card-name-deck-overlay {
+    color: rgb(37 99 235) !important;
+  }
+
+  [data-theme="light"] .card-level-chip {
+    color: rgb(15 23 42) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-color: rgb(37 99 235 / 0.45) !important;
+  }
+
+  [data-theme="light"] .card-frame-base {
+    background: linear-gradient(180deg, #f5f7fb 0%, #dce3ef 100%);
+    box-shadow: inset 0 0 0 2px rgba(100, 116, 139, 0.55);
+  }
+
+  [data-theme="light"] .card-frame-evo {
+    box-shadow:
+      inset 0 0 0 2px rgba(232, 121, 249, 0.95),
+      0 0 8px rgba(192, 38, 211, 0.18);
   }
 
   [data-theme="light"] .recommendation-card {

@@ -184,7 +184,7 @@ export function AnalyticsPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <Card>
-              <h3 className="text-sm font-semibold text-cr-text mb-2">Рост трофеев</h3>
+              <h3 className="chart-section-title text-sm font-semibold text-cr-text mb-2">Рост трофеев</h3>
               <p className="text-[11px] text-cr-muted mb-3">
                 Только рейтинговые 1v1 · ведите пальцем, тап по точке — закрепить
               </p>
@@ -198,7 +198,7 @@ export function AnalyticsPage() {
             </Card>
 
             <Card className="lg:col-span-2">
-              <h3 className="text-sm font-semibold text-cr-text mb-2">Винрейт по дням</h3>
+              <h3 className="chart-section-title text-sm font-semibold text-cr-text mb-2">Винрейт по дням</h3>
               <p className="text-[11px] text-cr-muted mb-3">
                 Фиолетовая линия — процент побед · ведите пальцем, тап — закрепить
               </p>
