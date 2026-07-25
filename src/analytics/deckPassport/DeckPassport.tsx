@@ -55,24 +55,26 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
   const metrics = getMetricDisplayList(analysis.metrics);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div className="deck-passport-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 pt-[max(2.75rem,var(--app-content-top))] sm:pt-4">
       <button
         type="button"
         aria-label="Закрыть"
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="deck-passport-backdrop absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
       <div
         className={cn(
-          "relative w-full sm:max-w-lg max-h-[92vh] sm:max-h-[88vh]",
-          "bg-[#0a0f2e] border border-white/10 rounded-t-2xl sm:rounded-2xl",
+          "deck-passport-sheet relative w-full sm:max-w-lg max-h-[min(92vh,calc(100dvh-3.5rem))] sm:max-h-[88vh]",
+          "bg-cr-bg border border-cr-border rounded-t-2xl sm:rounded-2xl",
           "shadow-2xl flex flex-col overflow-hidden transition-opacity duration-300",
         )}
       >
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10 shrink-0">
+        <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3 border-b border-cr-border shrink-0">
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-wider text-cr-gold">Ghøsteek Deck Passport</p>
+            <p className="text-[10px] uppercase tracking-wider text-cr-gold recommendation-accent">
+              Ghøsteek Deck Passport
+            </p>
             <h2 className="text-base font-semibold text-cr-text truncate">
               {deck.name || "Анализ колоды"}
             </h2>

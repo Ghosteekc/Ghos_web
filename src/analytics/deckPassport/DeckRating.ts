@@ -32,8 +32,7 @@ export function computeDeckMetrics(cardNames: string[], archetype: string): Deck
   const avg = avgElixir(cardNames);
   const wins = cardNames.filter(isWinCard).length;
   const spells = cardNames.filter(isSpellCard).length;
-  const buildings =
-    countRole(cardNames, "building") + countRole(cardNames, "defensive");
+  const buildings = countRole(cardNames, "building");
   const airDef = countRole(cardNames, "air_defense");
   const splash = countRole(cardNames, "splash");
   const antiTank = countRole(cardNames, "anti_tank");

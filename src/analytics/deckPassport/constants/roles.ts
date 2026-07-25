@@ -17,5 +17,5 @@ export const ROLE_BALANCE_CHECKS: RoleCheckItem[] = [
   { id: "anti_air", label: "Анти-воздух", roles: ["air_defense"] },
   { id: "splash", label: "Сплэш", roles: ["splash"] },
   { id: "dps", label: "Высокий DPS", roles: ["dps", "anti_tank"] },
-  { id: "building", label: "Защитное здание", roles: ["building", "defensive"] },
+  { id: "building", label: "Защитное здание", roles: ["building"] },
 ];

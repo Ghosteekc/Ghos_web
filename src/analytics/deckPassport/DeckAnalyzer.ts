@@ -1,6 +1,6 @@
 import type { Deck } from "@/types";
 import { balanceIssues } from "@/services/deckBuilder/builder";
-import { avgElixir } from "@/services/deckBuilder/database";
+import { avgElixir, cardRoles } from "@/services/deckBuilder/database";
 import {
   detectDeckArchetype,
   detectPlayStyle,
@@ -84,7 +84,7 @@ function buildWeaknesses(
   const out: string[] = [];
   const issues = balanceIssues(cardNames, archetype);
   if (metrics.antiAir < 5) out.push("слабая защита воздуха");
-  if (issues.includes("defensive") || issues.includes("building")) out.push("нет здания");
+  if (!cardNames.some((c) => cardRoles(c).has("building"))) out.push("нет здания");
   if (avgElixir(cardNames) >= 4.1) out.push("дорогая ротация");
   if (issues.includes("small_spell") || issues.includes("big_spell")) {
     out.push("отсутствует второе заклинание");

@@ -12,11 +12,9 @@ export interface PracticalityResult {
 }
 
 function countLegendaries(cardNames: string[], cards: DeckCard[]): number {
-  const fromRarity = cards.filter(
-    (c) => c.rarity === "legendary" || c.rarity === "champion",
-  ).length;
+  const fromRarity = cards.filter((c) => c.rarity === "legendary").length;
   if (fromRarity > 0) return fromRarity;
-  return cardNames.filter((n) => LEGENDARY_CARDS.has(n)).length;
+  return cardNames.filter((n) => LEGENDARY_CARDS.has(n) && !CHAMPION_CARDS.has(n)).length;
 }
 
 function countChampions(cardNames: string[], cards: DeckCard[]): number {
@@ -54,17 +52,19 @@ export function computePracticality(
     negatives.push("дорогая ротация");
   }
 
-  if (legends === 0) {
-    score += 10;
+  // Legendaries don't make a deck worse strategically — only note easy upgrade path.
+  if (legends === 0 && champions === 0) {
+    score += 8;
     positives.push("легко прокачать");
-  } else if (legends >= 2) {
-    score -= legends * 5;
-    negatives.push("несколько легендарных карт");
   }
 
   if (champions > 0) {
-    score -= champions * 12;
-    negatives.push(champions > 1 ? "несколько чемпионов" : "требуется чемпион");
+    score -= champions * 8;
+    negatives.push(
+      champions > 1
+        ? "несколько чемпионов — дорого прокачать"
+        : "чемпион в колоде — дорого прокачать",
+    );
   }
 
   if (evos >= 3) {
