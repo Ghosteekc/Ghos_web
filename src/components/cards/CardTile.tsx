@@ -159,16 +159,17 @@ export function CardTile({
   const fallbackSrc =
     name.trim().toLowerCase() === "ronin" ? "/cards/ronin.png" : iconUrl(name) || undefined;
   const isCollection = size === "collection";
-  const overlayLabel = showLabel && (size === "deck" || size === "lg");
+  // Keep name captions under the art so they never cover the card frame.
+  const overlayLabel = false;
   const label =
     labelOverride ??
     ((compactLabel || size === "deck" || size === "lg") && showLabel ? nameShort(name) : nameRu(name));
+  const belowCaption = showLabel && (size === "deck" || size === "lg");
 
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-0.5 min-w-0",
-        size === "deck" && "w-full overflow-hidden",
+        "flex flex-col items-center gap-1 min-w-0 w-full",
         className,
       )}
     >
@@ -203,14 +204,6 @@ export function CardTile({
             </div>
           )}
         </div>
-        {overlayLabel && (
-          <span
-            className={cn("card-name-deck-overlay", size === "lg" && "card-name-lg-overlay")}
-            title={nameRu(name)}
-          >
-            {label}
-          </span>
-        )}
         {isCollection && levelBadge != null && <LevelBadge level={levelBadge} />}
         {isCollection && elixirCost != null && <ElixirCostBadge cost={elixirCost} />}
         {!isCollection && levelBadge != null && (
@@ -227,8 +220,10 @@ export function CardTile({
       {showLabel && !overlayLabel && (
         <span
           className={cn(
-            "card-name-glow truncate px-0.5 text-center font-extrabold leading-none",
-            labelSizeClasses[size],
+            belowCaption
+              ? cn("card-name-caption", size === "lg" && "card-name-caption--lg")
+              : "card-name-glow truncate px-0.5 text-center font-extrabold leading-none",
+            !belowCaption && labelSizeClasses[size],
             labelClassName,
           )}
           title={nameRu(name)}
@@ -268,9 +263,14 @@ export function CardDeckGrid({
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 w-full">
+      <div
+        className={cn(
+          "grid grid-cols-4 grid-rows-2 w-full",
+          showLabels ? "gap-x-2 gap-y-3" : "gap-x-2 gap-y-1.5",
+        )}
+      >
         {slots.map((name, index) => (
-          <div key={name ? `${name}-${index}` : `empty-${index}`} className="min-w-0 overflow-hidden">
+          <div key={name ? `${name}-${index}` : `empty-${index}`} className="min-w-0 overflow-visible">
             {name ? (
               <CardTile
                 name={name}

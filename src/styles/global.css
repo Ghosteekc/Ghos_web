@@ -1568,6 +1568,46 @@
     text-shadow: var(--cr-stroke-body);
   }
 
+  .card-name-caption {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-height: 1rem;
+    padding: 0.18rem 0.2rem;
+    border-radius: 0.35rem;
+    font-family: "Supercell Magic", sans-serif;
+    font-size: 7px;
+    line-height: 1;
+    letter-spacing: 0;
+    text-align: center;
+    color: rgb(var(--cr-gold));
+    background: rgba(2, 8, 28, 0.92);
+    border: 1px solid rgb(var(--cr-accent) / 0.22);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+    pointer-events: none;
+    text-shadow: var(--cr-stroke-body);
+  }
+
+  .card-name-caption--lg {
+    min-height: 1.15rem;
+    font-size: 8px;
+    padding: 0.22rem 0.25rem;
+  }
+
+  [data-theme="light"] .card-name-caption {
+    color: rgb(37 99 235);
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgb(37 99 235 / 0.28);
+    text-shadow: none;
+  }
+
   .card-name-deck-overlay {
     position: absolute;
     left: 0;
