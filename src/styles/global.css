@@ -1520,10 +1520,6 @@
     text-shadow: none !important;
   }
 
-  [data-theme="light"] .profile-stat-winrate {
-    color: #000 !important;
-  }
-
   [data-theme="light"] .collection-level-value,
   [data-theme="light"] .profile-stat-collection,
   [data-theme="light"] .recommendation-accent,
