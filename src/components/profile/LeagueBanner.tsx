@@ -2,7 +2,24 @@ import { useState } from "react";
 import { Trophy } from "lucide-react";
 import type { LeagueInfo } from "@/types";
 import { formatNumber } from "@/utils";
-import { Card } from "@/components/ui";
+
+/** Current Jul–Aug 2026 Ranked gate; API usually overrides this. */
+export const DEFAULT_LEAGUE_UNLOCK_TROPHIES = 13_000;
+
+export function lockedLeagueFallback(unlockTrophies = DEFAULT_LEAGUE_UNLOCK_TROPHIES): LeagueInfo {
+  return {
+    unlocked: false,
+    unlock_trophies: unlockTrophies,
+    current_league_number: null,
+    current_league_name: null,
+    current_league_icon: null,
+    best_league_number: null,
+    best_league_name: null,
+    best_league_icon: null,
+    is_absolute_champion: false,
+    absolute_trophies: null,
+  };
+}
 
 interface LeagueBannerProps {
   league: LeagueInfo;
@@ -58,43 +75,39 @@ function LeagueSide({
 export function LeagueBanner({ league }: LeagueBannerProps) {
   if (!league.unlocked) {
     return (
-      <Card className="!py-3 !px-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 shrink-0 rounded-lg bg-cr-surface border border-cr-border flex items-center justify-center">
-            <Trophy className="w-5 h-5 text-cr-muted" />
-          </div>
-          <p className="text-sm text-cr-muted font-medium leading-snug">
-            Лига открывается с{" "}
-            <span className="text-cr-text font-bold tabular-nums">
-              {formatNumber(league.unlock_trophies)}
-            </span>{" "}
-            кубков
-          </p>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 shrink-0 rounded-lg bg-cr-surface border border-cr-border flex items-center justify-center">
+          <Trophy className="w-5 h-5 text-cr-muted" />
         </div>
-      </Card>
+        <p className="text-sm text-cr-muted font-medium leading-snug">
+          Лига открывается с{" "}
+          <span className="text-cr-text font-bold tabular-nums">
+            {formatNumber(league.unlock_trophies)}
+          </span>{" "}
+          кубков
+        </p>
+      </div>
     );
   }
 
   if (league.is_absolute_champion) {
     const name = league.current_league_name ?? "Абсолютный чемпион";
     return (
-      <Card className="!py-3 !px-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <LeagueIcon src={league.current_league_icon} alt={name} />
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-wide text-cr-muted font-semibold">Текущая лига</p>
-              <p className="text-sm font-bold text-cr-text truncate">{name}</p>
-            </div>
-          </div>
-          <div className="shrink-0 text-right">
-            <p className="text-[10px] uppercase tracking-wide text-violet-400 font-semibold">Кубки лиги</p>
-            <p className="text-lg font-extrabold tabular-nums text-violet-400 leading-none mt-0.5">
-              {formatNumber(league.absolute_trophies ?? 0)}
-            </p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <LeagueIcon src={league.current_league_icon} alt={name} />
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-wide text-cr-muted font-semibold">Текущая лига</p>
+            <p className="text-sm font-bold text-cr-text truncate">{name}</p>
           </div>
         </div>
-      </Card>
+        <div className="shrink-0 text-right">
+          <p className="text-[10px] uppercase tracking-wide text-violet-400 font-semibold">Кубки лиги</p>
+          <p className="text-lg font-extrabold tabular-nums text-violet-400 leading-none mt-0.5">
+            {formatNumber(league.absolute_trophies ?? 0)}
+          </p>
+        </div>
+      </div>
     );
   }
 
@@ -103,12 +116,10 @@ export function LeagueBanner({ league }: LeagueBannerProps) {
   const currentName = league.current_league_name ?? "—";
 
   return (
-    <Card className="!py-3 !px-4">
-      <div className="flex items-center gap-2">
-        <LeagueSide label="Лучшая" name={bestName} icon={bestIcon} />
-        <div className="w-px self-stretch bg-cr-border shrink-0" aria-hidden />
-        <LeagueSide label="Текущая" name={currentName} icon={league.current_league_icon} align="right" />
-      </div>
-    </Card>
+    <div className="flex items-center gap-2">
+      <LeagueSide label="Лучшая" name={bestName} icon={bestIcon} />
+      <div className="w-px self-stretch bg-cr-border shrink-0" aria-hidden />
+      <LeagueSide label="Текущая" name={currentName} icon={league.current_league_icon} align="right" />
+    </div>
   );
 }

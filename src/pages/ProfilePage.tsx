@@ -4,7 +4,7 @@ import { Card, Button, Loader } from "@/components/ui";
 import { ProfileCollectionNav } from "@/components/profile/ProfileCollectionNav";
 import { CardLevelScale } from "@/components/profile/CardLevelScale";
 import { ProfileStatGrid } from "@/components/profile/ProfileStatGrid";
-import { LeagueBanner } from "@/components/profile/LeagueBanner";
+import { LeagueBanner, lockedLeagueFallback } from "@/components/profile/LeagueBanner";
 import { SupercellDisclaimer } from "@/components/home/SupercellDisclaimer";
 import { useTelegram, usePageRefresh } from "@/hooks";
 import { api } from "@/api/client";
@@ -17,7 +17,7 @@ export function ProfilePage() {
   const { user } = useTelegram();
   const { nameRu } = useCardCatalog();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(() => !cacheHas("profile-v5"));
+  const [loading, setLoading] = useState(() => !cacheHas("profile-v6"));
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -43,6 +43,11 @@ export function ProfilePage() {
   if (loading) {
     return <Loader />;
   }
+
+  const league =
+    profile?.player_tag != null
+      ? (profile.league ?? lockedLeagueFallback())
+      : null;
 
   return (
     <div className="space-y-6">
@@ -94,10 +99,14 @@ export function ProfilePage() {
               )}
             </div>
           </div>
+
+          {league ? (
+            <div className="mt-3 pt-3 border-t border-cr-border">
+              <LeagueBanner league={league} />
+            </div>
+          ) : null}
         </Card>
       )}
-
-      {profile?.league ? <LeagueBanner league={profile.league} /> : null}
 
       <Card className="!p-3">
         <div className="flex items-center gap-3">
