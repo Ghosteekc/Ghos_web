@@ -428,8 +428,8 @@ function TopPlayersPanel({
       {players.map((player, i) => (
         <motion.div
           key={player.player_tag}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ y: 12 }}
+          animate={{ y: 0 }}
           transition={{ delay: i * 0.04 }}
         >
           <Card>
@@ -696,7 +696,7 @@ function RandomDeckPanel({
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+    <motion.div initial={{ y: 10 }} animate={{ y: 0 }} className="space-y-3">
       <RoflModeBar rofl={rofl} onRoflChange={setRofl} />
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between mb-2 gap-2">
@@ -868,8 +868,8 @@ export function DeckCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ y: 14 }}
+      animate={{ y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.5 }}
       className="group"
     >

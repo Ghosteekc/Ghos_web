@@ -118,14 +118,12 @@ export function SearchPage() {
 
       <AnimatePresence>
         {!loading && error && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Card className="text-center text-cr-loss text-sm">{error}</Card>
-          </motion.div>
+          <Card className="text-center text-cr-loss text-sm">{error}</Card>
         )}
         {!loading && !error && results.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 8 }}
+            animate={{ y: 0 }}
             className="space-y-3"
           >
             <h3 className="text-sm text-cr-muted">Результаты</h3>

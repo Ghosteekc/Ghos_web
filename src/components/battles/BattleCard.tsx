@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import {
   Trophy,
   ChevronRight,
@@ -19,75 +18,69 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
   const opponent = formatOpponentHeadline(summary.opponent_name, summary.opponent_tag);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.4 }}
-    >
-      <Card delay={index * 0.05} className="cursor-pointer relative overflow-hidden" onClick={onOpen}>
-        <div
-          className={cn(
-            "absolute left-0 top-0 bottom-0 w-1",
-            summary.won ? "bg-cr-win" : "bg-cr-loss",
-          )}
-        />
-        <div className="pl-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              {summary.won ? (
-                <Trophy className="w-5 h-5 text-cr-win" />
-              ) : (
-                <Flame className="w-5 h-5 text-cr-loss" />
-              )}
-              <span className={cn("font-semibold text-sm", summary.won ? "text-cr-win" : "text-cr-loss")}>
-                {summary.won ? "Победа" : "Поражение"}
-              </span>
-            </div>
-            <span className={cn("text-sm font-bold", getTrophyChangeColor(summary.trophy_change))}>
-              {summary.trophy_change >= 0 ? "+" : ""}{summary.trophy_change} 🏆
+    <Card delay={index * 0.04} className="cursor-pointer relative overflow-hidden" onClick={onOpen}>
+      <div
+        className={cn(
+          "absolute left-0 top-0 bottom-0 w-1",
+          summary.won ? "bg-cr-win" : "bg-cr-loss",
+        )}
+      />
+      <div className="pl-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            {summary.won ? (
+              <Trophy className="w-5 h-5 text-cr-win" />
+            ) : (
+              <Flame className="w-5 h-5 text-cr-loss" />
+            )}
+            <span className={cn("font-semibold text-sm", summary.won ? "text-cr-win" : "text-cr-loss")}>
+              {summary.won ? "Победа" : "Поражение"}
             </span>
           </div>
-
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="text-sm font-medium text-cr-text">против {opponent.title}</p>
-              {opponent.tagLine ? (
-                <p className="text-xs text-cr-muted">{opponent.tagLine}</p>
-              ) : null}
-            </div>
-            <div className="text-right">
-              {formatBattlePlayedAt(summary.timestamp, summary.played_at) ? (
-                <p className="text-xs font-semibold text-cr-accent">
-                  {formatBattlePlayedAt(summary.timestamp, summary.played_at)}
-                </p>
-              ) : null}
-              {(summary.duration ?? 0) > 0 ? (
-                <p className="text-xs text-cr-muted">{formatTime(summary.duration)}</p>
-              ) : null}
-              <p className="text-xs text-cr-muted flex items-center gap-1 justify-end">
-                <ElixirIcon size={12} />
-                {(summary.avg_elixir ?? 0).toFixed(1)}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex-1 max-w-[11rem]">
-              <PlayerDeckGrid
-                cards={summary.user_deck_cards?.length ? summary.user_deck_cards : summary.user_deck}
-                size="xs"
-              />
-            </div>
-            <div className="text-cr-muted shrink-0">
-              <ChevronRight className="w-5 h-5" />
-            </div>
-          </div>
-
-          {summary.top_reason ? (
-            <p className="text-xs text-cr-muted mt-3 leading-snug line-clamp-2">{summary.top_reason}</p>
-          ) : null}
+          <span className={cn("text-sm font-bold", getTrophyChangeColor(summary.trophy_change))}>
+            {summary.trophy_change >= 0 ? "+" : ""}{summary.trophy_change} 🏆
+          </span>
         </div>
-      </Card>
-    </motion.div>
+
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-sm font-medium text-cr-text">против {opponent.title}</p>
+            {opponent.tagLine ? (
+              <p className="text-xs text-cr-muted">{opponent.tagLine}</p>
+            ) : null}
+          </div>
+          <div className="text-right">
+            {formatBattlePlayedAt(summary.timestamp, summary.played_at) ? (
+              <p className="text-xs font-semibold text-cr-accent">
+                {formatBattlePlayedAt(summary.timestamp, summary.played_at)}
+              </p>
+            ) : null}
+            {(summary.duration ?? 0) > 0 ? (
+              <p className="text-xs text-cr-muted">{formatTime(summary.duration)}</p>
+            ) : null}
+            <p className="text-xs text-cr-muted flex items-center gap-1 justify-end">
+              <ElixirIcon size={12} />
+              {(summary.avg_elixir ?? 0).toFixed(1)}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex-1 max-w-[11rem]">
+            <PlayerDeckGrid
+              cards={summary.user_deck_cards?.length ? summary.user_deck_cards : summary.user_deck}
+              size="xs"
+            />
+          </div>
+          <div className="text-cr-muted shrink-0">
+            <ChevronRight className="w-5 h-5" />
+          </div>
+        </div>
+
+        {summary.top_reason ? (
+          <p className="text-xs text-cr-muted mt-3 leading-snug line-clamp-2">{summary.top_reason}</p>
+        ) : null}
+      </div>
+    </Card>
   );
 }
