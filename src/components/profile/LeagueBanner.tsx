@@ -5,6 +5,8 @@ import { formatNumber } from "@/utils";
 
 /** Current Jul–Aug 2026 Ranked gate; API usually overrides this. */
 export const DEFAULT_LEAGUE_UNLOCK_TROPHIES = 13_000;
+const ENTRY_LEAGUE_NAME = "Мастер I";
+const ENTRY_LEAGUE_ICON = "https://royaleapi.github.io/cr-api-assets/arenas/league4.png";
 
 export function lockedLeagueFallback(unlockTrophies = DEFAULT_LEAGUE_UNLOCK_TROPHIES): LeagueInfo {
   return {
@@ -16,6 +18,39 @@ export function lockedLeagueFallback(unlockTrophies = DEFAULT_LEAGUE_UNLOCK_TROP
     best_league_number: null,
     best_league_name: null,
     best_league_icon: null,
+    is_absolute_champion: false,
+    absolute_trophies: null,
+  };
+}
+
+/** Cups below gate → unlock text; cups at/above gate (or API unlocked) → league strip. */
+export function resolveLeagueInfo(
+  league: LeagueInfo | null | undefined,
+  trophies: number | null | undefined,
+): LeagueInfo {
+  const unlock = league?.unlock_trophies ?? DEFAULT_LEAGUE_UNLOCK_TROPHIES;
+  const cups = trophies ?? 0;
+  const hasLeagueNums =
+    league?.current_league_number != null || league?.best_league_number != null;
+  const unlocked = Boolean(league?.unlocked) || cups >= unlock || hasLeagueNums;
+
+  if (!unlocked) {
+    return lockedLeagueFallback(unlock);
+  }
+
+  if (league && (league.current_league_name || league.best_league_name || league.is_absolute_champion)) {
+    return { ...league, unlocked: true };
+  }
+
+  return {
+    unlocked: true,
+    unlock_trophies: unlock,
+    current_league_number: league?.current_league_number ?? 4,
+    current_league_name: league?.current_league_name ?? ENTRY_LEAGUE_NAME,
+    current_league_icon: league?.current_league_icon ?? ENTRY_LEAGUE_ICON,
+    best_league_number: league?.best_league_number ?? 4,
+    best_league_name: league?.best_league_name ?? ENTRY_LEAGUE_NAME,
+    best_league_icon: league?.best_league_icon ?? ENTRY_LEAGUE_ICON,
     is_absolute_champion: false,
     absolute_trophies: null,
   };

@@ -4,7 +4,7 @@ import { Card, Button, Loader } from "@/components/ui";
 import { ProfileCollectionNav } from "@/components/profile/ProfileCollectionNav";
 import { CardLevelScale } from "@/components/profile/CardLevelScale";
 import { ProfileStatGrid } from "@/components/profile/ProfileStatGrid";
-import { LeagueBanner, lockedLeagueFallback } from "@/components/profile/LeagueBanner";
+import { LeagueBanner, resolveLeagueInfo } from "@/components/profile/LeagueBanner";
 import { SupercellDisclaimer } from "@/components/home/SupercellDisclaimer";
 import { useTelegram, usePageRefresh } from "@/hooks";
 import { api } from "@/api/client";
@@ -46,7 +46,7 @@ export function ProfilePage() {
 
   const league =
     profile?.player_tag != null
-      ? (profile.league ?? lockedLeagueFallback())
+      ? resolveLeagueInfo(profile.league, profile.trophies)
       : null;
 
   return (

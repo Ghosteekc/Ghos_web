@@ -17,7 +17,7 @@ import { SearchResult } from "@/types";
 import { Button, Card, ElixirIcon, Loader } from "@/components/ui";
 import { PlayerDeckGrid } from "@/components/cards";
 import { FavoriteDeckButton } from "@/components/decks/FavoriteDeckButton";
-import { LeagueBanner, lockedLeagueFallback } from "@/components/profile/LeagueBanner";
+import { LeagueBanner, resolveLeagueInfo } from "@/components/profile/LeagueBanner";
 import { formatNumber, formatPlayerTag, getWinColor } from "@/utils";
 import { useCardCatalog, usePageRefresh, useTelegram } from "@/hooks";
 import { UI } from "@/constants/labels";
@@ -192,7 +192,7 @@ export function PlayerPreviewPage() {
           </Card>
 
           <Card className="!py-3 !px-4">
-            <LeagueBanner league={player.league ?? lockedLeagueFallback()} />
+            <LeagueBanner league={resolveLeagueInfo(player.league, player.trophies)} />
           </Card>
 
           <div className="grid grid-cols-2 gap-1.5">
