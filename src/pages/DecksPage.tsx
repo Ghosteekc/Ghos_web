@@ -22,7 +22,7 @@ import { DeckPassport } from "@/analytics/deckPassport";
 import { api, ApiError } from "@/api/client";
 import { cacheHas, cacheGet } from "@/api/cache";
 import { ArenaDecksPanel } from "@/components/analytics/ArenaDecksPanel";
-import type { Deck, RandomDeck, TopPlayer, TopPlayersData } from "@/types";
+import type { Deck, DeckCard as DeckCardData, RandomDeck, TopPlayer, TopPlayersData } from "@/types";
 import { usePageRefresh, useTelegram } from "@/hooks";
 import { deckFromCardNames, deckToComparePath } from "@/utils/deckActions";
 
@@ -63,7 +63,7 @@ function formatUpdatedAt(iso: string | null | undefined) {
   }
 }
 
-function DeckCardsGrid({ cards, useVariants = false }: { cards: DeckCard[]; useVariants?: boolean }) {
+function DeckCardsGrid({ cards, useVariants = false }: { cards: DeckCardData[]; useVariants?: boolean }) {
   if (useVariants) {
     return <ConstructorDeckGrid cards={cards} />;
   }
