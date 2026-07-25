@@ -100,19 +100,19 @@ function ArenaBlock({
 }
 
 export function RecommendationsPanel() {
-  const [profile, setProfile] = useState<Profile | null>(() => cacheGet<Profile>("profile-v4"));
+  const [profile, setProfile] = useState<Profile | null>(() => cacheGet<Profile>("profile-v5"));
   const [collection, setCollection] = useState<PlayerCollectionData | null>(() =>
     cacheGet<PlayerCollectionData>("player-collection-v12"),
   );
   const [loading, setLoading] = useState(
-    () => !cacheHas("profile-v4") || !cacheHas("player-collection-v12"),
+    () => !cacheHas("profile-v5") || !cacheHas("player-collection-v12"),
   );
   const [error, setError] = useState<string | null>(null);
   const [highlightedArena, setHighlightedArena] = useState<number | null>(null);
   const blockRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
   const load = useCallback(async () => {
-    const needProfile = !cacheHas("profile-v4");
+    const needProfile = !cacheHas("profile-v5");
     const needCollection = !cacheHas("player-collection-v12");
     if (needProfile || needCollection) {
       setLoading(true);
@@ -121,7 +121,7 @@ export function RecommendationsPanel() {
 
     try {
       const [profileData, collectionData] = await Promise.all([
-        needProfile ? api.getProfile() : Promise.resolve(cacheGet<Profile>("profile-v4")),
+        needProfile ? api.getProfile() : Promise.resolve(cacheGet<Profile>("profile-v5")),
         needCollection
           ? api.getPlayerCollection()
           : Promise.resolve(cacheGet<PlayerCollectionData>("player-collection-v12")),

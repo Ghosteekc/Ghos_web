@@ -57,6 +57,19 @@ export interface CollectionMasteryEntry {
   next_hint: string;
 }
 
+export interface LeagueInfo {
+  unlocked: boolean;
+  unlock_trophies: number;
+  current_league_number: number | null;
+  current_league_name: string | null;
+  current_league_icon: string | null;
+  best_league_number: number | null;
+  best_league_name: string | null;
+  best_league_icon: string | null;
+  is_absolute_champion: boolean;
+  absolute_trophies: number | null;
+}
+
 export interface Profile {
   player_tag: string | null;
   player_name: string | null;
@@ -78,6 +91,7 @@ export interface Profile {
   three_crown_wins: number | null;
   collection_level: number | null;
   cards_by_level: CardLevelCount[];
+  league?: LeagueInfo | null;
 }
 
 export interface BattleSummary {
