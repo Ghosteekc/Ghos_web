@@ -351,6 +351,7 @@ export interface SearchResult {
   deck_link?: string | null;
   deck_winrate?: number | null;
   deck_games?: number;
+  league?: LeagueInfo | null;
 }
 
 export interface Settings {
