@@ -4,7 +4,7 @@ import { Shield, Swords, Wand2, ChevronDown, ChevronUp, RefreshCw, ExternalLink,
 import { api, ApiError } from "@/api/client";
 import { cacheGet, cacheHas, cacheInvalidate } from "@/api/cache";
 import { Card, Button, Loader } from "@/components/ui";
-import { CardDeckGrid } from "@/components/cards";
+import { CardDeckGrid, CardTile } from "@/components/cards";
 import { useCardCatalog, usePageRefresh, useTelegram } from "@/hooks";
 import { battleDetailPath, cn } from "@/utils";
 import type { CounterDeckData, CustomizeData, Deck, InsightsData, OpponentEntry, WinrateEntry } from "@/types";
@@ -85,7 +85,19 @@ export function DeckWinratesPanel({ onAnalyze }: { onAnalyze?: (deck: Deck) => v
   return (
     <div className="space-y-3">
       {rows.map((row, i) => {
-        const canAnalyze = Boolean(onAnalyze) && row.cards.length === 8;
+        const deckCards =
+          row.deck_cards && row.deck_cards.length === 8
+            ? [...row.deck_cards].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0))
+            : row.cards.map((name, slot) => ({
+                id: `${name}-${slot}`,
+                name,
+                icon: iconUrl(name) || "",
+                cost: 0,
+                evolution_level: 0,
+                is_hero: false,
+                slot,
+              }));
+        const canAnalyze = Boolean(onAnalyze) && deckCards.length === 8;
         return (
           <Card key={i} delay={i * 0.03}>
             <div className="flex items-center justify-between mb-3">
@@ -99,7 +111,28 @@ export function DeckWinratesPanel({ onAnalyze }: { onAnalyze?: (deck: Deck) => v
                 {row.winrate.toFixed(1)}%
               </span>
             </div>
-            <CardDeckGrid cards={row.cards} size="lg" showLabels maxVisible={8} />
+            <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-3 w-full">
+              {deckCards.map((card, slot) => {
+                const displayMode = card.is_hero
+                  ? "hero"
+                  : (card.evolution_level ?? 0) >= 1
+                    ? "evo"
+                    : "base";
+                return (
+                  <div key={`${card.id}-${slot}`} className="min-w-0 overflow-visible">
+                    <CardTile
+                      name={card.name}
+                      icon={card.icon || iconUrl(card.name)}
+                      size="lg"
+                      showLabel
+                      displayMode={displayMode}
+                      iconEvo={card.icon || iconUrl(card.name)}
+                      iconHero={card.icon || iconUrl(card.name)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
             {canAnalyze ? (
               <Button
                 variant="secondary"
@@ -108,12 +141,12 @@ export function DeckWinratesPanel({ onAnalyze }: { onAnalyze?: (deck: Deck) => v
                   onAnalyze?.({
                     id: i + 1,
                     name: `Моя колода · ${row.winrate.toFixed(1)}%`,
-                    cards: row.cards.map((name, slot) => ({
-                      id: `${name}-${slot}`,
-                      name,
-                      icon: iconUrl(name) || "",
-                      cost: 0,
-                      slot,
+                    cards: deckCards.map((card, slot) => ({
+                      ...card,
+                      id: card.id || `${card.name}-${slot}`,
+                      icon: card.icon || iconUrl(card.name) || "",
+                      cost: card.cost || 0,
+                      slot: card.slot ?? slot,
                     })),
                     winrate: row.winrate,
                     total_games: row.total,

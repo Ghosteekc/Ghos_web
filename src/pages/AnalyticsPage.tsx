@@ -106,6 +106,16 @@ export function AnalyticsPage() {
     });
   }, [stats?.last_results]);
 
+  const trophyTotals = useMemo(() => {
+    let gained = 0;
+    let lost = 0;
+    for (const point of lastResults) {
+      if (point.trophyChange > 0) gained += point.trophyChange;
+      else if (point.trophyChange < 0) lost += -point.trophyChange;
+    }
+    return { gained, lost };
+  }, [lastResults]);
+
   const winrateByDay = useMemo(() => {
     const items = stats?.winrate_by_day ?? [];
     return [...items]
@@ -184,7 +194,15 @@ export function AnalyticsPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <Card>
-              <h3 className="chart-section-title text-sm font-semibold text-cr-text mb-2">Рост трофеев</h3>
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <h3 className="chart-section-title text-sm font-semibold text-cr-text">Рост трофеев</h3>
+                {lastResults.length > 0 ? (
+                  <div className="text-right shrink-0 leading-tight">
+                    <p className="text-xs font-bold text-cr-win">+{trophyTotals.gained}</p>
+                    <p className="text-xs font-bold text-cr-loss">−{trophyTotals.lost}</p>
+                  </div>
+                ) : null}
+              </div>
               <p className="text-[11px] text-cr-muted mb-3">
                 Только рейтинговые 1v1 · ведите пальцем, тап по точке — закрепить
               </p>

@@ -407,7 +407,7 @@ export const api = {
   getBattleByTime: (timestamp: string) =>
     request<BattleDetail>(`/api/battles/by-time/${encodeURIComponent(timestamp)}`),
 
-  getWinrates: () => cachedGet<WinrateEntry[]>("winrates", "/api/winrates", TTL.stats),
+  getWinrates: () => cachedGet<WinrateEntry[]>("winrates-v2", "/api/winrates", TTL.stats),
 
   getOpponents: () => cachedGet<OpponentEntry[]>("opponents", "/api/opponents", TTL.battles),
 
@@ -438,19 +438,12 @@ export const api = {
   },
 
   getDecks: (type?: string) => {
-
-    const key = `decks:${type ?? "all"}`;
-
+    const key = type === "mine" ? "decks:mine-v2" : `decks:${type ?? "all"}`;
     return cachedGet<DecksListData>(
-
       key,
-
       type ? `/api/decks?type=${type}` : "/api/decks",
-
       TTL.battles,
-
     );
-
   },
 
 

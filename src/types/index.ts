@@ -351,6 +351,7 @@ export interface HomeData {
 
 export interface WinrateEntry {
   cards: string[];
+  deck_cards?: DeckCard[];
   wins: number;
   losses: number;
   total: number;

@@ -4,6 +4,9 @@
       "elixir": 5,
       "type": "troop",
       "roles": [
+        "air_defense",
+        "dps",
+        "support",
         "win_condition"
       ]
     },
@@ -103,6 +106,7 @@
       "elixir": 2,
       "type": "troop",
       "roles": [
+        "mini_tank",
         "support"
       ]
     },
@@ -135,6 +139,7 @@
       "type": "troop",
       "roles": [
         "anti_swarm",
+        "defensive",
         "splash"
       ]
     },
@@ -158,6 +163,7 @@
       "elixir": 3,
       "type": "spell",
       "roles": [
+        "small_spell",
         "spell"
       ]
     },
@@ -165,9 +171,12 @@
       "elixir": 4,
       "type": "troop",
       "roles": [
+        "anti_swarm",
         "counterpush",
+        "defensive",
         "dps",
         "mini_tank",
+        "splash",
         "support"
       ]
     },
@@ -175,6 +184,8 @@
       "elixir": 3,
       "type": "troop",
       "roles": [
+        "air_defense",
+        "dps",
         "support"
       ]
     },
@@ -191,6 +202,7 @@
       "elixir": 5,
       "type": "troop",
       "roles": [
+        "air_defense",
         "splash"
       ]
     },
@@ -214,7 +226,9 @@
       "type": "troop",
       "roles": [
         "air_defense",
+        "anti_swarm",
         "dps",
+        "splash",
         "support"
       ]
     },
@@ -245,8 +259,12 @@
       "elixir": 5,
       "type": "troop",
       "roles": [
+        "air_defense",
         "anti_swarm",
-        "splash"
+        "defensive",
+        "dps",
+        "splash",
+        "support"
       ]
     },
     "Fire Spirit": {
@@ -270,6 +288,8 @@
       "type": "troop",
       "roles": [
         "air_defense",
+        "anti_swarm",
+        "splash",
         "support"
       ]
     },
@@ -411,6 +431,8 @@
       "elixir": 4,
       "type": "troop",
       "roles": [
+        "counterpush",
+        "mini_tank",
         "win_condition"
       ]
     },
@@ -426,7 +448,6 @@
       "elixir": 5,
       "type": "spell",
       "roles": [
-        "big_spell",
         "spell",
         "win_condition"
       ]
@@ -487,6 +508,8 @@
       "type": "troop",
       "roles": [
         "air_defense",
+        "anti_swarm",
+        "splash",
         "support"
       ]
     },
@@ -505,6 +528,7 @@
       "elixir": 5,
       "type": "building",
       "roles": [
+        "air_defense",
         "anti_tank",
         "building",
         "defensive"
@@ -539,6 +563,8 @@
       "elixir": 3,
       "type": "troop",
       "roles": [
+        "air_defense",
+        "dps",
         "support"
       ]
     },
@@ -557,6 +583,7 @@
       "roles": [
         "air_defense",
         "dps",
+        "splash",
         "support"
       ]
     },
@@ -564,7 +591,9 @@
       "elixir": 7,
       "type": "troop",
       "roles": [
+        "anti_swarm",
         "defensive",
+        "splash",
         "tank"
       ]
     },
@@ -579,6 +608,11 @@
       "elixir": 4,
       "type": "troop",
       "roles": [
+        "anti_tank",
+        "counterpush",
+        "dps",
+        "mini_tank",
+        "support",
         "win_condition"
       ]
     },
@@ -604,6 +638,7 @@
       "elixir": 5,
       "type": "troop",
       "roles": [
+        "air_defense",
         "swarm"
       ]
     },
@@ -642,6 +677,7 @@
       "type": "troop",
       "roles": [
         "air_defense",
+        "splash",
         "support"
       ]
     },
@@ -658,6 +694,7 @@
       "elixir": 4,
       "type": "troop",
       "roles": [
+        "air_defense",
         "support"
       ]
     },
@@ -666,6 +703,8 @@
       "type": "troop",
       "roles": [
         "anti_tank",
+        "dps",
+        "support",
         "tank",
         "win_condition"
       ]
@@ -725,6 +764,7 @@
       "elixir": 5,
       "type": "troop",
       "roles": [
+        "air_defense",
         "support"
       ]
     },
@@ -747,7 +787,10 @@
       "elixir": 3,
       "type": "spell",
       "roles": [
-        "spell"
+        "anti_swarm",
+        "small_spell",
+        "spell",
+        "splash"
       ]
     },
     "Royal Ghost": {
@@ -755,6 +798,7 @@
       "type": "troop",
       "roles": [
         "counterpush",
+        "mini_tank",
         "win_condition"
       ]
     },
@@ -805,13 +849,16 @@
       "elixir": 4,
       "type": "troop",
       "roles": [
-        "air_defense"
+        "air_defense",
+        "anti_swarm",
+        "splash"
       ]
     },
     "Skeleton King": {
       "elixir": 4,
       "type": "troop",
       "roles": [
+        "splash",
         "win_condition"
       ]
     },
@@ -826,6 +873,9 @@
       "elixir": 6,
       "type": "troop",
       "roles": [
+        "anti_tank",
+        "dps",
+        "support",
         "tank",
         "win_condition"
       ]
@@ -834,6 +884,7 @@
       "elixir": 2,
       "type": "troop",
       "roles": [
+        "air_defense",
         "swarm"
       ]
     },
@@ -855,6 +906,7 @@
       "elixir": 4,
       "type": "building",
       "roles": [
+        "air_defense",
         "anti_tank",
         "building",
         "defensive"
@@ -873,6 +925,9 @@
       "elixir": 9,
       "type": "troop",
       "roles": [
+        "air_defense",
+        "dps",
+        "support",
         "win_condition"
       ]
     },
@@ -890,6 +945,7 @@
       "type": "spell",
       "roles": [
         "anti_swarm",
+        "small_spell",
         "spell"
       ]
     },
@@ -907,6 +963,7 @@
       "elixir": 3,
       "type": "spell",
       "roles": [
+        "small_spell",
         "spell"
       ]
     },
@@ -914,6 +971,7 @@
       "elixir": 3,
       "type": "spell",
       "roles": [
+        "small_spell",
         "spell"
       ]
     },
@@ -929,6 +987,9 @@
       "elixir": 5,
       "type": "troop",
       "roles": [
+        "air_defense",
+        "anti_swarm",
+        "splash",
         "support"
       ]
     },
@@ -964,6 +1025,7 @@
       "elixir": 4,
       "type": "troop",
       "roles": [
+        "air_defense",
         "support"
       ]
     }

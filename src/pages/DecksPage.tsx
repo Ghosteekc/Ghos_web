@@ -69,11 +69,21 @@ function DeckCardsGrid({ cards, useVariants = false }: { cards: DeckCard[]; useV
   const sorted = [...cards].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
   return (
     <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-4">
-      {sorted.map((card, i) => (
-        <div key={`${card.id}-${i}`} className="min-w-0 overflow-hidden">
-          <CardTile name={card.name} icon={card.icon} size="deck" />
-        </div>
-      ))}
+      {sorted.map((card, i) => {
+        const displayMode = card.is_hero ? "hero" : (card.evolution_level ?? 0) >= 1 ? "evo" : "base";
+        return (
+          <div key={`${card.id}-${i}`} className="min-w-0 overflow-hidden">
+            <CardTile
+              name={card.name}
+              icon={card.icon}
+              size="deck"
+              displayMode={displayMode}
+              iconEvo={card.icon}
+              iconHero={card.icon}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

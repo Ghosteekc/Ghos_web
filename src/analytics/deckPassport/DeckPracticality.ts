@@ -70,7 +70,7 @@ export function computePracticality(
   if (evos >= 3) {
     score -= (evos - 2) * 6;
     negatives.push("требуется несколько эволюций");
-  } else if (evos <= 1) {
+  } else if (evos === 0) {
     score += 4;
     positives.push("минимум эволюций");
   }
