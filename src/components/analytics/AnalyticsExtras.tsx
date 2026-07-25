@@ -4,7 +4,7 @@ import { Shield, Swords, Wand2, ChevronDown, ChevronUp, RefreshCw, ExternalLink,
 import { api, ApiError } from "@/api/client";
 import { cacheGet, cacheHas, cacheInvalidate } from "@/api/cache";
 import { Card, Button, Loader } from "@/components/ui";
-import { CardDeckGrid, CardTile } from "@/components/cards";
+import { CardDeckGrid, CardTile, PlayerDeckGrid } from "@/components/cards";
 import { useCardCatalog, usePageRefresh, useTelegram } from "@/hooks";
 import { battleDetailPath, cn } from "@/utils";
 import type { CounterDeckData, CustomizeData, Deck, InsightsData, OpponentEntry, WinrateEntry } from "@/types";
@@ -262,7 +262,11 @@ export function OpponentsPanel() {
                 ))}
               </div>
             )}
-            <CardDeckGrid cards={opp.deck} size="lg" showLabels maxVisible={8} />
+            <PlayerDeckGrid
+              cards={opp.deck_cards?.length ? opp.deck_cards : opp.deck}
+              size="lg"
+              showLabels
+            />
 
             {isOpen && (
               <div className="mt-3 pt-3 border-t border-cr-win/20 rounded-lg bg-cr-win/5 px-3 pb-3 -mx-1">

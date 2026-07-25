@@ -15,7 +15,7 @@ import type { LucideIcon } from "lucide-react";
 import { api, ApiError } from "@/api/client";
 import { SearchResult } from "@/types";
 import { Button, Card, ElixirIcon, Loader } from "@/components/ui";
-import { CardTile } from "@/components/cards/CardTile";
+import { PlayerDeckGrid } from "@/components/cards";
 import { FavoriteDeckButton } from "@/components/decks/FavoriteDeckButton";
 import { formatNumber, formatPlayerTag, getWinColor } from "@/utils";
 import { useCardCatalog, usePageRefresh, useTelegram } from "@/hooks";
@@ -255,15 +255,7 @@ export function PlayerPreviewPage() {
 
             {hasDeck ? (
               <>
-                <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-3">
-                  {[...cards]
-                    .sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0))
-                    .map((card, i) => (
-                      <div key={`${card.id}-${i}`} className="min-w-0 overflow-hidden">
-                        <CardTile name={card.name} icon={card.icon} size="deck" />
-                      </div>
-                    ))}
-                </div>
+                <PlayerDeckGrid cards={cards} size="deck" className="mb-3" />
                 <div className="flex gap-2">
                   {player.deck_link ? (
                     <Button

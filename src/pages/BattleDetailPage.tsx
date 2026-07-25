@@ -10,7 +10,7 @@ import {
   Target,
 } from "lucide-react";
 import { Card, Button, Loader, LinearProgress } from "@/components/ui";
-import { CardTile } from "@/components/cards";
+import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { BattleDetail } from "@/types";
 import { formatTime, getTrophyChangeColor, formatBattlePlayedAt } from "@/utils";
@@ -238,13 +238,12 @@ export function BattleDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Card>
           <h3 className="font-semibold text-cr-text mb-4">Ваша колода</h3>
-          <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-4">
-            {battle.user_deck.map((name, i) => (
-              <div key={i} className="min-w-0 overflow-hidden flex justify-center">
-                <CardTile name={name} size="lg" showLabel />
-              </div>
-            ))}
-          </div>
+          <PlayerDeckGrid
+            cards={battle.user_deck_cards?.length ? battle.user_deck_cards : battle.user_deck}
+            size="lg"
+            showLabels
+            className="mb-4"
+          />
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-cr-muted">Ср. эликсир</span>
@@ -256,13 +255,12 @@ export function BattleDetailPage() {
 
         <Card>
           <h3 className="font-semibold text-cr-text mb-4">Колода противника</h3>
-          <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-4">
-            {battle.opponent_deck.map((name, i) => (
-              <div key={i} className="min-w-0 overflow-hidden flex justify-center">
-                <CardTile name={name} size="lg" showLabel />
-              </div>
-            ))}
-          </div>
+          <PlayerDeckGrid
+            cards={battle.opponent_deck_cards?.length ? battle.opponent_deck_cards : battle.opponent_deck}
+            size="lg"
+            showLabels
+            className="mb-4"
+          />
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-cr-muted">Ср. эликсир</span>

@@ -377,7 +377,7 @@ async function cachedGet<T>(key: string, path: string, ttlMs: number): Promise<T
 
 export const api = {
 
-  getHome: () => cachedGet<HomeData>("home", "/api/home", TTL.home),
+  getHome: () => cachedGet<HomeData>("home-v2", "/api/home", TTL.home),
 
 
 
@@ -389,15 +389,10 @@ export const api = {
 
 
   getBattles: () =>
-
     cachedGet<{ battles: BattleSummary[]; cached_total: number | null; cached_winrate: number | null }>(
-
-      "battles",
-
+      "battles-v2",
       "/api/battles",
-
       TTL.battles,
-
     ),
 
 
@@ -409,7 +404,7 @@ export const api = {
 
   getWinrates: () => cachedGet<WinrateEntry[]>("winrates-v2", "/api/winrates", TTL.stats),
 
-  getOpponents: () => cachedGet<OpponentEntry[]>("opponents", "/api/opponents", TTL.battles),
+  getOpponents: () => cachedGet<OpponentEntry[]>("opponents-v2", "/api/opponents", TTL.battles),
 
   getCounterDeck: (index: number) =>
     request<CounterDeckData>(`/api/opponents/${index}/counter`),

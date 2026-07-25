@@ -10,7 +10,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Card, Button, Loader } from "@/components/ui";
-import { CardTile } from "@/components/cards";
+import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { MineDeckStats } from "@/types";
 import { usePageRefresh, useCardCatalog } from "@/hooks";
@@ -132,18 +132,7 @@ export function MineDeckStatsPage() {
       ) : null}
 
       <Card>
-        <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-4">
-          {data.cards.map((card) => (
-            <div key={card.id || card.name} className="min-w-0 overflow-hidden">
-              <CardTile
-                name={card.name}
-                icon={card.icon}
-                size="deck"
-                elixirCost={card.cost}
-              />
-            </div>
-          ))}
-        </div>
+        <PlayerDeckGrid cards={data.cards} size="deck" className="mb-4" />
 
         <div className="grid grid-cols-2 gap-3">
           <StatBox

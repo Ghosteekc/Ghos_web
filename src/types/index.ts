@@ -92,6 +92,8 @@ export interface BattleSummary {
   avg_elixir: number;
   user_deck: string[];
   opponent_deck: string[];
+  user_deck_cards?: DeckCard[];
+  opponent_deck_cards?: DeckCard[];
   top_reason: string | null;
   timestamp: string;
   played_at?: string;
@@ -115,6 +117,8 @@ export interface BattleDetail {
   outcome_summary?: string;
   user_deck: string[];
   opponent_deck: string[];
+  user_deck_cards?: DeckCard[];
+  opponent_deck_cards?: DeckCard[];
   user_stats: { avg_elixir: number; win_conditions: string[]; spells: string[] };
   opponent_stats: { avg_elixir: number; win_conditions: string[]; spells: string[] };
   reasons: string[];
@@ -362,6 +366,7 @@ export interface OpponentEntry {
   index: number;
   name: string;
   deck: string[];
+  deck_cards?: DeckCard[];
   threats: string[];
   avg_elixir: number;
   won_against: boolean;

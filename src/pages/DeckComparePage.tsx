@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Swords, TrendingDown, TrendingUp } from "lucide-react";
 import { Card, Button, Loader } from "@/components/ui";
-import { CardTile } from "@/components/cards";
+import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import type { DeckCompareCardNote, DeckCompareResult } from "@/types";
 import { usePageRefresh } from "@/hooks";
@@ -66,15 +66,7 @@ function SummaryList({ title, items, tone }: { title: string; items: string[]; t
 }
 
 function DeckGrid({ cards }: { cards: DeckCompareResult["user_deck"] }) {
-  return (
-    <div className="grid grid-cols-4 grid-rows-2 gap-2">
-      {cards.map((card) => (
-        <div key={card.name} className="min-w-0">
-          <CardTile name={card.name} icon={card.icon} size="deck" />
-        </div>
-      ))}
-    </div>
-  );
+  return <PlayerDeckGrid cards={cards} size="deck" gapClassName="gap-2" />;
 }
 
 export function DeckComparePage() {

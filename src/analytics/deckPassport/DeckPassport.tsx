@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { X } from "lucide-react";
 import type { Deck } from "@/types";
 import { Card, Button } from "@/components/ui";
-import { CardTile } from "@/components/cards";
+import { PlayerDeckGrid } from "@/components/cards";
 import { useCardCatalog } from "@/hooks/CardCatalogProvider";
 import { cn } from "@/utils";
 import { analyzeDeckPassport, getMetricDisplayList } from "./DeckAnalyzer";
@@ -198,12 +198,8 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
             <p className="text-xs text-cr-text leading-relaxed">{analysis.summary}</p>
           </Card>
 
-          <div className="grid grid-cols-4 grid-rows-2 gap-2 pb-2">
-            {[...(deck.cards ?? [])]
-              .sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0))
-              .map((c, i) => (
-                <CardTile key={`${c.name}-${i}`} name={c.name} icon={c.icon} size="deck" />
-              ))}
+          <div className="pb-2">
+            <PlayerDeckGrid cards={deck.cards} size="deck" />
           </div>
         </div>
       </div>

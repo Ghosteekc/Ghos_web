@@ -7,7 +7,7 @@ import {
 import { formatTime, getTrophyChangeColor, cn, formatBattlePlayedAt, formatOpponentHeadline } from "@/utils";
 import { BattleSummary } from "@/types";
 import { Card, ElixirIcon } from "@/components/ui";
-import { CardTile } from "@/components/cards";
+import { PlayerDeckGrid } from "@/components/cards";
 
 interface BattleCardSimpleProps {
   summary: BattleSummary;
@@ -72,10 +72,11 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
           </div>
 
           <div className="flex items-center justify-between gap-3">
-            <div className="grid grid-cols-4 grid-rows-2 gap-1 flex-1 max-w-[11rem]">
-              {(summary.user_deck ?? []).slice(0, 8).map((name, i) => (
-                <CardTile key={`${name}-${i}`} name={name} size="xs" />
-              ))}
+            <div className="flex-1 max-w-[11rem]">
+              <PlayerDeckGrid
+                cards={summary.user_deck_cards?.length ? summary.user_deck_cards : summary.user_deck}
+                size="xs"
+              />
             </div>
             <div className="text-cr-muted shrink-0">
               <ChevronRight className="w-5 h-5" />

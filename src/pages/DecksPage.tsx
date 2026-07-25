@@ -13,7 +13,7 @@ import {
   ScanSearch,
 } from "lucide-react";
 import { Card, Button, Loader, ElixirIcon, FeatureNavGrid, ScrollToTopButton } from "@/components/ui";
-import { CardTile } from "@/components/cards";
+import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { ConstructorPanel, ConstructorDeckGrid } from "@/components/decks/ConstructorPanel";
 import { FavoriteDeckButton } from "@/components/decks/FavoriteDeckButton";
 import { FavoritesPanel } from "@/components/decks/FavoritesPanel";
@@ -66,26 +66,7 @@ function DeckCardsGrid({ cards, useVariants = false }: { cards: DeckCard[]; useV
   if (useVariants) {
     return <ConstructorDeckGrid cards={cards} />;
   }
-  const sorted = [...cards].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
-  return (
-    <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-4">
-      {sorted.map((card, i) => {
-        const displayMode = card.is_hero ? "hero" : (card.evolution_level ?? 0) >= 1 ? "evo" : "base";
-        return (
-          <div key={`${card.id}-${i}`} className="min-w-0 overflow-hidden">
-            <CardTile
-              name={card.name}
-              icon={card.icon}
-              size="deck"
-              displayMode={displayMode}
-              iconEvo={card.icon}
-              iconHero={card.icon}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
+  return <PlayerDeckGrid cards={cards} size="deck" className="mb-4" />;
 }
 
 export function DecksPage() {
