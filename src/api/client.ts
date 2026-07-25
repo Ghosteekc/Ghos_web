@@ -39,7 +39,7 @@ import {
   ConstructorData,
 } from "@/types";
 
-import { cacheGet, cacheSet, cacheInvalidate, cacheHas, inflight, TTL, sleep, lsGet, lsSet } from "./cache";
+import { cacheGet, cacheSet, cacheInvalidate, cacheHas, inflight, TTL, sleep, lsGet, lsSet, lsClearAll } from "./cache";
 import { setLastSyncAt } from "@/utils/lastSync";
 import { toUserFacingError } from "@/utils/userError";
 
@@ -572,6 +572,17 @@ export const api = {
   clearBattleHistory: async () => {
     cacheInvalidate();
     return request<{ ok: boolean; deleted_count: number }>("/api/battles", { method: "DELETE" });
+  },
+
+
+
+  unlinkAccount: async () => {
+    const result = await request<{ ok: boolean; unlinked_tag: string | null }>("/api/account/unlink", {
+      method: "POST",
+    });
+    cacheInvalidate();
+    lsClearAll();
+    return result;
   },
 
 

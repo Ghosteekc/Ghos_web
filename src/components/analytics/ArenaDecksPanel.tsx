@@ -5,6 +5,7 @@ import { api, ApiError } from "@/api/client";
 import { cacheGet, cacheHas } from "@/api/cache";
 import { Card, Button, Loader } from "@/components/ui";
 import type { ArenaDecksData, Deck } from "@/types";
+import { deckToComparePath } from "@/utils/deckActions";
 
 const ARENA_DECKS_CACHE = "arena-decks-v8";
 
@@ -19,12 +20,9 @@ function formatArenaSubtitle(arenaName: string, trophies: number, source?: strin
   return base;
 }
 
+/** @deprecated use deckToComparePath from @/utils/deckActions */
 export function buildArenaComparePath(deck: Deck): string {
-  const names = deck.cards.map((c) => c.name);
-  if (names.length !== 8) return "";
-  const ref = names.map(encodeURIComponent).join("|");
-  const name = encodeURIComponent(deck.name ?? "Колода");
-  return `/decks/compare?ref=${ref}&name=${name}&from=arena`;
+  return deckToComparePath(deck, "arena");
 }
 
 type ArenaDecksPanelProps = {
@@ -101,7 +99,7 @@ export function ArenaDecksPanel({ renderDeck }: ArenaDecksPanelProps) {
         {decks.map((deck, i) => (
           <div key={`${deck.id}-${deck.name}`} className="w-full">
             {renderDeck(deck, i, () => {
-              const path = buildArenaComparePath(deck);
+              const path = deckToComparePath(deck, "arena");
               if (path) navigate(path);
             })}
           </div>

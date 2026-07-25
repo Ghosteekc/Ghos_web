@@ -51,6 +51,26 @@ function sectionFromParam(raw: string | null): AnalyticsSection {
 const CHART_MARGIN = { top: 8, right: 8, left: 4, bottom: 4 };
 const CHART_YAXIS_WIDTH = 32;
 
+function readChartGridStroke(): string {
+  if (typeof document === "undefined") return "rgba(255,255,255,0.08)";
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue("--cr-chart-grid")
+    .trim();
+  return value || "rgba(255,255,255,0.08)";
+}
+
+function useChartGridStroke(): string {
+  const [stroke, setStroke] = useState(readChartGridStroke);
+  useEffect(() => {
+    const sync = () => setStroke(readChartGridStroke());
+    sync();
+    const obs = new MutationObserver(sync);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => obs.disconnect();
+  }, []);
+  return stroke;
+}
+
 export function AnalyticsPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -161,7 +181,7 @@ export function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="analytics-page-header">
         <h1 className="page-title">Аналитика</h1>
         <p className="page-subtitle mt-1">Статистика, соперники и улучшение колод</p>
         {refreshing && (
@@ -246,6 +266,7 @@ export { AnalyticsPage as default };
 
 function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
   const scrub = useChartScrub();
+  const gridStroke = useChartGridStroke();
   const point = scrub.activeIndex != null ? data[scrub.activeIndex] : null;
   const cursorX = point?.index;
   const stickyPointRef = useRef(point);
@@ -263,7 +284,7 @@ function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
           margin={CHART_MARGIN}
           onMouseLeave={scrub.chartHandlers.onMouseLeave}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+          <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
           <XAxis dataKey="index" hide />
           <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} width={CHART_YAXIS_WIDTH} />
           <Tooltip content={() => null} cursor={false} wrapperStyle={{ display: "none" }} />
@@ -311,6 +332,7 @@ function TrophyGrowthChart({ data }: { data: TrophyChartPoint[] }) {
 
 function WinrateDayChart({ data }: { data: WinrateDayPoint[] }) {
   const scrub = useChartScrub();
+  const gridStroke = useChartGridStroke();
   const point = scrub.activeIndex != null ? data[scrub.activeIndex] : null;
   const stickyPointRef = useRef(point);
   const stickyCoordRef = useRef(scrub.coordinate);
@@ -329,7 +351,7 @@ function WinrateDayChart({ data }: { data: WinrateDayPoint[] }) {
           barGap={2}
           onMouseLeave={scrub.chartHandlers.onMouseLeave}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+          <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
           <XAxis
             dataKey="date"
             stroke="#9ca3af"

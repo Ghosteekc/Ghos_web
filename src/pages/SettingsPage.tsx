@@ -12,9 +12,11 @@ import {
   BellOff,
   RefreshCw,
   Vibrate,
+  Unlink2,
 } from "lucide-react";
 import { Card, Loader } from "@/components/ui";
 import { api } from "@/api/client";
+import { cacheInvalidate, lsClearAll } from "@/api/cache";
 import { useTelegram, usePageRefresh, useSettings } from "@/hooks";
 import { applyTheme, type AppTheme } from "@/hooks/useTheme";
 import { ensureSettingsLoaded } from "@/stores/settingsStore";
@@ -22,6 +24,7 @@ import { Profile } from "@/types";
 import { haptic } from "@/utils/hapticManager";
 import { translate } from "@/i18n";
 import { formatLastSyncLabel, getLastSyncAt, LAST_SYNC_EVENT } from "@/utils/lastSync";
+import { formatPlayerTag } from "@/utils";
 
 export function SettingsPage() {
   const { tg, showAlert, showConfirm } = useTelegram();
@@ -30,6 +33,7 @@ export function SettingsPage() {
   const [profileLoading, setProfileLoading] = useState(true);
   const [clearing, setClearing] = useState(false);
   const [clearingHistory, setClearingHistory] = useState(false);
+  const [unlinking, setUnlinking] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [lastSyncLabel, setLastSyncLabel] = useState<string | null>(() =>
     formatLastSyncLabel(getLastSyncAt()),
@@ -146,6 +150,61 @@ export function SettingsPage() {
     }
   };
 
+  const handleUnlinkAccount = async () => {
+    if (!profile?.player_tag) {
+      void showAlert?.(
+        "Аккаунт Clash Royale уже не привязан.\n\n"
+          + "Чтобы снова войти в профиль, зарегистрируйтесь в боте: /link #ВАШТЕГ",
+      );
+      return;
+    }
+
+    const tagLabel = formatPlayerTag(profile.player_tag);
+    const ok = await showConfirm?.(
+      "Выйти и отвязать аккаунт?\n\n"
+        + `Аккаунт Clash Royale ${tagLabel} будет отвязан от текущего аккаунта Telegram.\n\n`
+        + "Выход произойдёт и в боте, и в Mini App.\n"
+        + "Чтобы снова пользоваться профилем, зарегистрируйтесь в боте под своим тегом: /link #ТЕГ\n\n"
+        + "Отвязать аккаунт?",
+    );
+    if (!ok) return;
+
+    haptic.confirm();
+    setUnlinking(true);
+    try {
+      await api.unlinkAccount();
+      cacheInvalidate();
+      lsClearAll();
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              player_tag: null,
+              player_name: null,
+              trophies: null,
+              arena_name: null,
+              favorite_card: null,
+              favorite_card_icon: null,
+              avatar_url: null,
+              winrate: null,
+              skill_rating: null,
+            }
+          : prev,
+      );
+      window.dispatchEvent(new Event("app:sync"));
+      haptic.success();
+      await showAlert?.(
+        `Аккаунт Clash Royale ${tagLabel} отвязан от этого Telegram.\n\n`
+          + "Вы вышли из профиля. Чтобы вернуться — /link #ВАШТЕГ в боте.",
+      );
+    } catch (e) {
+      haptic.error();
+      await showAlert?.(e instanceof Error ? e.message : "Не удалось отвязать аккаунт");
+    } finally {
+      setUnlinking(false);
+    }
+  };
+
   const handleSyncData = async () => {
     if (!profile?.player_tag) {
       void showAlert?.("Сначала привяжите аккаунт Clash Royale в боте: /link #ТЕГ");
@@ -256,11 +315,18 @@ export function SettingsPage() {
 
         <section>
           <h3 className="text-sm font-semibold text-cr-muted mb-3 uppercase tracking-wider">Обо мне</h3>
-          <Card>
+          <Card className="space-y-3">
             <div className="flex items-center gap-4">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-cr-muted">Username</p>
                 <p className="text-cr-text font-semibold">@{tg?.initDataUnsafe?.user?.username ?? "—"}</p>
+                {profile?.player_tag ? (
+                  <p className="text-xs text-cr-muted mt-1 font-mono">
+                    CR: {formatPlayerTag(profile.player_tag)}
+                  </p>
+                ) : (
+                  <p className="text-xs text-cr-muted mt-1">Clash Royale не привязан</p>
+                )}
               </div>
               <motion.button
                 type="button"
@@ -277,6 +343,27 @@ export function SettingsPage() {
                 </span>
               </motion.button>
             </div>
+            <button
+              type="button"
+              className="settings-data-btn w-full"
+              onClick={() => void handleUnlinkAccount()}
+              disabled={unlinking}
+            >
+              <span className="pixel-btn-icon-slot" aria-hidden>
+                <Unlink2 className="w-5 h-5 text-cr-loss" />
+              </span>
+              <span>
+                {unlinking
+                  ? "Отвязка…"
+                  : profile?.player_tag
+                    ? "Выйти и отвязать аккаунт CR"
+                    : "Аккаунт уже отвязан"}
+              </span>
+            </button>
+            <p className="text-[11px] text-cr-muted leading-snug px-0.5">
+              Аккаунт Clash Royale будет отвязан от текущего Telegram. Выход сработает и в боте.
+              Чтобы снова зайти в профиль — /link #ТЕГ в боте.
+            </p>
           </Card>
         </section>
 

@@ -1,16 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
-import { Star, ExternalLink, Trash2 } from "lucide-react";
+import { Star, ExternalLink, Trash2, ScanSearch, Swords } from "lucide-react";
 import { Card, Button, Loader } from "@/components/ui";
 import { CardDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { usePageRefresh, useTelegram, useFavoriteDecks } from "@/hooks";
+import type { Deck } from "@/types";
+import { deckFromCardNames } from "@/utils/deckActions";
 
 interface FavoriteEntry {
   cards: string[];
   deck_link?: string | null;
 }
 
-export function FavoritesPanel() {
+type FavoritesPanelProps = {
+  onAnalyze?: (deck: Deck) => void;
+  onCompare?: (deck: Deck) => void;
+};
+
+export function FavoritesPanel({ onAnalyze, onCompare }: FavoritesPanelProps) {
   const { openLink } = useTelegram();
   const { removeFavorite } = useFavoriteDecks();
   const [entries, setEntries] = useState<FavoriteEntry[]>([]);
@@ -51,6 +58,14 @@ export function FavoritesPanel() {
     }
   };
 
+  const toDeck = (entry: FavoriteEntry, index: number): Deck | null =>
+    deckFromCardNames(entry.cards, {
+      id: index + 1,
+      name: `Избранное #${index + 1}`,
+      type: "meta",
+      deckLink: entry.deck_link,
+    });
+
   if (loading) return <Loader />;
 
   return (
@@ -59,38 +74,76 @@ export function FavoritesPanel() {
 
       {entries.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {entries.map((entry, i) => (
-            <Card key={i}>
-              <div className="flex items-center justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-cr-gold shrink-0" />
-                  <p className="text-sm font-medium text-cr-text">Колода #{i + 1}</p>
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  {entry.deck_link && (
+          {entries.map((entry, i) => {
+            const canAct = entry.cards.length === 8;
+            return (
+              <Card key={i}>
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-5 h-5 text-cr-gold shrink-0" />
+                    <p className="text-sm font-medium text-cr-text">Колода #{i + 1}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {entry.deck_link && (
+                      <Button
+                        variant="ghost"
+                        className="!p-2"
+                        onClick={() => openLink(entry.deck_link!)}
+                        aria-label="Открыть в игре"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
-                      className="!p-2"
-                      onClick={() => openLink(entry.deck_link!)}
-                      aria-label="Открыть в игре"
+                      className="!p-2 text-cr-loss"
+                      disabled={removing === i}
+                      onClick={() => void remove(i)}
+                      aria-label="Удалить"
                     >
-                      <ExternalLink className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    className="!p-2 text-cr-loss"
-                    disabled={removing === i}
-                    onClick={() => void remove(i)}
-                    aria-label="Удалить"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  </div>
                 </div>
-              </div>
-              <CardDeckGrid cards={entry.cards} size="deck" showLabels maxVisible={8} />
-            </Card>
-          ))}
+                <CardDeckGrid cards={entry.cards} size="deck" showLabels maxVisible={8} />
+                {canAct && (onAnalyze || onCompare) ? (
+                  <div
+                    className={
+                      "grid gap-2 mt-3 " +
+                      (onAnalyze && onCompare ? "grid-cols-2" : "grid-cols-1")
+                    }
+                  >
+                    {onAnalyze ? (
+                      <Button
+                        variant="secondary"
+                        className="!py-2 text-sm flex items-center justify-center gap-2"
+                        onClick={() => {
+                          const deck = toDeck(entry, i);
+                          if (deck) onAnalyze(deck);
+                        }}
+                      >
+                        <ScanSearch className="w-4 h-4" />
+                        Анализ
+                      </Button>
+                    ) : null}
+                    {onCompare ? (
+                      <Button
+                        variant="secondary"
+                        className="!py-2 text-sm flex items-center justify-center gap-2"
+                        onClick={() => {
+                          const deck = toDeck(entry, i);
+                          if (deck) onCompare(deck);
+                        }}
+                      >
+                        <Swords className="w-4 h-4" />
+                        Сравнить
+                      </Button>
+                    ) : null}
+                  </div>
+                ) : null}
+              </Card>
+            );
+          })}
         </div>
       ) : (
         <Card className="text-center">

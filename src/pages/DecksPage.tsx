@@ -22,8 +22,9 @@ import { DeckPassport } from "@/analytics/deckPassport";
 import { api, ApiError } from "@/api/client";
 import { cacheHas, cacheGet } from "@/api/cache";
 import { ArenaDecksPanel } from "@/components/analytics/ArenaDecksPanel";
-import type { Deck, DeckCard, RandomDeck, TopPlayer, TopPlayersData } from "@/types";
+import type { Deck, RandomDeck, TopPlayer, TopPlayersData } from "@/types";
 import { usePageRefresh, useTelegram } from "@/hooks";
+import { deckFromCardNames, deckToComparePath } from "@/utils/deckActions";
 
 import { DECK_CATEGORY_LABELS, DECK_FILTER_LABELS, UI } from "@/constants/labels";
 
@@ -206,7 +207,13 @@ export function DecksPage() {
       </div>
 
       <div className={filter === "favorites" ? "" : "hidden"}>
-        <FavoritesPanel />
+        <FavoritesPanel
+          onAnalyze={setPassportDeck}
+          onCompare={(deck) => {
+            const path = deckToComparePath(deck, "favorites");
+            if (path) navigate(path);
+          }}
+        />
       </div>
 
       <div className={filter === "random" ? "" : "hidden"}>
@@ -216,6 +223,10 @@ export function DecksPage() {
             setTimeout(() => setCopyHint(null), 3000);
           }}
           onAnalyze={setPassportDeck}
+          onCompare={(deck) => {
+            const path = deckToComparePath(deck, "random");
+            if (path) navigate(path);
+          }}
         />
       </div>
 
@@ -224,6 +235,11 @@ export function DecksPage() {
           onCopied={(msg) => {
             setCopyHint(msg);
             setTimeout(() => setCopyHint(null), 3000);
+          }}
+          onAnalyze={setPassportDeck}
+          onCompare={(deck) => {
+            const path = deckToComparePath(deck, "top");
+            if (path) navigate(path);
           }}
         />
       </div>
@@ -235,6 +251,11 @@ export function DecksPage() {
               <DeckCard
                 deck={deck}
                 index={i}
+                showCompare
+                onCompare={() => {
+                  const path = deckToComparePath(deck, "constructor");
+                  if (path) navigate(path);
+                }}
                 onCopied={(msg) => {
                   setCopyHint(msg);
                   setTimeout(() => setCopyHint(null), 3000);
@@ -266,11 +287,22 @@ export function DecksPage() {
 
       {(filter === "meta" || filter === "mine") && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full overflow-x-hidden">
-          {decks.map((deck, i) => (
+          {decks.map((deck, i) => {
+            const canCompare = deck.type !== "mine" && (deck.cards?.length ?? 0) === 8;
+            return (
             <div key={`${deck.id}-${deck.name}`} className="w-full">
               <DeckCard
                 deck={deck}
                 index={i}
+                showCompare={canCompare}
+                onCompare={
+                  canCompare
+                    ? () => {
+                        const path = deckToComparePath(deck, filter);
+                        if (path) navigate(path);
+                      }
+                    : undefined
+                }
                 onCopied={(msg) => {
                   setCopyHint(msg);
                   setTimeout(() => setCopyHint(null), 3000);
@@ -286,7 +318,8 @@ export function DecksPage() {
                 onAnalyze={() => setPassportDeck(deck)}
               />
             </div>
-          ))}
+            );
+          })}
           {!error && decks.length === 0 && !loading ? (
             <Card className="col-span-full text-center">
               <SlidersHorizontal className="w-12 h-12 text-cr-muted mx-auto mb-3 opacity-50" />
@@ -308,7 +341,15 @@ export function DecksPage() {
 
 export { DecksPage as default };
 
-function TopPlayersPanel({ onCopied }: { onCopied: (msg: string) => void }) {
+function TopPlayersPanel({
+  onCopied,
+  onAnalyze,
+  onCompare,
+}: {
+  onCopied: (msg: string) => void;
+  onAnalyze: (deck: Deck) => void;
+  onCompare: (deck: Deck) => void;
+}) {
   const { openLink } = useTelegram();
   const [players, setPlayers] = useState<TopPlayer[]>(() => {
     const hit = cacheGet<TopPlayersData>("top-players-v2");
@@ -428,6 +469,59 @@ function TopPlayersPanel({ onCopied }: { onCopied: (msg: string) => void }) {
 
             <DeckCardsGrid cards={player.cards} />
 
+            {player.cards.length === 8 ? (
+              <div className="grid grid-cols-2 gap-2 mt-0 mb-2">
+                <Button
+                  variant="secondary"
+                  className="!py-2 text-sm flex items-center justify-center gap-2"
+                  onClick={() => {
+                    const deck = deckFromCardNames(
+                      player.cards.map((c) => c.name),
+                      {
+                        id: player.rank,
+                        name: `${player.player_name} · #${player.rank}`,
+                        avgElixir: player.avg_elixir,
+                        winrate: player.winrate,
+                        totalGames: player.total_games,
+                        type: "meta",
+                        deckLink: player.deck_link,
+                      },
+                    );
+                    if (!deck) return;
+                    deck.cards = player.cards.map((c, slot) => ({ ...c, slot }));
+                    onAnalyze(deck);
+                  }}
+                >
+                  <ScanSearch className="w-4 h-4" />
+                  Анализ
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="!py-2 text-sm flex items-center justify-center gap-2"
+                  onClick={() => {
+                    const deck = deckFromCardNames(
+                      player.cards.map((c) => c.name),
+                      {
+                        id: player.rank,
+                        name: `${player.player_name} · #${player.rank}`,
+                        avgElixir: player.avg_elixir,
+                        winrate: player.winrate,
+                        totalGames: player.total_games,
+                        type: "meta",
+                        deckLink: player.deck_link,
+                      },
+                    );
+                    if (!deck) return;
+                    deck.cards = player.cards.map((c, slot) => ({ ...c, slot }));
+                    onCompare(deck);
+                  }}
+                >
+                  <Swords className="w-4 h-4" />
+                  Сравнить
+                </Button>
+              </div>
+            ) : null}
+
             <div className="flex gap-2 mt-0">
               {player.deck_link ? (
                 <Button
@@ -522,9 +616,11 @@ function RoflModeBar({
 function RandomDeckPanel({
   onCopied,
   onAnalyze,
+  onCompare,
 }: {
   onCopied: (msg: string) => void;
   onAnalyze: (deck: Deck) => void;
+  onCompare: (deck: Deck) => void;
 }) {
   const { openLink } = useTelegram();
   const [deck, setDeck] = useState<RandomDeck | null>(null);
@@ -637,33 +733,64 @@ function RandomDeckPanel({
 
         <div className="flex flex-col gap-2">
           {deck.cards.length === 8 ? (
-            <Button
-              variant="secondary"
-              className="w-full !py-2 text-sm flex items-center justify-center gap-2"
-              onClick={() =>
-                onAnalyze({
-                  id: 0,
-                  name: deck.rofl_name ?? "Случайная колода",
-                  cards: deck.card_infos.map((c, slot) => ({
-                    ...c,
-                    slot,
-                    rarity: undefined,
-                    evolution_level: 0,
-                    is_hero: false,
-                  })),
-                  winrate: 0,
-                  total_games: 0,
-                  avg_elixir: deck.avg_elixir,
-                  best_matchups: [],
-                  worst_matchups: [],
-                  type: "random",
-                  deck_link: deck.deck_link,
-                })
-              }
-            >
-              <ScanSearch className="w-4 h-4" />
-              Анализ
-            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="secondary"
+                className="!py-2 text-sm flex items-center justify-center gap-2"
+                onClick={() => {
+                  const payload: Deck = {
+                    id: 0,
+                    name: deck.rofl_name ?? "Случайная колода",
+                    cards: deck.card_infos.map((c, slot) => ({
+                      ...c,
+                      slot,
+                      rarity: undefined,
+                      evolution_level: 0,
+                      is_hero: false,
+                    })),
+                    winrate: 0,
+                    total_games: 0,
+                    avg_elixir: deck.avg_elixir,
+                    best_matchups: [],
+                    worst_matchups: [],
+                    type: "random",
+                    deck_link: deck.deck_link,
+                  };
+                  onAnalyze(payload);
+                }}
+              >
+                <ScanSearch className="w-4 h-4" />
+                Анализ
+              </Button>
+              <Button
+                variant="secondary"
+                className="!py-2 text-sm flex items-center justify-center gap-2"
+                onClick={() => {
+                  const payload: Deck = {
+                    id: 0,
+                    name: deck.rofl_name ?? "Случайная колода",
+                    cards: deck.card_infos.map((c, slot) => ({
+                      ...c,
+                      slot,
+                      rarity: undefined,
+                      evolution_level: 0,
+                      is_hero: false,
+                    })),
+                    winrate: 0,
+                    total_games: 0,
+                    avg_elixir: deck.avg_elixir,
+                    best_matchups: [],
+                    worst_matchups: [],
+                    type: "random",
+                    deck_link: deck.deck_link,
+                  };
+                  onCompare(payload);
+                }}
+              >
+                <Swords className="w-4 h-4" />
+                Сравнить
+              </Button>
+            </div>
           ) : null}
           <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 items-stretch">
             <Button
@@ -838,26 +965,34 @@ export function DeckCard({
           </Button>
         ) : null}
 
-        {showCompare && onCompare ? (
-          <Button
-            variant="secondary"
-            className="w-full !py-2 text-sm flex items-center justify-center gap-2 mb-3"
-            onClick={onCompare}
+        {canFavorite && (onAnalyze || (showCompare && onCompare)) ? (
+          <div
+            className={
+              "grid gap-2 mb-3 " +
+              (onAnalyze && showCompare && onCompare ? "grid-cols-2" : "grid-cols-1")
+            }
           >
-            <Swords className="w-4 h-4" />
-            Сравнить с моей
-          </Button>
-        ) : null}
-
-        {canFavorite && onAnalyze ? (
-          <Button
-            variant="secondary"
-            className="w-full !py-2 text-sm flex items-center justify-center gap-2 mb-3"
-            onClick={onAnalyze}
-          >
-            <ScanSearch className="w-4 h-4" />
-            Анализ
-          </Button>
+            {onAnalyze ? (
+              <Button
+                variant="secondary"
+                className="!py-2 text-sm flex items-center justify-center gap-2"
+                onClick={onAnalyze}
+              >
+                <ScanSearch className="w-4 h-4" />
+                Анализ
+              </Button>
+            ) : null}
+            {showCompare && onCompare ? (
+              <Button
+                variant="secondary"
+                className="!py-2 text-sm flex items-center justify-center gap-2"
+                onClick={onCompare}
+              >
+                <Swords className="w-4 h-4" />
+                {onAnalyze ? "Сравнить" : "Сравнить с моей"}
+              </Button>
+            ) : null}
+          </div>
         ) : null}
 
         {canImport || canFavorite ? (

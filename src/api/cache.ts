@@ -31,6 +31,20 @@ export function cacheInvalidate(prefix?: string) {
   }
 }
 
+/** Clear all ghosteek localStorage cache entries. */
+export function lsClearAll() {
+  try {
+    const keys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(LS_PREFIX)) keys.push(key);
+    }
+    for (const key of keys) localStorage.removeItem(key);
+  } catch {
+    /* private mode */
+  }
+}
+
 const LS_PREFIX = "ghosteek-cache:";
 
 export function lsGet<T>(key: string, ttlMs: number, staleGraceMs = 0): T | null {
