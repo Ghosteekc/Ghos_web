@@ -72,7 +72,7 @@ export function computeDeckMetrics(cardNames: string[], archetype: string): Deck
     control: clampMetric(controlBase),
     counterpush: clampMetric(Math.min(10, counterpush * 2 + (wins > 0 ? 2 : 0))),
     cycleSpeed: clampMetric(cycleSpeedBase),
-    antiAir: metricFromRatio(Math.min(1, airDef / 2.5)),
+    antiAir: metricFromRatio(Math.min(1, airDef / 2)),
     antiGround: clampMetric(
       Math.min(10, splash * 1.5 + buildings * 1.2 + countRole(cardNames, "defensive")),
     ),

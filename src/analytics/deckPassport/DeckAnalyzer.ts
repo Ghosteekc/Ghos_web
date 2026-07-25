@@ -83,7 +83,15 @@ function buildWeaknesses(
 ): string[] {
   const out: string[] = [];
   const issues = balanceIssues(cardNames, archetype);
-  if (metrics.antiAir < 5) out.push("слабая защита воздуха");
+  const airDefenseCount = cardNames.filter((c) => cardRoles(c).has("air_defense")).length;
+
+  // Keep consistent with role balance: "анти-воздух есть" must not contradict weaknesses.
+  if (airDefenseCount === 0) {
+    out.push("слабая защита воздуха");
+  } else if (airDefenseCount === 1 && metrics.antiAir < 5) {
+    out.push("мало анти-воздуха");
+  }
+
   if (!cardNames.some((c) => cardRoles(c).has("building"))) out.push("нет здания");
   if (avgElixir(cardNames) >= 4.1) out.push("дорогая ротация");
   if (issues.includes("small_spell") || issues.includes("big_spell")) {

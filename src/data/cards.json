@@ -28,6 +28,7 @@
       "elixir": 4,
       "type": "troop",
       "roles": [
+        "air_defense",
         "anti_swarm",
         "splash"
       ]
