@@ -99,12 +99,6 @@ export function ProfilePage() {
               )}
             </div>
           </div>
-
-          {league ? (
-            <div className="mt-3 pt-3 border-t border-cr-border">
-              <LeagueBanner league={league} />
-            </div>
-          ) : null}
         </Card>
       )}
 
@@ -123,6 +117,12 @@ export function ProfilePage() {
           </div>
         </div>
       </Card>
+
+      {league ? (
+        <Card className="!py-3 !px-4">
+          <LeagueBanner league={league} />
+        </Card>
+      ) : null}
 
       {profile && <ProfileStatGrid profile={profile} />}
 
