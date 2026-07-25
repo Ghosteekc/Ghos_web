@@ -5,8 +5,8 @@ import {
   Crown,
   ExternalLink,
   Flame,
-  Layers,
   MapPinned,
+  Swords,
   Trophy,
   TrendingUp,
   Users,
@@ -108,14 +108,11 @@ export function PlayerPreviewPage() {
               : "text-cr-muted",
         },
         {
-          label: "Коллекция",
+          label: "Победы",
           value:
-            player.collection_level != null
-              ? formatNumber(player.collection_level)
-              : "—",
-          valueClass: "text-cr-gold",
-          icon: Layers,
-          iconClass: "text-cr-blue",
+            player.total_wins != null ? formatNumber(player.total_wins) : "—",
+          icon: Swords,
+          iconClass: "text-cr-win",
         },
         {
           label: "Арена",
