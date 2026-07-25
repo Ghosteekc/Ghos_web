@@ -55,17 +55,18 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
   const metrics = getMetricDisplayList(analysis.metrics);
 
   return (
-    <div className="deck-passport-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 pt-[max(2.75rem,var(--app-content-top))] sm:pt-4">
+    <div className="deck-passport-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
       <button
         type="button"
         aria-label="Закрыть"
-        className="deck-passport-backdrop absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="deck-passport-backdrop absolute inset-0"
         onClick={onClose}
       />
 
       <div
         className={cn(
-          "deck-passport-sheet relative w-full sm:max-w-lg max-h-[min(92vh,calc(100dvh-3.5rem))] sm:max-h-[88vh]",
+          "deck-passport-sheet relative w-full sm:max-w-lg",
+          "max-h-[calc(100dvh-var(--device-safe-top)-1.75rem)] sm:max-h-[86vh]",
           "border border-cr-border rounded-t-2xl sm:rounded-2xl",
           "shadow-2xl flex flex-col overflow-hidden transition-opacity duration-300",
         )}

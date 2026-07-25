@@ -181,7 +181,7 @@ export function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="analytics-page-header">
+      <div>
         <h1 className="page-title">Аналитика</h1>
         <p className="page-subtitle mt-1">Статистика, соперники и улучшение колод</p>
         {refreshing && (

@@ -64,7 +64,6 @@ export function Layout() {
 
   return (
     <div className="min-h-screen flex overflow-x-hidden">
-      <div className="app-top-frost" aria-hidden />
       <Sidebar />
 
       <main className="app-main">

@@ -21,7 +21,7 @@
     --cr-bg-top: #0b122c;
     --cr-bg-bottom: #0b122c;
     --cr-bg-pattern: url("/bg-dark.png");
-    --cr-bg-pattern-size: 18.5rem auto;
+    --cr-bg-pattern-size: cover;
     --cr-glass-bg: rgb(var(--cr-card) / 0.42);
     --cr-glass-bg-strong: rgb(var(--cr-card) / 0.55);
     --cr-glass-blur: blur(18px) saturate(150%);
@@ -62,7 +62,7 @@
     --cr-bg-top: #d9d8d6;
     --cr-bg-bottom: #d9d8d6;
     --cr-bg-pattern: url("/bg-light.png");
-    --cr-bg-pattern-size: 18.5rem auto;
+    --cr-bg-pattern-size: cover;
     --cr-glass-bg: rgb(255 255 255 / 0.48);
     --cr-glass-bg-strong: rgb(255 255 255 / 0.62);
     --cr-glass-blur: blur(18px) saturate(140%);
@@ -116,22 +116,31 @@
 
   html {
     overflow-x: hidden;
+    background-color: var(--cr-bg-top);
   }
 
   body {
     @apply antialiased overflow-x-hidden font-sans;
     color: rgb(var(--cr-text));
     text-shadow: var(--cr-stroke-body);
-    background-color: var(--cr-bg-top);
-    background-image: var(--cr-bg-pattern);
-    /* fixed is flaky in Android/Telegram WebViews — scroll + tile is reliable */
-    background-attachment: scroll;
-    background-repeat: repeat;
-    background-position: top center;
-    background-size: var(--cr-bg-pattern-size);
+    background-color: transparent;
     min-height: 100%;
     min-height: 100dvh;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Fixed wallpaper: one cover frame — source tiles are not seamless when repeated */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--cr-bg-top);
+    background-image: var(--cr-bg-pattern);
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: var(--cr-bg-pattern-size);
   }
 
   #root {
@@ -1001,46 +1010,6 @@
     padding-right: max(1rem, var(--app-content-right));
   }
 
-  /* Frosted strip over the Telegram / safe-area chrome above page titles */
-  .app-top-frost {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 40;
-    height: calc(var(--mobile-header-offset) + 0.35rem);
-    pointer-events: none;
-    background: linear-gradient(
-      180deg,
-      rgb(var(--cr-bg) / 0.55) 0%,
-      rgb(var(--cr-surface) / 0.28) 62%,
-      transparent 100%
-    );
-    backdrop-filter: blur(18px) saturate(150%);
-    -webkit-backdrop-filter: blur(18px) saturate(150%);
-    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
-  }
-
-  [data-theme="light"] .app-top-frost {
-    background: linear-gradient(
-      180deg,
-      rgb(255 255 255 / 0.52) 0%,
-      rgb(236 240 248 / 0.28) 62%,
-      transparent 100%
-    );
-  }
-
-  @media (min-width: 1024px) {
-    .app-top-frost {
-      display: none;
-    }
-  }
-
-  .analytics-page-header {
-    padding-top: 0.55rem;
-  }
-
   @media (min-width: 1024px) {
     .app-main {
       padding-top: 2rem;
@@ -1568,7 +1537,7 @@
   }
 
   [data-theme="light"] .deck-passport-backdrop {
-    background: rgba(15, 23, 42, 0.35);
+    background: rgb(15 23 42 / 0.28);
   }
 
   [data-theme="light"] .deck-passport-sheet {
@@ -1593,6 +1562,12 @@
     background: var(--cr-glass-bg);
     backdrop-filter: var(--cr-glass-blur);
     -webkit-backdrop-filter: var(--cr-glass-blur);
+  }
+
+  .deck-passport-backdrop {
+    background: rgb(0 0 0 / 0.48);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
   }
 
   .deck-passport-sheet {
