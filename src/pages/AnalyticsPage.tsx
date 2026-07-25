@@ -18,8 +18,8 @@ import { Card, FeatureNavGrid, Loader, ScrollToTopButton, Button } from "@/compo
 import { api } from "@/api/client";
 import { cacheGet, lsGet, TTL } from "@/api/cache";
 
-const STATS_MEM_KEY = "stats-v7";
-const STATS_LS_KEY = "stats-overview-v3";
+const STATS_MEM_KEY = "stats-v8";
+const STATS_LS_KEY = "stats-overview-v4";
 const STATS_STALE_GRACE_MS = 7 * 24 * 60 * 60_000;
 
 function bootstrapStats(): StatsOverview | null {
@@ -204,9 +204,9 @@ export function AnalyticsPage() {
                 ) : null}
               </div>
               <p className="text-[11px] text-cr-muted mb-3">
-                Только рейтинговые 1v1 · ведите пальцем, тап по точке — закрепить
+                Рейтинговые 1v1 · до 40 последних · ведите пальцем, тап — закрепить
               </p>
-              <ChartTooltipAnchor className="h-[170px]" pointCount={lastResults.length}>
+              <ChartTooltipAnchor className="h-[190px]" pointCount={lastResults.length}>
                 {lastResults.length > 0 ? (
                   <TrophyGrowthChart data={lastResults} />
                 ) : (
