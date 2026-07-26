@@ -381,10 +381,10 @@ export const api = {
 
 
 
-  getProfile: () => cachedGet<Profile>("profile-v7", "/api/me", TTL.profile),
+  getProfile: () => cachedGet<Profile>("profile-v8", "/api/me", TTL.profile),
 
   getPlayerCollection: () =>
-    cachedGet<PlayerCollectionData>("player-collection-v12", "/api/profile/collection", TTL.profile),
+    cachedGet<PlayerCollectionData>("player-collection-v13", "/api/profile/collection", TTL.profile),
 
 
 
@@ -415,7 +415,7 @@ export const api = {
 
   getPlayerPreview: (tag: string) => {
     const clean = tag.replace(/^#/, "");
-    return cachedGet<SearchResult>(`player-v5:${clean}`, `/api/players/${encodeURIComponent(clean)}`, TTL.profile);
+    return cachedGet<SearchResult>(`player-v6:${clean}`, `/api/players/${encodeURIComponent(clean)}`, TTL.profile);
   },
 
   removeFavoriteDeck: (deck: string[]) => {
