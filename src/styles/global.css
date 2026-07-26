@@ -1874,6 +1874,16 @@
 
   .collection-card-wrap {
     overflow: visible;
+    border-radius: 0.4rem;
+    box-shadow:
+      0 0 0 2px rgb(var(--cr-accent) / 0.72),
+      0 0 14px rgb(var(--cr-blue) / 0.38),
+      0 0 4px rgb(var(--cr-accent) / 0.28);
+  }
+
+  .collection-card-wrap .card-frame-base {
+    box-shadow:
+      inset 0 0 0 2px rgb(var(--cr-accent) / 0.55);
   }
 
   .card-frame-base {
@@ -2007,6 +2017,18 @@
     box-shadow:
       0 0 0 1px rgb(var(--cr-border) / 0.22),
       0 3px 10px rgba(15, 23, 42, 0.08);
+  }
+
+  [data-theme="light"] .collection-card-wrap {
+    box-shadow:
+      0 0 0 2px rgb(var(--cr-blue) / 0.55),
+      0 0 12px rgb(var(--cr-blue) / 0.22),
+      0 2px 8px rgb(15 23 42 / 0.1);
+  }
+
+  [data-theme="light"] .collection-card-wrap .card-frame-base {
+    box-shadow:
+      inset 0 0 0 2px rgb(var(--cr-blue) / 0.42);
   }
 
   [data-theme="light"] .card-tile-rim {
