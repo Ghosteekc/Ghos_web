@@ -582,8 +582,9 @@
 
   [data-theme="light"] .pixel-btn--nav-row,
   [data-theme="light"] .pixel-btn--secondary {
-    --pb-bg: rgb(228 228 228);
-    --pb-bg-pressed: rgb(214 214 214);
+    /* Lift action buttons above soft gray cards */
+    --pb-bg: rgb(250 250 250);
+    --pb-bg-pressed: rgb(236 236 236);
   }
 
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active,
