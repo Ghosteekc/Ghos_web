@@ -18,10 +18,11 @@
     --cr-accent: 147 180 255;
     --cr-border: 255 255 255;
     --cr-border-alpha: 0.08;
-    --cr-bg-top: #111a36;
-    --cr-bg-bottom: #111a36;
+    --cr-bg-top: #050b23;
+    --cr-bg-bottom: #050b23;
     --cr-bg-pattern: url("/bg-dark.png");
-    --cr-bg-pattern-size: auto;
+    /* Full tile width ≤ viewport — no side crop; height keeps aspect, then repeats */
+    --cr-bg-pattern-size: min(100vw, 29.5rem) auto;
     --cr-glass-bg: rgb(var(--cr-card) / 0.42);
     --cr-glass-bg-strong: rgb(var(--cr-card) / 0.55);
     --cr-glass-blur: blur(18px) saturate(150%);
@@ -59,10 +60,10 @@
     --cr-accent: 29 78 216;
     --cr-border: 100 116 139;
     --cr-border-alpha: 0.22;
-    --cr-bg-top: #dedede;
-    --cr-bg-bottom: #dedede;
+    --cr-bg-top: #d4d4d4;
+    --cr-bg-bottom: #d4d4d4;
     --cr-bg-pattern: url("/bg-light.png");
-    --cr-bg-pattern-size: auto;
+    --cr-bg-pattern-size: min(100vw, 29.5rem) auto;
     --cr-glass-bg: rgb(255 255 255 / 0.48);
     --cr-glass-bg-strong: rgb(255 255 255 / 0.62);
     --cr-glass-blur: blur(18px) saturate(140%);
@@ -127,7 +128,7 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Fixed seamless wallpaper — native tile size, repeats without seams */
+  /* Fixed wallpaper: scale tile to viewport width (no crop), keep ratio, seamless repeat */
   body::before {
     content: "";
     position: fixed;
@@ -137,7 +138,7 @@
     background-color: var(--cr-bg-top);
     background-image: var(--cr-bg-pattern);
     background-repeat: repeat;
-    background-position: top left;
+    background-position: top center;
     background-size: var(--cr-bg-pattern-size);
   }
 
