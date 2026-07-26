@@ -1,13 +1,10 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Palette,
   LogOut,
   Trash2,
   Eraser,
-  Moon,
-  Sun,
-  Smartphone,
   Bell,
   BellOff,
   RefreshCw,
@@ -15,10 +12,11 @@ import {
   Unlink2,
 } from "lucide-react";
 import { Card, Loader } from "@/components/ui";
+import { ThemeSegment } from "@/components/settings/ThemeSegment";
 import { api } from "@/api/client";
 import { cacheInvalidate, lsClearAll } from "@/api/cache";
 import { useTelegram, usePageRefresh, useSettings } from "@/hooks";
-import { applyTheme, type AppTheme } from "@/hooks/useTheme";
+import { applyTheme } from "@/hooks/useTheme";
 import { ensureSettingsLoaded } from "@/stores/settingsStore";
 import { Profile } from "@/types";
 import { haptic } from "@/utils/hapticManager";
@@ -250,29 +248,10 @@ export function SettingsPage() {
                     <p className="text-xs text-cr-muted">Тёмная, светлая или как на устройстве</p>
                   </div>
                 </div>
-                <div className="theme-segment-track">
-                  <ThemeButton
-                    active={settings.theme === "dark"}
-                    label="Тёмная"
-                    onClick={() => void updateSetting({ theme: "dark" })}
-                  >
-                    <Moon className="w-4 h-4" />
-                  </ThemeButton>
-                  <ThemeButton
-                    active={settings.theme === "light"}
-                    label="Светлая"
-                    onClick={() => void updateSetting({ theme: "light" })}
-                  >
-                    <Sun className="w-4 h-4" />
-                  </ThemeButton>
-                  <ThemeButton
-                    active={settings.theme === "auto"}
-                    label="Системная"
-                    onClick={() => void updateSetting({ theme: "auto" })}
-                  >
-                    <Smartphone className="w-4 h-4" />
-                  </ThemeButton>
-                </div>
+                <ThemeSegment
+                  value={settings.theme}
+                  onChange={(theme) => void updateSetting({ theme })}
+                />
               </div>
             </div>
           </Card>
@@ -446,30 +425,6 @@ export function SettingsPage() {
         Ghosteek CR Assistant v1.0
       </p>
     </div>
-  );
-}
-
-function ThemeButton({
-  active,
-  children,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  children: ReactNode;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      aria-pressed={active}
-      onClick={onClick}
-      className={"segment-tab " + (active ? "segment-tab--active" : "")}
-    >
-      {children}
-    </button>
   );
 }
 
