@@ -93,9 +93,8 @@ export const battleDetailPath = (timestamp: string, fallbackIndex?: number): str
 };
 
 export const getWinColor = (winrate: number): string => {
-  if (winrate >= 60) return "text-cr-win";
-  if (winrate <= 40) return "text-cr-loss";
-  return "text-cr-text";
+  if (winrate >= 50) return "text-cr-win";
+  return "text-cr-loss";
 };
 
 export const getTrophyChangeColor = (change: number): string => {

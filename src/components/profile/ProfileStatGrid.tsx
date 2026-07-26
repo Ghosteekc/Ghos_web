@@ -51,7 +51,7 @@ export function ProfileStatGrid({ profile }: ProfileStatGridProps) {
       value: profile.winrate != null ? `${profile.winrate.toFixed(1)}%` : "—",
       valueClass: getWinColor(profile.winrate ?? 50),
       icon: TrendingUp,
-      iconClass: "text-cr-win",
+      iconClass: getWinColor(profile.winrate ?? 50),
     },
     {
       label: "Победы",
