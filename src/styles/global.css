@@ -47,10 +47,11 @@
   }
 
   [data-theme="light"] {
-    --cr-bg: 236 240 248;
-    --cr-surface: 252 253 255;
-    --cr-card: 255 255 255;
-    --cr-card-hover: 232 238 250;
+    /* Wallpaper #d4d4d4 — cards only a step lighter, not pure white */
+    --cr-bg: 212 212 212;
+    --cr-surface: 226 226 226;
+    --cr-card: 232 232 232;
+    --cr-card-hover: 240 240 240;
     --cr-gold: 196 140 18;
     --cr-blue: 37 99 235;
     --cr-win: 22 148 72;
@@ -59,13 +60,13 @@
     --cr-muted: 71 85 105;
     --cr-accent: 29 78 216;
     --cr-border: 100 116 139;
-    --cr-border-alpha: 0.22;
+    --cr-border-alpha: 0.18;
     --cr-bg-top: #d4d4d4;
     --cr-bg-bottom: #d4d4d4;
     --cr-bg-pattern: url("/bg-light.png");
     --cr-bg-pattern-size: min(100vw, 29.5rem) auto;
-    --cr-glass-bg: rgb(255 255 255 / 0.48);
-    --cr-glass-bg-strong: rgb(255 255 255 / 0.62);
+    --cr-glass-bg: rgb(var(--cr-card) / 0.72);
+    --cr-glass-bg-strong: rgb(var(--cr-card) / 0.88);
     --cr-glass-blur: blur(18px) saturate(140%);
     --cr-chart-grid: rgba(100, 116, 139, 0.32);
     /* No CR stroke on light — dark outlines muddy text on pale cards */
@@ -573,16 +574,16 @@
 
   [data-theme="light"] .pixel-bevel,
   [data-theme="light"] .pixel-btn--chip {
-    --pb-light: rgba(255, 255, 255, 0.85);
-    --pb-dark: rgba(120, 130, 160, 0.4);
-    --pb-bg: rgb(248 250 255);
-    --pb-bg-pressed: rgb(228 234 248);
+    --pb-light: rgba(255, 255, 255, 0.55);
+    --pb-dark: rgba(120, 130, 160, 0.35);
+    --pb-bg: rgb(232 232 232);
+    --pb-bg-pressed: rgb(220 220 220);
   }
 
   [data-theme="light"] .pixel-btn--nav-row,
   [data-theme="light"] .pixel-btn--secondary {
-    --pb-bg: rgb(242 246 255);
-    --pb-bg-pressed: rgb(220 228 245);
+    --pb-bg: rgb(228 228 228);
+    --pb-bg-pressed: rgb(214 214 214);
   }
 
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active,
@@ -615,8 +616,8 @@
   }
 
   [data-theme="light"] .pixel-btn-icon-slot {
-    background: rgba(255, 255, 255, 0.65);
-    border-color: rgba(120, 130, 160, 0.35);
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(120, 130, 160, 0.28);
   }
 
   .scroll-to-top-btn {
