@@ -47,8 +47,24 @@ export function useTelegram() {
       else if (style === "medium") haptic.medium();
       else haptic.light();
     },
-    showAlert: (message: string) => tg?.showAlert(message),
-    showConfirm: (message: string) => tg?.showConfirm(message),
+    /** Telegram WebApp uses callbacks — wrap so callers can await. */
+    showAlert: (message: string) =>
+      new Promise<void>((resolve) => {
+        if (!tg?.showAlert) {
+          window.alert(message);
+          resolve();
+          return;
+        }
+        tg.showAlert(message, () => resolve());
+      }),
+    showConfirm: (message: string) =>
+      new Promise<boolean>((resolve) => {
+        if (!tg?.showConfirm) {
+          resolve(window.confirm(message));
+          return;
+        }
+        tg.showConfirm(message, (confirmed) => resolve(Boolean(confirmed)));
+      }),
   };
 }
 

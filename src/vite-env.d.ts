@@ -37,8 +37,8 @@ export interface TelegramWebApp {
     notificationOccurred: (type: "error" | "success" | "warning") => void;
     selectionChanged: () => void;
   };
-  showAlert: (message: string) => void;
-  showConfirm: (message: string) => void;
+  showAlert: (message: string, callback?: () => void) => void;
+  showConfirm: (message: string, callback?: (confirmed: boolean) => void) => void;
 }
 
 declare global {
