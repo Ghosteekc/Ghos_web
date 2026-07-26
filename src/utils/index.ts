@@ -21,6 +21,11 @@ export const formatNumber = (num: number): string => {
   return num.toString();
 };
 
+/** Full integer with locale grouping — no K/M abbreviation. */
+export const formatFullNumber = (num: number): string =>
+  Math.round(num).toLocaleString("ru-RU");
+
+
 export const formatTime = (seconds: number): string => {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;

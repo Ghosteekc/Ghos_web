@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui";
 import { Profile } from "@/types";
-import { formatNumber, getWinColor, getTrophyChangeColor } from "@/utils";
+import { formatFullNumber, getWinColor, getTrophyChangeColor } from "@/utils";
 import { UI } from "@/constants/labels";
 
 interface ProfileStatGridProps {
@@ -41,7 +41,7 @@ export function ProfileStatGrid({ profile }: ProfileStatGridProps) {
     },
     {
       label: "Трофеи",
-      value: profile.trophies != null ? formatNumber(profile.trophies) : "—",
+      value: profile.trophies != null ? formatFullNumber(profile.trophies) : "—",
       valueClass: "text-cr-text",
       icon: Trophy,
       iconClass: "text-cr-blue",
@@ -55,7 +55,7 @@ export function ProfileStatGrid({ profile }: ProfileStatGridProps) {
     },
     {
       label: "Победы",
-      value: profile.total_wins != null ? formatNumber(profile.total_wins) : "—",
+      value: profile.total_wins != null ? formatFullNumber(profile.total_wins) : "—",
       valueClass: "text-cr-text",
       icon: Swords,
       iconClass: "text-cr-win",
@@ -64,7 +64,7 @@ export function ProfileStatGrid({ profile }: ProfileStatGridProps) {
       label: "3 короны",
       value:
         profile.three_crown_wins != null
-          ? formatNumber(profile.three_crown_wins)
+          ? formatFullNumber(profile.three_crown_wins)
           : "—",
       valueClass: "text-cr-text",
       icon: Crown,
@@ -74,7 +74,7 @@ export function ProfileStatGrid({ profile }: ProfileStatGridProps) {
       label: "Коллекция",
       value:
         profile.collection_level != null
-          ? formatNumber(profile.collection_level)
+          ? formatFullNumber(profile.collection_level)
           : "—",
       valueClass: "text-cr-gold profile-stat-collection",
       icon: Layers,

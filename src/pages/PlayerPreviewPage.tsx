@@ -18,7 +18,7 @@ import { Button, Card, ElixirIcon, Loader } from "@/components/ui";
 import { PlayerDeckGrid } from "@/components/cards";
 import { FavoriteDeckButton } from "@/components/decks/FavoriteDeckButton";
 import { LeagueBanner, resolveLeagueInfo } from "@/components/profile/LeagueBanner";
-import { formatNumber, formatPlayerTag, getWinColor } from "@/utils";
+import { formatFullNumber, formatPlayerTag, getWinColor } from "@/utils";
 import { useCardCatalog, usePageRefresh, useTelegram } from "@/hooks";
 import { UI } from "@/constants/labels";
 
@@ -84,14 +84,14 @@ export function PlayerPreviewPage() {
     ? [
         {
           label: "Кубки",
-          value: formatNumber(player.trophies),
+          value: formatFullNumber(player.trophies),
           icon: Trophy,
           iconClass: "text-cr-gold",
         },
         {
           label: "Макс.",
           value:
-            player.max_trophies != null ? formatNumber(player.max_trophies) : "—",
+            player.max_trophies != null ? formatFullNumber(player.max_trophies) : "—",
           icon: Crown,
           iconClass: "text-cr-gold",
         },
@@ -110,7 +110,7 @@ export function PlayerPreviewPage() {
         {
           label: "Победы",
           value:
-            player.total_wins != null ? formatNumber(player.total_wins) : "—",
+            player.total_wins != null ? formatFullNumber(player.total_wins) : "—",
           icon: Swords,
           iconClass: "text-cr-win",
         },
