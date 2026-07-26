@@ -12,11 +12,12 @@ import {
   Bar,
   ReferenceLine,
 } from "recharts";
-import { TrendingUp, TrendingDown, Flame, Clock } from "lucide-react";
+import { TrendingUp, TrendingDown, Swords } from "lucide-react";
 import { StatsOverview } from "@/types";
 import { Card, FeatureNavGrid, Loader, ScrollToTopButton, Button } from "@/components/ui";
 import { api } from "@/api/client";
 import { cacheGet, lsGet, TTL } from "@/api/cache";
+import { getWinColor } from "@/utils";
 
 const STATS_MEM_KEY = "stats-v8";
 const STATS_LS_KEY = "stats-overview-v4";
@@ -199,14 +200,20 @@ export function AnalyticsPage() {
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "Всего боёв", value: stats.total_battles, icon: Flame, color: "text-cr-gold" },
+              { label: "Всего боёв", value: stats.total_battles, icon: Swords, color: "text-cr-gold" },
               { label: "Победы", value: stats.wins, icon: TrendingUp, color: "text-cr-win" },
               { label: "Поражения", value: stats.losses, icon: TrendingDown, color: "text-cr-loss" },
-              { label: "Винрейт", value: `${stats.winrate.toFixed(1)}%`, icon: Clock, color: "text-cr-blue" },
+              {
+                label: "Винрейт",
+                value: `${stats.winrate.toFixed(1)}%`,
+                icon: stats.winrate >= 50 ? TrendingUp : TrendingDown,
+                color: getWinColor(stats.winrate),
+                valueClass: getWinColor(stats.winrate),
+              },
             ].map((item, i) => (
               <Card key={i} className="text-center">
                 <item.icon className={"w-6 h-6 mx-auto mb-2 " + item.color} />
-                <p className="text-2xl font-bold text-cr-text">{item.value}</p>
+                <p className={"text-2xl font-bold " + (item.valueClass ?? "text-cr-text")}>{item.value}</p>
                 <p className="text-label">{item.label}</p>
               </Card>
             ))}
