@@ -137,7 +137,7 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
             </ul>
           </Card>
 
-          <Card className="!p-3 border-cr-gold/20 bg-cr-gold/5">
+          <Card className="!p-3 border-cr-border">
             <h3 className="text-sm font-semibold text-cr-text mb-2">Практичность</h3>
             <p className="text-2xl font-bold text-cr-gold tabular-nums">{analysis.practicality}%</p>
             <div className="mt-3 space-y-1">

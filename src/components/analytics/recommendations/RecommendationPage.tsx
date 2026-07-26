@@ -21,7 +21,7 @@ function ErrorCard({ message }: { message: string }) {
 
 function ArenaProgressHeader({ summary }: { summary: ArenaProgressSummary }) {
   return (
-    <div className="rounded-xl border border-cr-gold/25 bg-cr-gold/5 p-4">
+    <Card className="!p-4 border-cr-border">
       <h3 className="text-sm font-semibold text-cr-text">Приоритет прокачки аккаунта</h3>
       <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
@@ -49,7 +49,7 @@ function ArenaProgressHeader({ summary }: { summary: ArenaProgressSummary }) {
           style={{ width: `${summary.progressPercent}%` }}
         />
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -69,10 +69,10 @@ function ArenaBlock({
       ref={blockRef}
       id={`arena-block-${summary.arena}`}
       className={cn(
-        "recommendation-arena-block scroll-mt-24 rounded-2xl border p-4 transition-colors duration-300",
+        "recommendation-arena-block scroll-mt-24 rounded-2xl border p-4 transition-colors duration-300 bg-cr-card",
         highlighted
-          ? "is-highlighted border-cr-gold/50 bg-cr-gold/10 shadow-[0_0_0_1px_rgba(251,191,36,0.25)]"
-          : "border-white/10 bg-white/[0.02]",
+          ? "is-highlighted border-cr-gold/50 shadow-[0_0_0_1px_rgba(251,191,36,0.25)]"
+          : "border-cr-border",
       )}
     >
       <button
@@ -191,7 +191,7 @@ export function RecommendationsPanel() {
 
   return (
     <div className="space-y-5 recommendations-panel">
-      <Card className="border-cr-gold/20 bg-cr-gold/5">
+      <Card className="border-cr-border">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-cr-text">Рекомендации по прокачке</p>
@@ -227,10 +227,10 @@ export function RecommendationsPanel() {
               type="button"
               onClick={() => scrollToArena(arena.arena)}
               className={cn(
-                "rounded-lg border px-2.5 py-1.5 text-left transition-colors",
+                "rounded-lg border px-2.5 py-1.5 text-left transition-colors bg-cr-card",
                 playerArena === arena.arena
-                  ? "border-cr-gold/40 bg-cr-gold/10"
-                  : "border-white/10 bg-white/[0.03]",
+                  ? "border-cr-gold/40"
+                  : "border-cr-border",
               )}
             >
               <span className="block text-[10px] text-cr-muted">Арена {arena.arena}</span>

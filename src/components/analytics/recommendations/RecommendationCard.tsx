@@ -15,8 +15,8 @@ export function RecommendationCard({ card }: RecommendationCardProps) {
         : "text-cr-muted";
 
   return (
-    <div className="recommendation-card flex items-start gap-3 rounded-xl border border-white/10 p-3 transition-colors">
-      <div className="w-12 h-[3.75rem] shrink-0 rounded-lg border border-white/10 bg-cr-bg/80 overflow-hidden flex items-center justify-center">
+    <div className="recommendation-card flex items-start gap-3 rounded-xl border border-cr-border p-3 transition-colors">
+      <div className="w-12 h-[3.75rem] shrink-0 rounded-lg border border-cr-border bg-cr-surface overflow-hidden flex items-center justify-center">
         {card.icon ? (
           <img
             src={card.icon}
