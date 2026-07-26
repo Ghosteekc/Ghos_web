@@ -30,11 +30,12 @@ export function resolveLeagueInfo(
 ): LeagueInfo {
   const unlock = league?.unlock_trophies ?? DEFAULT_LEAGUE_UNLOCK_TROPHIES;
   const cups = trophies ?? 0;
-  const hasLeagueNums =
-    league?.current_league_number != null || league?.best_league_number != null;
-  const unlocked = Boolean(league?.unlocked) || cups >= unlock || hasLeagueNums;
 
-  if (!unlocked) {
+  // Trust backend unlock flag; only open by cups if API omitted league entirely.
+  if (league?.unlocked) {
+    return league;
+  }
+  if (cups < unlock) {
     return lockedLeagueFallback(unlock);
   }
 
@@ -45,10 +46,10 @@ export function resolveLeagueInfo(
   return {
     unlocked: true,
     unlock_trophies: unlock,
-    current_league_number: league?.current_league_number ?? 4,
+    current_league_number: league?.current_league_number ?? 1,
     current_league_name: league?.current_league_name ?? ENTRY_LEAGUE_NAME,
     current_league_icon: league?.current_league_icon ?? ENTRY_LEAGUE_ICON,
-    best_league_number: league?.best_league_number ?? 4,
+    best_league_number: league?.best_league_number ?? 1,
     best_league_name: league?.best_league_name ?? ENTRY_LEAGUE_NAME,
     best_league_icon: league?.best_league_icon ?? ENTRY_LEAGUE_ICON,
     is_absolute_champion: false,

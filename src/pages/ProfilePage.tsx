@@ -17,7 +17,7 @@ export function ProfilePage() {
   const { user } = useTelegram();
   const { nameRu } = useCardCatalog();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(() => !cacheHas("profile-v6"));
+  const [loading, setLoading] = useState(() => !cacheHas("profile-v7"));
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
