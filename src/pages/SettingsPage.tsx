@@ -237,7 +237,7 @@ export function SettingsPage() {
 
       <div className="space-y-4">
         <section>
-          <h3 className="text-sm font-semibold text-cr-muted mb-3 uppercase tracking-wider">Внешний вид</h3>
+          <h3 className="section-title mb-3">Внешний вид</h3>
           <Card>
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-3">
@@ -258,7 +258,7 @@ export function SettingsPage() {
         </section>
 
         <section>
-          <h3 className="text-sm font-semibold text-cr-muted mb-3 uppercase tracking-wider">Интерфейс</h3>
+          <h3 className="section-title mb-3">Интерфейс</h3>
           <Card>
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
@@ -293,7 +293,7 @@ export function SettingsPage() {
         </section>
 
         <section>
-          <h3 className="text-sm font-semibold text-cr-muted mb-3 uppercase tracking-wider">Обо мне</h3>
+          <h3 className="section-title mb-3">Обо мне</h3>
           <Card className="space-y-3">
             <div className="flex items-center gap-4">
               <div className="flex-1 min-w-0">
@@ -347,7 +347,7 @@ export function SettingsPage() {
         </section>
 
         <section>
-          <h3 className="text-sm font-semibold text-cr-muted mb-3 uppercase tracking-wider">Уведомления</h3>
+          <h3 className="section-title mb-3">Уведомления</h3>
           <Card className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -379,7 +379,7 @@ export function SettingsPage() {
         </section>
 
         <section>
-          <h3 className="text-sm font-semibold text-cr-muted mb-3 uppercase tracking-wider">Данные</h3>
+          <h3 className="section-title mb-3">Данные</h3>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"

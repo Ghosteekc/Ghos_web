@@ -44,6 +44,27 @@
       1px 1px 0 #000,
       -1px 0 0 #000,
       1px 0 0 #000;
+
+    /* Content UI tokens (NOT used by DockBar — keep dock on --cr-* only) */
+    --ui-panel: 14 28 68;
+    --ui-panel-raised: 18 34 78;
+    --ui-panel-sunken: 8 18 48;
+    --ui-border: 148 175 255;
+    --ui-border-alpha: 0.14;
+    --ui-radius: 1.25rem;
+    --ui-radius-lg: 1.5rem;
+    --ui-shadow:
+      0 1px 0 rgb(255 255 255 / 0.04),
+      0 8px 22px rgb(0 0 0 / 0.28);
+    --ui-shadow-soft:
+      0 1px 0 rgb(255 255 255 / 0.05),
+      0 4px 14px rgb(0 0 0 / 0.22);
+    --ui-inset-highlight: inset 0 1px 0 rgb(255 255 255 / 0.07);
+    --ui-inset-depth: inset 0 -1px 0 rgb(0 0 0 / 0.22);
+    --ui-active-ring: 147 180 255;
+    --ui-active-ring-alpha: 0.42;
+    --ui-active-fill: 18 34 78;
+    --ui-active-glow: 0 0 0 1px rgb(147 180 255 / 0.22);
   }
 
   [data-theme="light"] {
@@ -72,6 +93,27 @@
     /* No CR stroke on light — dark outlines muddy text on pale cards */
     --cr-stroke-title: none;
     --cr-stroke-body: none;
+
+    /* Soft almost-white panels over gray wallpaper (DockBar stays on light overrides) */
+    --ui-panel: 246 247 250;
+    --ui-panel-raised: 252 252 253;
+    --ui-panel-sunken: 236 238 242;
+    --ui-border: 100 116 139;
+    --ui-border-alpha: 0.15;
+    --ui-radius: 1.25rem;
+    --ui-radius-lg: 1.5rem;
+    --ui-shadow:
+      0 1px 2px rgb(15 23 42 / 0.04),
+      0 6px 16px rgb(15 23 42 / 0.05);
+    --ui-shadow-soft:
+      0 1px 2px rgb(15 23 42 / 0.03),
+      0 3px 10px rgb(15 23 42 / 0.04);
+    --ui-inset-highlight: inset 0 1px 0 rgb(255 255 255 / 0.85);
+    --ui-inset-depth: inset 0 -1px 0 rgb(15 23 42 / 0.04);
+    --ui-active-ring: 59 130 246;
+    --ui-active-ring-alpha: 0.28;
+    --ui-active-fill: 239 246 255;
+    --ui-active-glow: 0 0 0 1px rgb(59 130 246 / 0.12);
   }
 
   :root {
@@ -199,25 +241,47 @@
   .glass-panel,
   .glass-card,
   .info-glass {
-    background: rgb(var(--cr-card));
+    background: rgb(var(--ui-panel));
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    border: 1px solid rgb(var(--cr-border) / var(--cr-border-alpha));
-    box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+    border: 1px solid rgb(var(--ui-border) / var(--ui-border-alpha));
+    border-radius: var(--ui-radius-lg);
+    box-shadow: var(--ui-inset-highlight), var(--ui-inset-depth), var(--ui-shadow);
   }
 
   .glass-panel {
-    @apply rounded-cr shadow-card;
+    border-radius: var(--ui-radius);
   }
 
   .glass-card,
   .info-glass {
-    @apply rounded-cr-lg shadow-card;
+    border-radius: var(--ui-radius-lg);
+  }
+
+  .ui-panel-raised {
+    background: rgb(var(--ui-panel-raised));
+  }
+
+  .ui-panel-sunken {
+    background: rgb(var(--ui-panel-sunken));
+  }
+
+  .ui-active {
+    background: rgb(var(--ui-active-fill));
+    box-shadow:
+      var(--ui-inset-highlight),
+      inset 0 0 0 1.5px rgb(var(--ui-active-ring) / var(--ui-active-ring-alpha)),
+      var(--ui-active-glow),
+      var(--ui-shadow-soft);
   }
 
   .battle-history-card {
     /* Avoid content-visibility — it caused blank cards during fast scroll */
     contain: layout paint style;
+  }
+
+  .battle-history-card.glass-card {
+    box-shadow: var(--ui-inset-highlight), var(--ui-inset-depth), var(--ui-shadow-soft);
   }
 
   .battle-light-deck-slot--evo {
@@ -268,11 +332,11 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.06),
       inset 0 0 0 1px rgba(0, 0, 0, 0.35);
     --pb-glow-active:
-      0 0 12px rgba(251, 191, 36, 0.28),
-      0 0 4px rgba(251, 191, 36, 0.16);
+      0 0 0 1px rgba(251, 191, 36, 0.28),
+      0 0 10px rgba(251, 191, 36, 0.14);
     --pb-inner-ring:
-      inset 0 0 0 2px rgba(140, 175, 255, 0.55),
-      inset 0 0 14px rgba(88, 118, 210, 0.12);
+      inset 0 0 0 1.5px rgba(140, 175, 255, 0.45),
+      inset 0 0 10px rgba(88, 118, 210, 0.08);
     background: var(--pb-bg);
     border: none;
     border-radius: var(--pb-radius);
@@ -595,31 +659,31 @@
 
   [data-theme="light"] .pixel-bevel,
   [data-theme="light"] .pixel-btn--chip {
-    --pb-light: rgba(255, 255, 255, 0.55);
-    --pb-dark: rgba(120, 130, 160, 0.35);
-    --pb-bg: rgb(232 232 232);
-    --pb-bg-pressed: rgb(220 220 220);
+    --pb-light: rgba(255, 255, 255, 0.7);
+    --pb-dark: rgba(100, 116, 139, 0.28);
+    --pb-bg: rgb(var(--ui-panel));
+    --pb-bg-pressed: rgb(var(--ui-panel-sunken));
   }
 
   [data-theme="light"] .pixel-btn--nav-row,
   [data-theme="light"] .pixel-btn--secondary {
-    /* Lift action buttons above soft gray cards */
-    --pb-bg: rgb(250 250 250);
-    --pb-bg-pressed: rgb(236 236 236);
+    /* Lift action buttons above soft panels */
+    --pb-bg: rgb(var(--ui-panel-raised));
+    --pb-bg-pressed: rgb(var(--ui-panel-sunken));
   }
 
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active,
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) {
     --pb-glow-active:
-      0 0 10px rgba(180, 120, 8, 0.22),
-      0 0 3px rgba(180, 120, 8, 0.14);
+      0 0 0 1px rgba(59, 130, 246, 0.22),
+      0 0 8px rgba(59, 130, 246, 0.1);
     --pb-shadow-pressed:
-      inset 0 3px 7px rgba(15, 23, 42, 0.18),
+      inset 0 3px 7px rgba(15, 23, 42, 0.14),
       inset 0 1px 0 rgba(255, 255, 255, 0.65),
-      inset 0 0 0 1px rgba(15, 23, 42, 0.12);
+      inset 0 0 0 1.5px rgba(59, 130, 246, 0.28);
     --pb-filter-pressed:
-      drop-shadow(0 1px 0 rgba(15, 23, 42, 0.1))
-      drop-shadow(0 0 0 1px rgba(59, 100, 200, 0.28));
+      drop-shadow(0 1px 0 rgba(15, 23, 42, 0.08))
+      drop-shadow(0 0 0 1px rgba(59, 100, 200, 0.18));
   }
 
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):not(.pixel-btn--primary).pixel-btn--active,
@@ -1536,11 +1600,9 @@
   [data-theme="light"] .glass-panel,
   [data-theme="light"] .glass-card,
   [data-theme="light"] .info-glass {
-    background: rgb(var(--cr-card));
-    border-color: rgb(100 116 139 / 0.18);
-    box-shadow:
-      0 1px 2px rgb(15 23 42 / 0.04),
-      0 8px 20px rgb(15 23 42 / 0.06);
+    background: rgb(var(--ui-panel));
+    border-color: rgb(var(--ui-border) / var(--ui-border-alpha));
+    box-shadow: var(--ui-inset-highlight), var(--ui-inset-depth), var(--ui-shadow);
   }
 
   [data-theme="light"] .level-bar-track {
@@ -1553,6 +1615,12 @@
 
   [data-theme="light"] .page-title {
     color: rgb(15 23 42);
+    text-shadow: none;
+  }
+
+  [data-theme="light"] .page-subtitle,
+  [data-theme="light"] .section-title {
+    color: rgb(71 85 105);
     text-shadow: none;
   }
 
@@ -1662,11 +1730,11 @@
   }
 
   [data-theme="light"] .recommendation-card {
-    border-color: rgb(100 116 139 / 0.22);
-    background: rgb(var(--cr-card));
+    border-color: rgb(var(--ui-border) / var(--ui-border-alpha));
+    background: rgb(var(--ui-panel));
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+    box-shadow: var(--ui-inset-highlight), var(--ui-inset-depth), var(--ui-shadow-soft);
   }
 
   [data-theme="light"] .recommendation-card .text-cr-text,
@@ -1697,15 +1765,18 @@
   }
 
   .recommendation-card {
-    background: rgb(var(--cr-card));
+    background: rgb(var(--ui-panel));
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    border: 1px solid rgb(var(--ui-border) / var(--ui-border-alpha));
+    border-radius: var(--ui-radius);
+    box-shadow: var(--ui-inset-highlight), var(--ui-inset-depth), var(--ui-shadow-soft);
   }
 
-  /* Recommendations: force solid cards — no gold/white alpha wash over the wallpaper */
+  /* Recommendations: force solid panels — no gold/white alpha wash over the wallpaper */
   .recommendations-panel .glass-card,
   .recommendations-panel .recommendation-arena-block {
-    background: rgb(var(--cr-card)) !important;
+    background: rgb(var(--ui-panel)) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -1749,18 +1820,39 @@
     @apply text-2xl font-cr tracking-tight;
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-title);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
   }
 
   .page-subtitle {
-    @apply text-sm;
-    color: rgb(var(--cr-accent));
+    @apply text-sm leading-snug;
+    color: rgb(var(--cr-muted));
     text-shadow: var(--cr-stroke-body);
+  }
+
+  .section-title {
+    @apply text-sm font-semibold uppercase tracking-wider;
+    color: rgb(var(--cr-muted));
+    letter-spacing: 0.06em;
+    line-height: 1.3;
   }
 
   .text-label {
     @apply text-xs font-cr uppercase tracking-wide;
     color: rgb(var(--cr-accent));
     text-shadow: var(--cr-stroke-body);
+    line-height: 1.25;
+  }
+
+  .stat-value {
+    @apply font-bold tabular-nums leading-none;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+  }
+
+  .stat-caption {
+    @apply text-[10px] leading-tight;
+    color: rgb(var(--cr-muted));
   }
 
   .card-name-glow {

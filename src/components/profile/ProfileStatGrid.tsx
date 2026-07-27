@@ -83,18 +83,18 @@ export function ProfileStatGrid({ profile }: ProfileStatGridProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-1.5">
+    <div className="grid grid-cols-2 gap-2">
       {items.map((item, index) => (
         <Card
           key={item.label}
           delay={index * 0.04}
-          className="!py-2 !px-2 text-center flex flex-col items-center justify-center gap-0.5 min-h-[3.75rem] min-w-0"
+          className="!py-2.5 !px-2.5 text-center flex flex-col items-center justify-center gap-1 min-h-[4.25rem] min-w-0"
         >
-          <item.icon className={`w-5 h-5 shrink-0 ${item.iconClass}`} />
-          <p className={`text-lg font-bold tabular-nums leading-none ${item.valueClass}`}>
+          <item.icon className={`w-4 h-4 shrink-0 opacity-90 ${item.iconClass}`} />
+          <p className={`stat-value ${item.valueClass}`}>
             {item.value}
           </p>
-          <p className={`text-[10px] text-cr-muted leading-tight px-0.5 profile-stat-label`}>{item.label}</p>
+          <p className="stat-caption px-0.5 profile-stat-label">{item.label}</p>
         </Card>
       ))}
     </div>
