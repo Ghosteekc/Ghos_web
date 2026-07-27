@@ -72,6 +72,7 @@ function CardArt({
           alt={name}
           className="absolute inset-0 h-full w-full object-contain object-center drop-shadow-md [clip-path:inset(0_50%_0_0)]"
           loading="lazy"
+      decoding="async"
           onError={() => setBroken(true)}
         />
         <img
@@ -79,6 +80,7 @@ function CardArt({
           alt={name}
           className="absolute inset-0 h-full w-full object-contain object-center drop-shadow-md [clip-path:inset(0_0_0_50%)]"
           loading="lazy"
+      decoding="async"
           onError={() => setBroken(true)}
         />
         <div className="absolute inset-y-[8%] left-1/2 z-20 w-px -translate-x-1/2 bg-black/50" aria-hidden />
@@ -95,6 +97,7 @@ function CardArt({
       alt={name}
       className="relative z-10 h-full w-full object-contain object-center drop-shadow-md"
       loading="lazy"
+      decoding="async"
       onError={() => setBroken(true)}
     />
   );

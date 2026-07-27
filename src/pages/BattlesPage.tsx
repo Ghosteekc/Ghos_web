@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Trophy,
@@ -53,11 +53,15 @@ export function BattlesPage() {
     }
   };
 
-  const filtered = battles.filter((b) => {
-    if (filter === "wins") return b.won;
-    if (filter === "losses") return !b.won;
-    return true;
-  });
+  const filtered = useMemo(
+    () =>
+      battles.filter((b) => {
+        if (filter === "wins") return b.won;
+        if (filter === "losses") return !b.won;
+        return true;
+      }),
+    [battles, filter],
+  );
 
   return (
     <div className="space-y-6">
@@ -92,11 +96,10 @@ export function BattlesPage() {
         <Loader />
       ) : (
         <div className="space-y-4">
-          {filtered.map((battle, i) => (
+          {filtered.map((battle) => (
             <BattleCardSimple
               key={`${battle.timestamp}-${battle.index}`}
               summary={battle}
-              index={i}
               onOpen={() => navigate(battleDetailPath(battle.timestamp, battle.index))}
             />
           ))}

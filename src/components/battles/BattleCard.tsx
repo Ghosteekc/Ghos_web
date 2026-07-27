@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import {
   Trophy,
   ChevronRight,
@@ -11,14 +12,30 @@ import { PlayerDeckGrid } from "@/components/cards";
 interface BattleCardSimpleProps {
   summary: BattleSummary;
   onOpen: () => void;
-  index: number;
 }
 
-export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimpleProps) {
-  const opponent = formatOpponentHeadline(summary.opponent_name, summary.opponent_tag);
+function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
+  const opponent = useMemo(
+    () => formatOpponentHeadline(summary.opponent_name, summary.opponent_tag),
+    [summary.opponent_name, summary.opponent_tag],
+  );
+  const playedAt = useMemo(
+    () => formatBattlePlayedAt(summary.timestamp, summary.played_at),
+    [summary.timestamp, summary.played_at],
+  );
+  const userCards = summary.user_deck_cards?.length
+    ? summary.user_deck_cards
+    : summary.user_deck;
+  const opponentCards = summary.opponent_deck_cards?.length
+    ? summary.opponent_deck_cards
+    : summary.opponent_deck;
 
   return (
-    <Card delay={index * 0.04} className="cursor-pointer relative overflow-hidden" onClick={onOpen}>
+    <Card
+      noMotion
+      className="battle-history-card cursor-pointer relative overflow-hidden"
+      onClick={onOpen}
+    >
       <div
         className={cn(
           "absolute left-0 top-0 bottom-0 w-1",
@@ -50,10 +67,8 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
             ) : null}
           </div>
           <div className="text-right">
-            {formatBattlePlayedAt(summary.timestamp, summary.played_at) ? (
-              <p className="text-xs font-semibold text-cr-accent">
-                {formatBattlePlayedAt(summary.timestamp, summary.played_at)}
-              </p>
+            {playedAt ? (
+              <p className="text-xs font-semibold text-cr-accent">{playedAt}</p>
             ) : null}
             {(summary.duration ?? 0) > 0 ? (
               <p className="text-xs text-cr-muted">{formatTime(summary.duration)}</p>
@@ -67,10 +82,7 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <div className="flex-1 min-w-0">
-            <PlayerDeckGrid
-              cards={summary.user_deck_cards?.length ? summary.user_deck_cards : summary.user_deck}
-              size="xs"
-            />
+            <PlayerDeckGrid cards={userCards} size="xs" />
           </div>
           <span
             className="shrink-0 px-0.5 text-[10px] sm:text-xs font-cr font-extrabold tracking-wide text-cr-gold"
@@ -79,14 +91,7 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
             VS
           </span>
           <div className="flex-1 min-w-0">
-            <PlayerDeckGrid
-              cards={
-                summary.opponent_deck_cards?.length
-                  ? summary.opponent_deck_cards
-                  : summary.opponent_deck
-              }
-              size="xs"
-            />
+            <PlayerDeckGrid cards={opponentCards} size="xs" />
           </div>
           <div className="text-cr-muted shrink-0 pl-0.5">
             <ChevronRight className="w-5 h-5" />
@@ -100,3 +105,5 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
     </Card>
   );
 }
+
+export const BattleCardSimple = memo(BattleCardSimpleInner);

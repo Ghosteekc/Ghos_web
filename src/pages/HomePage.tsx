@@ -90,7 +90,6 @@ export function HomePage() {
           <h3 className="text-sm font-semibold text-cr-text mb-3 px-1">Последний бой</h3>
           <BattleCardSimple
             summary={lastBattle}
-            index={0}
             onOpen={() => navigate(battleDetailPath(lastBattle.timestamp, lastBattle.index))}
           />
         </div>

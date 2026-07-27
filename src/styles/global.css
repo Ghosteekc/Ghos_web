@@ -215,6 +215,12 @@
     @apply rounded-cr-lg shadow-card;
   }
 
+  /* Skip off-screen paint work while scrolling battle history */
+  .battle-history-card {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 14.5rem;
+  }
+
   /* Buttons stay fully opaque - no glass / no backdrop blur */
   .pixel-btn,
   .pixel-btn.pixel-bevel,
