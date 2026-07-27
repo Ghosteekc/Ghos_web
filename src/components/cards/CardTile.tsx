@@ -26,7 +26,7 @@ const labelSizeClasses: Record<CardTileSize, string> = {
   collection: "card-name-deck",
 };
 
-function cardFrameClass(displayMode: CardDisplayMode, rarity?: string): string {
+function cardFrameClass(displayMode: CardDisplayMode, rarity?: string): string | null {
   if (rarity === "champion") return "card-frame-champion";
   switch (displayMode) {
     case "evo":
@@ -36,8 +36,12 @@ function cardFrameClass(displayMode: CardDisplayMode, rarity?: string): string {
     case "split":
       return "card-frame-split";
     default:
-      return "card-frame-base";
+      return null;
   }
+}
+
+function collectionFrameClass(displayMode: CardDisplayMode, rarity?: string): string {
+  return cardFrameClass(displayMode, rarity) ?? "card-frame-base";
 }
 
 function CardArt({
@@ -132,6 +136,8 @@ interface CardTileProps {
   className?: string;
   badge?: string | number;
   levelBadge?: string | number;
+  /** Small-tile level chip corner (default top-right). Use top-left in tight grids. */
+  levelBadgeAnchor?: "top-left" | "top-right";
   elixirCost?: number;
   rarity?: string;
   displayMode?: CardDisplayMode;
@@ -151,6 +157,7 @@ export function CardTile({
   className,
   badge,
   levelBadge,
+  levelBadgeAnchor = "top-right",
   elixirCost,
   rarity,
   displayMode = "base",
@@ -202,7 +209,9 @@ export function CardTile({
         <div
           className={cn(
             "relative z-10 h-full w-full",
-            isCollection && cardFrameClass(displayMode, rarity),
+            isCollection
+              ? collectionFrameClass(displayMode, rarity)
+              : (size === "lg" || size === "deck") && cardFrameClass(displayMode, rarity),
           )}
         >
           {src ? (
@@ -228,7 +237,12 @@ export function CardTile({
           <ElixirCostBadge cost={resolvedElixir} size={isCollection ? "lg" : "md"} />
         )}
         {!isCollection && size !== "lg" && size !== "deck" && levelBadge != null && (
-          <span className="absolute top-0 right-0 z-50 min-w-[1.1rem] rounded-md border border-cr-gold/40 bg-cr-bg/95 px-1 py-0.5 text-[10px] font-sans font-extrabold leading-none text-white pointer-events-none card-level-chip">
+          <span
+            className={cn(
+              "absolute top-0 z-50 min-w-[1.1rem] rounded-md border border-cr-gold/40 bg-cr-bg/95 px-1 py-0.5 text-[10px] font-sans font-extrabold leading-none text-white pointer-events-none card-level-chip",
+              levelBadgeAnchor === "top-left" ? "left-0" : "right-0",
+            )}
+          >
             {levelBadge}
           </span>
         )}

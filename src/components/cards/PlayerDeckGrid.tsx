@@ -45,6 +45,7 @@ interface PlayerDeckGridProps {
   showLabels?: boolean;
   className?: string;
   gapClassName?: string;
+  levelBadgeAnchor?: "top-left" | "top-right";
 }
 
 /** Player/profile decks with evolution and hero art (as in Clash Royale). */
@@ -54,6 +55,7 @@ export function PlayerDeckGrid({
   showLabels = false,
   className,
   gapClassName,
+  levelBadgeAnchor,
 }: PlayerDeckGridProps) {
   const items = toDeckCards(cards)
     .slice(0, 8)
@@ -79,6 +81,7 @@ export function PlayerDeckGrid({
               iconHero={card.icon}
               elixirCost={card.cost > 0 ? card.cost : undefined}
               levelBadge={card.level != null && card.level > 0 ? card.level : undefined}
+              levelBadgeAnchor={levelBadgeAnchor}
             />
           </div>
         );

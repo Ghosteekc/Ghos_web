@@ -390,7 +390,7 @@ export const api = {
 
   getBattles: () =>
     cachedGet<{ battles: BattleSummary[]; cached_total: number | null; cached_winrate: number | null }>(
-      "battles-v3",
+      "battles-v4",
       "/api/battles",
       TTL.battles,
     ),

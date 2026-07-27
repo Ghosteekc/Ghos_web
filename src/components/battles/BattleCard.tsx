@@ -55,6 +55,14 @@ function LightBattleDeckStrip({
                 {card.name.charAt(0)}
               </span>
             )}
+            {card.level != null && card.level > 0 ? (
+              <span
+                className="battle-light-deck-level card-level-chip pointer-events-none absolute left-0 top-0 z-10"
+                aria-hidden
+              >
+                {card.level}
+              </span>
+            ) : null}
           </div>
         );
       })}
