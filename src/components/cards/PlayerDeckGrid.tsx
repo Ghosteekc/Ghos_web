@@ -80,6 +80,7 @@ export function PlayerDeckGrid({
               iconEvo={card.icon}
               iconHero={card.icon}
               elixirCost={card.cost > 0 ? card.cost : undefined}
+              rarity={card.rarity}
               levelBadge={card.level != null && card.level > 0 ? card.level : undefined}
               levelBadgeAnchor={levelBadgeAnchor}
             />

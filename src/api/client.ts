@@ -429,7 +429,7 @@ export const api = {
   prefetchDeckTabs: () => {
     void cachedGet<DecksListData>("decks:meta", "/api/decks?type=meta", TTL.battles).catch(() => {});
     void cachedGet<TopPlayersData>("top-players-v3", "/api/decks/top-players?limit=10", TTL.topPlayers).catch(() => {});
-    void cachedGet<ArenaDecksData>("arena-decks-v8", "/api/decks/arena", TTL.arenaDecks).catch(() => {});
+    void cachedGet<ArenaDecksData>("arena-decks-v9", "/api/decks/arena", TTL.arenaDecks).catch(() => {});
   },
 
   getDecks: (type?: string) => {
@@ -449,7 +449,7 @@ export const api = {
 
 
   getArenaDecks: () =>
-    cachedGet<ArenaDecksData>("arena-decks-v8", "/api/decks/arena", TTL.arenaDecks),
+    cachedGet<ArenaDecksData>("arena-decks-v9", "/api/decks/arena", TTL.arenaDecks),
 
 
 
