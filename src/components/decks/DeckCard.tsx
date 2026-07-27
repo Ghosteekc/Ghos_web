@@ -18,6 +18,8 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
     void navigator.clipboard.writeText(cardNames);
   };
 
+  const isMine = deck.type === "mine";
+
   return (
     <Card delay={index * 0.04} className="cursor-pointer overflow-hidden relative" onClick={onOpen}>
       <div className="flex items-center justify-between mb-4">
@@ -37,9 +39,21 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-4">
+      <div
+        className={
+          "grid grid-cols-4 grid-rows-2 mb-4 " +
+          (isMine ? "gap-x-2 gap-y-1" : "gap-x-1.5 gap-y-0.5")
+        }
+      >
         {deck.cards.map((card) => (
-          <div key={card.id} className="min-w-0 overflow-hidden">
+          <div
+            key={card.id}
+            className={
+              "min-w-0 " +
+              (isMine ? "overflow-hidden" : "overflow-visible transform origin-center scale-[1.07]") +
+              ""
+            }
+          >
             <CardTile name={card.name} icon={card.icon} size="deck" />
           </div>
         ))}

@@ -25,7 +25,7 @@ function LightBattleDeckStrip({
   const items = useMemo(() => toDeckCards(cards).slice(0, 8), [cards]);
 
   return (
-    <div className="battle-light-deck grid grid-cols-4 gap-0.5">
+    <div className="battle-light-deck grid grid-cols-4 gap-[1px]">
       {items.map((card, index) => {
         const src = card.icon || iconUrl(card.name) || "";
         const evo = (card.evolution_level ?? 0) >= 1 && !card.is_hero;
@@ -43,8 +43,8 @@ function LightBattleDeckStrip({
               <img
                 src={src}
                 alt=""
-                width={40}
-                height={50}
+                width={44}
+                height={55}
                 className="h-full w-full object-contain"
                 loading="lazy"
                 decoding="async"
