@@ -188,7 +188,7 @@ export function CardTile({
           "relative shrink-0 card-tile-wrap",
           isCollection
             ? "overflow-visible collection-card-wrap"
-            : showElixir
+            : showElixir || levelBadge != null
               ? "overflow-visible"
               : "overflow-hidden",
           sizeClasses[size],
@@ -218,11 +218,13 @@ export function CardTile({
             </div>
           )}
         </div>
-        {isCollection && levelBadge != null && <LevelBadge level={levelBadge} />}
+        {(isCollection || size === "lg" || size === "deck") && levelBadge != null && (
+          <LevelBadge level={levelBadge} />
+        )}
         {showElixir && (
           <ElixirCostBadge cost={resolvedElixir} size={isCollection ? "lg" : "md"} />
         )}
-        {!isCollection && levelBadge != null && (
+        {!isCollection && size !== "lg" && size !== "deck" && levelBadge != null && (
           <span className="absolute top-0 right-0 z-50 min-w-[1.1rem] rounded-md border border-cr-gold/40 bg-cr-bg/95 px-1 py-0.5 text-[10px] font-sans font-extrabold leading-none text-white pointer-events-none card-level-chip">
             {levelBadge}
           </span>

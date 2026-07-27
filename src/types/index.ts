@@ -151,6 +151,7 @@ export interface DeckCard {
   evolution_level?: number;
   is_hero?: boolean;
   slot?: number;
+  level?: number | null;
 }
 
 export interface Deck {

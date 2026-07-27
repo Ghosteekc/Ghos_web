@@ -78,6 +78,7 @@ export function PlayerDeckGrid({
               iconEvo={card.icon}
               iconHero={card.icon}
               elixirCost={card.cost > 0 ? card.cost : undefined}
+              levelBadge={card.level != null && card.level > 0 ? card.level : undefined}
             />
           </div>
         );
