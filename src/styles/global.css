@@ -215,10 +215,17 @@
     @apply rounded-cr-lg shadow-card;
   }
 
-  /* Skip off-screen paint work while scrolling battle history */
   .battle-history-card {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 14.5rem;
+    /* Avoid content-visibility — it caused blank cards during fast scroll */
+    contain: layout paint style;
+  }
+
+  .battle-light-deck-slot--evo {
+    box-shadow: inset 0 0 0 1.5px rgb(232 121 249 / 0.9);
+  }
+
+  .battle-light-deck-slot--hero {
+    box-shadow: inset 0 0 0 1.5px rgb(251 191 36 / 0.9);
   }
 
   /* Buttons stay fully opaque - no glass / no backdrop blur */

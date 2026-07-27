@@ -5,14 +5,64 @@ import {
   Flame,
 } from "lucide-react";
 import { formatTime, getTrophyChangeColor, cn, formatBattlePlayedAt, formatOpponentHeadline } from "@/utils";
-import { BattleSummary } from "@/types";
+import type { BattleSummary, DeckCard } from "@/types";
 import { Card, ElixirIcon } from "@/components/ui";
-import { PlayerDeckGrid } from "@/components/cards";
+import { toDeckCards } from "@/components/cards/PlayerDeckGrid";
+import { useCardCatalog } from "@/hooks/CardCatalogProvider";
 
 interface BattleCardSimpleProps {
   summary: BattleSummary;
   onOpen: () => void;
 }
+
+/** Lightweight 4×2 deck for battle list — plain images, no CardTile tree. */
+function LightBattleDeckStrip({
+  cards,
+}: {
+  cards: Array<DeckCard | string> | null | undefined;
+}) {
+  const { iconUrl } = useCardCatalog();
+  const items = useMemo(() => toDeckCards(cards).slice(0, 8), [cards]);
+
+  return (
+    <div className="battle-light-deck grid grid-cols-4 gap-0.5">
+      {items.map((card, index) => {
+        const src = card.icon || iconUrl(card.name) || "";
+        const evo = (card.evolution_level ?? 0) >= 1 && !card.is_hero;
+        const hero = Boolean(card.is_hero);
+        return (
+          <div
+            key={`${card.id}-${index}`}
+            className={cn(
+              "battle-light-deck-slot relative aspect-[4/5] overflow-hidden rounded-[0.2rem] bg-cr-bg/40",
+              evo && "battle-light-deck-slot--evo",
+              hero && "battle-light-deck-slot--hero",
+            )}
+          >
+            {src ? (
+              <img
+                src={src}
+                alt=""
+                width={40}
+                height={50}
+                className="h-full w-full object-contain"
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+              />
+            ) : (
+              <span className="flex h-full items-center justify-center text-[8px] font-bold text-cr-muted">
+                {card.name.charAt(0)}
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const LightBattleDeckStripMemo = memo(LightBattleDeckStrip);
 
 function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
   const opponent = useMemo(
@@ -33,7 +83,7 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
   return (
     <Card
       noMotion
-      className="battle-history-card cursor-pointer relative overflow-hidden"
+      className="battle-history-card cursor-pointer relative overflow-hidden !shadow-none"
       onClick={onOpen}
     >
       <div
@@ -43,7 +93,7 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
         )}
       />
       <div className="pl-4">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             {summary.won ? (
               <Trophy className="w-5 h-5 text-cr-win" />
@@ -59,14 +109,14 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
           </span>
         </div>
 
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-sm font-medium text-cr-text">против {opponent.title}</p>
+        <div className="flex items-center justify-between mb-2">
+          <div className="min-w-0 pr-2">
+            <p className="text-sm font-medium text-cr-text truncate">против {opponent.title}</p>
             {opponent.tagLine ? (
-              <p className="text-xs text-cr-muted">{opponent.tagLine}</p>
+              <p className="text-xs text-cr-muted truncate">{opponent.tagLine}</p>
             ) : null}
           </div>
-          <div className="text-right">
+          <div className="text-right shrink-0">
             {playedAt ? (
               <p className="text-xs font-semibold text-cr-accent">{playedAt}</p>
             ) : null}
@@ -82,7 +132,7 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <div className="flex-1 min-w-0">
-            <PlayerDeckGrid cards={userCards} size="xs" />
+            <LightBattleDeckStripMemo cards={userCards} />
           </div>
           <span
             className="shrink-0 px-0.5 text-[10px] sm:text-xs font-cr font-extrabold tracking-wide text-cr-gold"
@@ -91,7 +141,7 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
             VS
           </span>
           <div className="flex-1 min-w-0">
-            <PlayerDeckGrid cards={opponentCards} size="xs" />
+            <LightBattleDeckStripMemo cards={opponentCards} />
           </div>
           <div className="text-cr-muted shrink-0 pl-0.5">
             <ChevronRight className="w-5 h-5" />
@@ -99,7 +149,7 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
         </div>
 
         {summary.top_reason ? (
-          <p className="text-xs text-cr-muted mt-3 leading-snug line-clamp-2">{summary.top_reason}</p>
+          <p className="text-xs text-cr-muted mt-2 leading-snug line-clamp-2">{summary.top_reason}</p>
         ) : null}
       </div>
     </Card>
