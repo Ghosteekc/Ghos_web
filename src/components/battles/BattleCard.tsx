@@ -65,14 +65,30 @@ export function BattleCardSimple({ summary, onOpen, index }: BattleCardSimplePro
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex-1 max-w-[11rem]">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex-1 min-w-0">
             <PlayerDeckGrid
               cards={summary.user_deck_cards?.length ? summary.user_deck_cards : summary.user_deck}
               size="xs"
             />
           </div>
-          <div className="text-cr-muted shrink-0">
+          <span
+            className="shrink-0 px-0.5 text-[10px] sm:text-xs font-cr font-extrabold tracking-wide text-cr-gold"
+            aria-hidden
+          >
+            VS
+          </span>
+          <div className="flex-1 min-w-0">
+            <PlayerDeckGrid
+              cards={
+                summary.opponent_deck_cards?.length
+                  ? summary.opponent_deck_cards
+                  : summary.opponent_deck
+              }
+              size="xs"
+            />
+          </div>
+          <div className="text-cr-muted shrink-0 pl-0.5">
             <ChevronRight className="w-5 h-5" />
           </div>
         </div>
