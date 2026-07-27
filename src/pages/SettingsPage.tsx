@@ -324,7 +324,7 @@ export function SettingsPage() {
             </div>
             <button
               type="button"
-              className="settings-data-btn w-full"
+              className="settings-data-btn w-full settings-data-btn--danger"
               onClick={() => void handleUnlinkAccount()}
               disabled={unlinking}
             >
