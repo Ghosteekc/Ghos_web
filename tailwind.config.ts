@@ -23,14 +23,14 @@ const config: Config = {
         cr: ["Supercell Magic", "SC CCBackBeat", "sans-serif"],
         mono: ["SC CCBackBeat", "monospace"],
       },
-      borderRadius: {
-        "cr": "1.25rem",
-        "cr-lg": "1.5rem",
-      },
       boxShadow: {
-        "glow": "0 0 20px rgba(251, 191, 36, 0.15)",
+        glow: "0 0 20px rgba(251, 191, 36, 0.15)",
         "glow-blue": "0 0 20px rgba(96, 165, 250, 0.15)",
-        "card": "0 8px 32px rgba(0, 0, 0, 0.25)",
+        card: "var(--ui-shadow)",
+      },
+      borderRadius: {
+        cr: "var(--ui-radius)",
+        "cr-lg": "var(--ui-radius-lg)",
       },
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
