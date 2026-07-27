@@ -603,7 +603,7 @@ export function ConstructorDeckGrid({ cards }: { cards: DeckCard[] }) {
 
       {sorted.map((card, i) => (
 
-        <div key={`${card.id}-${i}`} className="min-w-0 overflow-hidden">
+        <div key={`${card.id}-${i}`} className="min-w-0 overflow-visible">
 
           <CardTile
 
@@ -622,6 +622,8 @@ export function ConstructorDeckGrid({ cards }: { cards: DeckCard[] }) {
             iconEvo={card.icon}
 
             iconHero={card.icon}
+
+            elixirCost={card.cost && card.cost > 0 ? card.cost : undefined}
 
           />
 

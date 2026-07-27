@@ -100,10 +100,11 @@ function CardArt({
   );
 }
 
-function ElixirCostBadge({ cost }: { cost: number }) {
+function ElixirCostBadge({ cost, size = "md" }: { cost: number; size?: "md" | "lg" }) {
+  const iconSize = size === "lg" ? 26 : 22;
   return (
-    <span className="cr-elixir-badge" aria-label={`${cost} эликсира`}>
-      <ElixirIcon size={20} className="text-[#d946ef]" />
+    <span className={cn("cr-elixir-badge", size === "lg" && "cr-elixir-badge--lg")} aria-label={`${cost} эликсира`}>
+      <ElixirIcon size={iconSize} className="text-[#d946ef]" />
       <span className="cr-elixir-badge-num">{cost}</span>
     </span>
   );
@@ -154,11 +155,20 @@ export function CardTile({
   iconEvo,
   iconHero,
 }: CardTileProps) {
-  const { nameRu, nameShort, iconUrl } = useCardCatalog();
+  const { nameRu, nameShort, iconUrl, getCard } = useCardCatalog();
   const src = icon || iconUrl(name);
   const fallbackSrc =
     name.trim().toLowerCase() === "ronin" ? "/cards/ronin.png" : iconUrl(name) || undefined;
   const isCollection = size === "collection";
+  const catalogElixir = getCard(name)?.elixir;
+  const resolvedElixir =
+    elixirCost != null && elixirCost > 0 && elixirCost < 99
+      ? elixirCost
+      : catalogElixir != null && catalogElixir > 0 && catalogElixir < 99
+        ? catalogElixir
+        : null;
+  const showElixir =
+    resolvedElixir != null && (isCollection || size === "deck" || size === "lg" || size === "grid");
   // Keep name captions under the art so they never cover the card frame.
   const overlayLabel = false;
   const label =
@@ -176,7 +186,11 @@ export function CardTile({
       <div
         className={cn(
           "relative shrink-0 card-tile-wrap",
-          isCollection ? "overflow-visible collection-card-wrap" : "overflow-hidden",
+          isCollection
+            ? "overflow-visible collection-card-wrap"
+            : showElixir
+              ? "overflow-visible"
+              : "overflow-hidden",
           sizeClasses[size],
         )}
         title={nameRu(name)}
@@ -205,7 +219,9 @@ export function CardTile({
           )}
         </div>
         {isCollection && levelBadge != null && <LevelBadge level={levelBadge} />}
-        {isCollection && elixirCost != null && <ElixirCostBadge cost={elixirCost} />}
+        {showElixir && (
+          <ElixirCostBadge cost={resolvedElixir} size={isCollection ? "lg" : "md"} />
+        )}
         {!isCollection && levelBadge != null && (
           <span className="absolute top-0 right-0 z-50 min-w-[1.1rem] rounded-md border border-cr-gold/40 bg-cr-bg/95 px-1 py-0.5 text-[10px] font-sans font-extrabold leading-none text-white pointer-events-none card-level-chip">
             {levelBadge}

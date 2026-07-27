@@ -77,6 +77,7 @@ export function PlayerDeckGrid({
               displayMode={mode}
               iconEvo={card.icon}
               iconHero={card.icon}
+              elixirCost={card.cost > 0 ? card.cost : undefined}
             />
           </div>
         );
