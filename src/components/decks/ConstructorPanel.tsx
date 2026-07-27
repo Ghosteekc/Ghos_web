@@ -54,13 +54,12 @@ type CatalogCard = {
 
 
 function slotDisplayMode(slotIndex: number, card: CatalogCard): CardDisplayMode {
-
+  // Hero slot — only real heroes (heroMedium), not evo-only cards.
   if (slotIndex === 1 && card.has_hero) return "hero";
-
-  if ((slotIndex === 0 || slotIndex === 2) && (card.max_evolution_level ?? 0) >= 1) return "evo";
-
+  // Evo slots — only cards with actual evolution art.
+  // Hero-only cards (Magic Archer, Giant, …) have maxEvolutionLevel>=1 but no evo icon.
+  if ((slotIndex === 0 || slotIndex === 2) && Boolean(card.icon_evo)) return "evo";
   return "base";
-
 }
 
 
