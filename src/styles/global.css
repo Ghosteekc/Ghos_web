@@ -1640,7 +1640,7 @@
   }
 
   [data-theme="light"] .section-title {
-    color: rgb(var(--cr-accent));
+    color: rgb(var(--cr-gold));
     text-shadow: none;
   }
 
@@ -1852,7 +1852,7 @@
 
   .section-title {
     @apply text-sm font-semibold uppercase tracking-wider;
-    color: rgb(var(--cr-accent));
+    color: rgb(var(--cr-gold));
     letter-spacing: 0.06em;
     line-height: 1.3;
   }
