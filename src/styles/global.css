@@ -1634,9 +1634,13 @@
     text-shadow: none;
   }
 
-  [data-theme="light"] .page-subtitle,
-  [data-theme="light"] .section-title {
+  [data-theme="light"] .page-subtitle {
     color: rgb(var(--cr-muted));
+    text-shadow: none;
+  }
+
+  [data-theme="light"] .section-title {
+    color: rgb(var(--cr-accent));
     text-shadow: none;
   }
 
@@ -1848,7 +1852,7 @@
 
   .section-title {
     @apply text-sm font-semibold uppercase tracking-wider;
-    color: rgb(var(--cr-muted));
+    color: rgb(var(--cr-accent));
     letter-spacing: 0.06em;
     line-height: 1.3;
   }

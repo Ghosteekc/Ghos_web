@@ -67,7 +67,7 @@ function DeckCardsGrid({ cards, useVariants = false }: { cards: DeckCardData[]; 
   if (useVariants) {
     return <ConstructorDeckGrid cards={cards} />;
   }
-  return <PlayerDeckGrid cards={cards} size="deck" className="mb-4" />;
+  return <PlayerDeckGrid cards={cards} size="lg" showLabels className="mb-4" />;
 }
 
 export function DecksPage() {
@@ -723,10 +723,10 @@ function RandomDeckPanel({
             : "8 случайных карт, как в игре. Нажмите «Заново», если колода не нравится."}
         </p>
 
-        <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-4">
+        <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-3 mb-4">
           {deck.card_infos.map((card, i) => (
-            <div key={card.id} className="min-w-0 overflow-hidden">
-              <CardTile name={card.name} icon={card.icon} size="deck" />
+            <div key={card.id} className="min-w-0 overflow-visible">
+              <CardTile name={card.name} icon={card.icon} size="lg" showLabel />
             </div>
           ))}
         </div>

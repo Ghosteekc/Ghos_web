@@ -593,47 +593,28 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
 
 export function ConstructorDeckGrid({ cards }: { cards: DeckCard[] }) {
-
   const sorted = [...cards].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
 
   return (
-
-    <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-1 mb-4">
-
+    <div className="grid grid-cols-4 grid-rows-2 gap-x-2 gap-y-3 mb-4">
       {sorted.map((card, i) => (
-
         <div key={`${card.id}-${i}`} className="min-w-0 overflow-visible">
-
           <CardTile
-
             name={card.name}
-
             icon={card.icon}
-
-            size="deck"
-
+            size="lg"
+            showLabel
             displayMode={
-
               card.is_hero ? "hero" : (card.evolution_level ?? 0) >= 1 ? "evo" : "base"
-
             }
-
             iconEvo={card.icon}
-
             iconHero={card.icon}
-
             elixirCost={card.cost && card.cost > 0 ? card.cost : undefined}
-
           />
-
         </div>
-
       ))}
-
     </div>
-
   );
-
 }
 
 

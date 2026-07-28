@@ -105,7 +105,7 @@ export function FavoritesPanel({ onAnalyze, onCompare }: FavoritesPanelProps) {
                     </Button>
                   </div>
                 </div>
-                <CardDeckGrid cards={entry.cards} size="deck" showLabels maxVisible={8} />
+                <CardDeckGrid cards={entry.cards} size="lg" showLabels maxVisible={8} />
                 {canAct && (onAnalyze || onCompare) ? (
                   <div
                     className={
