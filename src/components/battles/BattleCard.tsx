@@ -25,7 +25,7 @@ function LightBattleDeckStrip({
   const items = useMemo(() => toDeckCards(cards).slice(0, 8), [cards]);
 
   return (
-    <div className="battle-light-deck grid grid-cols-4 gap-[1px]">
+    <div className="battle-light-deck grid grid-cols-4 gap-0.5">
       {items.map((card, index) => {
         const src = card.icon || iconUrl(card.name) || "";
         const evo = (card.evolution_level ?? 0) >= 1 && !card.is_hero;
@@ -34,7 +34,7 @@ function LightBattleDeckStrip({
           <div
             key={`${card.id}-${index}`}
             className={cn(
-              "battle-light-deck-slot relative aspect-[4/5] overflow-hidden rounded-[0.2rem] bg-cr-bg/40",
+              "battle-light-deck-slot relative aspect-[4/5] overflow-hidden rounded-[0.25rem] bg-cr-bg/40",
               evo && "battle-light-deck-slot--evo",
               hero && "battle-light-deck-slot--hero",
             )}
@@ -43,8 +43,8 @@ function LightBattleDeckStrip({
               <img
                 src={src}
                 alt=""
-                width={44}
-                height={55}
+                width={52}
+                height={65}
                 className="h-full w-full object-contain"
                 loading="lazy"
                 decoding="async"
@@ -138,21 +138,21 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <div className="flex-1 min-w-0">
+        <div className="battle-decks-row flex items-center gap-1">
+          <div className="min-w-0 flex-1">
             <LightBattleDeckStripMemo cards={userCards} />
           </div>
           <span
-            className="shrink-0 px-0.5 text-[10px] sm:text-xs font-cr font-extrabold tracking-wide text-cr-gold"
+            className="shrink-0 text-[10px] font-cr font-extrabold tracking-wide text-cr-gold"
             aria-hidden
           >
             VS
           </span>
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <LightBattleDeckStripMemo cards={opponentCards} />
           </div>
-          <div className="text-cr-muted shrink-0 pl-0.5">
-            <ChevronRight className="w-5 h-5" />
+          <div className="shrink-0 text-cr-muted">
+            <ChevronRight className="h-4 w-4" />
           </div>
         </div>
 
