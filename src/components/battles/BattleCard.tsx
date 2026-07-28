@@ -43,8 +43,8 @@ function LightBattleDeckStrip({
               <img
                 src={src}
                 alt=""
-                width={52}
-                height={65}
+                width={64}
+                height={80}
                 className="h-full w-full object-contain"
                 loading="lazy"
                 decoding="async"
@@ -138,12 +138,12 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
           </div>
         </div>
 
-        <div className="battle-decks-row flex items-center gap-1">
+        <div className="battle-decks-row flex items-center gap-0.5">
           <div className="min-w-0 flex-1">
             <LightBattleDeckStripMemo cards={userCards} />
           </div>
           <span
-            className="shrink-0 text-[10px] font-cr font-extrabold tracking-wide text-cr-gold"
+            className="shrink-0 px-0.5 text-[9px] font-cr font-extrabold tracking-wide text-cr-gold"
             aria-hidden
           >
             VS
@@ -151,8 +151,8 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
           <div className="min-w-0 flex-1">
             <LightBattleDeckStripMemo cards={opponentCards} />
           </div>
-          <div className="shrink-0 text-cr-muted">
-            <ChevronRight className="h-4 w-4" />
+          <div className="shrink-0 text-cr-muted self-center">
+            <ChevronRight className="h-3.5 w-3.5" />
           </div>
         </div>
 

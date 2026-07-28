@@ -91,9 +91,14 @@
     --cr-glass-bg-strong: rgb(var(--cr-card) / 0.88);
     --cr-glass-blur: blur(18px) saturate(140%);
     --cr-chart-grid: rgba(102, 112, 133, 0.28);
-    /* No CR stroke on light — dark outlines muddy text on pale cards */
+    /* No CR stroke on light cards — wallpaper-only text uses --cr-stroke-wallpaper */
     --cr-stroke-title: none;
     --cr-stroke-body: none;
+    --cr-stroke-wallpaper:
+      -1px 0 0 rgba(0, 0, 0, 0.5),
+      1px 0 0 rgba(0, 0, 0, 0.5),
+      0 -1px 0 rgba(0, 0, 0, 0.5),
+      0 1px 0 rgba(0, 0, 0, 0.5);
 
     /* Soft panels (DockBar keeps its own light overrides below) */
     --ui-panel: 255 255 255;
@@ -294,20 +299,37 @@
   }
 
   .battle-decks-row {
-    margin-inline: -0.125rem;
+    margin-inline: -0.25rem;
+    padding-block: 0.15rem;
   }
 
   .battle-decks-row .battle-light-deck {
-    /* Chromium / Telegram WebView — чуть крупнее иконки без ломки сетки */
-    zoom: 1.12;
+    /* Larger icons — tile may grow a bit; cards stay readable */
+    zoom: 1.32;
   }
 
   .battle-light-deck-level {
-    min-width: 0.85rem;
+    min-width: 0.95rem;
     padding: 1px 3px;
-    font-size: 8px;
+    font-size: 9px;
     line-height: 1;
     border-radius: 0.15rem;
+  }
+
+  /* Constructor seed tile: soft gold glass with ~15px Gaussian backdrop blur */
+  .constructor-seed-card.glass-card {
+    background: rgb(var(--cr-gold) / 0.12);
+    backdrop-filter: blur(15px) saturate(140%);
+    -webkit-backdrop-filter: blur(15px) saturate(140%);
+    border-color: rgb(var(--cr-gold) / 0.32);
+    box-shadow: var(--ui-inset-highlight), var(--ui-inset-depth), var(--ui-shadow-soft);
+  }
+
+  [data-theme="light"] .constructor-seed-card.glass-card {
+    background: rgb(var(--cr-gold) / 0.14);
+    backdrop-filter: blur(15px) saturate(140%);
+    -webkit-backdrop-filter: blur(15px) saturate(140%);
+    border-color: rgb(var(--cr-gold) / 0.35);
   }
 
   /* Buttons stay fully opaque - no glass / no backdrop blur */
@@ -1631,17 +1653,21 @@
 
   [data-theme="light"] .page-title {
     color: rgb(var(--cr-text));
-    text-shadow: none;
+    text-shadow: var(--cr-stroke-wallpaper);
   }
 
   [data-theme="light"] .page-subtitle {
     color: rgb(var(--cr-muted));
-    text-shadow: none;
+    text-shadow: var(--cr-stroke-wallpaper);
   }
 
   [data-theme="light"] .section-title {
     color: rgb(var(--cr-gold));
-    text-shadow: none;
+    text-shadow: var(--cr-stroke-wallpaper);
+  }
+
+  [data-theme="light"] .decks-tab-description {
+    text-shadow: var(--cr-stroke-wallpaper);
   }
 
   [data-theme="light"] .shadow-glow {
@@ -1677,6 +1703,17 @@
   [data-theme="light"] .btn-gold,
   [data-theme="light"] .btn-blue {
     text-shadow: none !important;
+  }
+
+  /* Wallpaper-only copy: thin black outline (cards keep stroke killed above) */
+  [data-theme="light"] .page-title,
+  [data-theme="light"] .section-title,
+  [data-theme="light"] .page-subtitle,
+  [data-theme="light"] .decks-tab-description,
+  [data-theme="light"] .supercell-disclaimer,
+  [data-theme="light"] .supercell-disclaimer p,
+  [data-theme="light"] .supercell-disclaimer a {
+    text-shadow: var(--cr-stroke-wallpaper) !important;
   }
 
   [data-theme="light"] .filter-tab.filter-tab--active,
