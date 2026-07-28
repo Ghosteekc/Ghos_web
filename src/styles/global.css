@@ -9,13 +9,14 @@
     --cr-surface: 6 14 42;
     --cr-card: 10 22 58;
     --cr-card-hover: 14 28 72;
-    --cr-gold: 255 220 80;
-    --cr-blue: 120 170 255;
-    --cr-win: 90 230 130;
-    --cr-loss: 255 110 110;
+    /* Palette: Warning / Primary / Success / Danger / Secondary Blue */
+    --cr-gold: 200 148 18;
+    --cr-blue: 61 108 242;
+    --cr-win: 35 165 89;
+    --cr-loss: 214 69 69;
     --cr-text: 255 255 255;
     --cr-muted: 200 210 240;
-    --cr-accent: 147 180 255;
+    --cr-accent: 93 125 232;
     --cr-border: 255 255 255;
     --cr-border-alpha: 0.08;
     --cr-bg-top: #050b23;
@@ -49,7 +50,7 @@
     --ui-panel: 14 28 68;
     --ui-panel-raised: 18 34 78;
     --ui-panel-sunken: 8 18 48;
-    --ui-border: 148 175 255;
+    --ui-border: 93 125 232;
     --ui-border-alpha: 0.14;
     --ui-radius: 1.25rem;
     --ui-radius-lg: 1.5rem;
@@ -61,26 +62,26 @@
       0 4px 14px rgb(0 0 0 / 0.22);
     --ui-inset-highlight: inset 0 1px 0 rgb(255 255 255 / 0.07);
     --ui-inset-depth: inset 0 -1px 0 rgb(0 0 0 / 0.22);
-    --ui-active-ring: 147 180 255;
+    --ui-active-ring: 61 108 242;
     --ui-active-ring-alpha: 0.42;
     --ui-active-fill: 18 34 78;
-    --ui-active-glow: 0 0 0 1px rgb(147 180 255 / 0.22);
+    --ui-active-glow: 0 0 0 1px rgb(61 108 242 / 0.22);
   }
 
   [data-theme="light"] {
-    /* Wallpaper #d4d4d4 — cards only a step lighter, not pure white */
+    /* Wallpaper #d4d4d4 unchanged — palette only on content tokens */
     --cr-bg: 212 212 212;
-    --cr-surface: 226 226 226;
-    --cr-card: 232 232 232;
-    --cr-card-hover: 240 240 240;
-    --cr-gold: 196 140 18;
-    --cr-blue: 37 99 235;
-    --cr-win: 22 148 72;
-    --cr-loss: 200 40 40;
-    --cr-text: 15 23 42;
-    --cr-muted: 71 85 105;
-    --cr-accent: 29 78 216;
-    --cr-border: 100 116 139;
+    --cr-surface: 232 236 243;
+    --cr-card: 255 255 255;
+    --cr-card-hover: 248 250 253;
+    --cr-gold: 200 148 18;
+    --cr-blue: 61 108 242;
+    --cr-win: 35 165 89;
+    --cr-loss: 214 69 69;
+    --cr-text: 24 35 59;
+    --cr-muted: 102 112 133;
+    --cr-accent: 93 125 232;
+    --cr-border: 232 236 243;
     --cr-border-alpha: 0.18;
     --cr-bg-top: #d4d4d4;
     --cr-bg-bottom: #d4d4d4;
@@ -89,31 +90,31 @@
     --cr-glass-bg: rgb(var(--cr-card) / 0.72);
     --cr-glass-bg-strong: rgb(var(--cr-card) / 0.88);
     --cr-glass-blur: blur(18px) saturate(140%);
-    --cr-chart-grid: rgba(100, 116, 139, 0.32);
+    --cr-chart-grid: rgba(102, 112, 133, 0.28);
     /* No CR stroke on light — dark outlines muddy text on pale cards */
     --cr-stroke-title: none;
     --cr-stroke-body: none;
 
-    /* Soft almost-white panels over gray wallpaper (DockBar stays on light overrides) */
-    --ui-panel: 246 247 250;
-    --ui-panel-raised: 252 252 253;
-    --ui-panel-sunken: 236 238 242;
-    --ui-border: 100 116 139;
+    /* Soft panels (DockBar keeps its own light overrides below) */
+    --ui-panel: 255 255 255;
+    --ui-panel-raised: 248 250 253;
+    --ui-panel-sunken: 232 236 243;
+    --ui-border: 232 236 243;
     --ui-border-alpha: 0.15;
     --ui-radius: 1.25rem;
     --ui-radius-lg: 1.5rem;
     --ui-shadow:
-      0 1px 2px rgb(15 23 42 / 0.04),
-      0 6px 16px rgb(15 23 42 / 0.05);
+      0 1px 2px rgb(24 35 59 / 0.04),
+      0 6px 16px rgb(24 35 59 / 0.05);
     --ui-shadow-soft:
-      0 1px 2px rgb(15 23 42 / 0.03),
-      0 3px 10px rgb(15 23 42 / 0.04);
+      0 1px 2px rgb(24 35 59 / 0.03),
+      0 3px 10px rgb(24 35 59 / 0.04);
     --ui-inset-highlight: inset 0 1px 0 rgb(255 255 255 / 0.85);
-    --ui-inset-depth: inset 0 -1px 0 rgb(15 23 42 / 0.04);
-    --ui-active-ring: 59 130 246;
+    --ui-inset-depth: inset 0 -1px 0 rgb(24 35 59 / 0.04);
+    --ui-active-ring: 217 228 255;
     --ui-active-ring-alpha: 0.28;
-    --ui-active-fill: 239 246 255;
-    --ui-active-glow: 0 0 0 1px rgb(59 130 246 / 0.12);
+    --ui-active-fill: 245 248 255;
+    --ui-active-glow: 0 0 0 1px rgb(217 228 255 / 0.9);
   }
 
   :root {
@@ -669,7 +670,7 @@
   [data-theme="light"] .pixel-bevel,
   [data-theme="light"] .pixel-btn--chip {
     --pb-light: rgba(255, 255, 255, 0.7);
-    --pb-dark: rgba(100, 116, 139, 0.28);
+    --pb-dark: rgba(102, 112, 133, 0.28);
     --pb-bg: rgb(var(--ui-panel));
     --pb-bg-pressed: rgb(var(--ui-panel-sunken));
   }
@@ -684,20 +685,20 @@
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active,
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):active:not(:disabled) {
     --pb-glow-active:
-      0 0 0 1px rgba(59, 130, 246, 0.22),
-      0 0 8px rgba(59, 130, 246, 0.1);
+      0 0 0 1px rgba(61, 108, 242, 0.22),
+      0 0 8px rgba(61, 108, 242, 0.1);
     --pb-shadow-pressed:
-      inset 0 3px 7px rgba(15, 23, 42, 0.14),
+      inset 0 3px 7px rgba(24, 35, 59, 0.14),
       inset 0 1px 0 rgba(255, 255, 255, 0.65),
-      inset 0 0 0 1.5px rgba(59, 130, 246, 0.28);
+      inset 0 0 0 1.5px rgba(61, 108, 242, 0.28);
     --pb-filter-pressed:
-      drop-shadow(0 1px 0 rgba(15, 23, 42, 0.08))
-      drop-shadow(0 0 0 1px rgba(59, 100, 200, 0.18));
+      drop-shadow(0 1px 0 rgba(24, 35, 59, 0.08))
+      drop-shadow(0 0 0 1px rgba(61, 108, 242, 0.18));
   }
 
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):not(.pixel-btn--primary).pixel-btn--active,
   [data-theme="light"] .pixel-btn:not(.pixel-btn--ghost):not(.pixel-btn--primary):active:not(:disabled) {
-    color: rgb(196 140 18);
+    color: rgb(200 148 18);
     text-shadow: none;
   }
 
@@ -925,28 +926,28 @@
 
   [data-theme="light"] .chart-tooltip-glass {
     background: rgba(255, 255, 255, 0.88);
-    border-color: rgba(15, 23, 42, 0.12);
-    color: rgb(15, 23, 42);
+    border-color: rgba(24, 35, 59, 0.12);
+    color: rgb(24, 35, 59);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      0 12px 28px rgba(15, 23, 42, 0.14);
+      0 12px 28px rgba(24, 35, 59, 0.14);
   }
 
   [data-theme="light"] .chart-tooltip-bubble {
-    color: rgb(15, 23, 42);
+    color: rgb(24, 35, 59);
     background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.86) 0%,
-      rgba(248, 250, 252, 0.78) 55%,
-      rgba(241, 245, 249, 0.82) 100%
+      rgba(248, 250, 253, 0.78) 55%,
+      rgba(245, 248, 255, 0.82) 100%
     );
     backdrop-filter: blur(16px) saturate(140%);
     -webkit-backdrop-filter: blur(16px) saturate(140%);
     box-shadow:
       inset 0 1px 2px rgba(255, 255, 255, 0.95),
       inset 0 0 18px rgb(var(--cr-blue) / 0.06),
-      inset 0 -6px 12px rgba(15, 23, 42, 0.04),
-      0 8px 20px rgba(15, 23, 42, 0.12);
+      inset 0 -6px 12px rgba(24, 35, 59, 0.04),
+      0 8px 20px rgba(24, 35, 59, 0.12);
   }
 
   [data-theme="light"] .chart-tooltip-bubble-glass {
@@ -972,7 +973,7 @@
   }
 
   [data-theme="light"] .chart-tooltip-hint {
-    color: rgb(71, 85, 105) !important;
+    color: rgb(102, 112, 133) !important;
   }
 
   @media (min-width: 1024px) {
@@ -1118,7 +1119,7 @@
   }
 
   [data-theme="light"] .theme-segment-track {
-    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(24, 35, 59, 0.12);
   }
 
   [data-theme="light"] .theme-segment-bubble-glass {
@@ -1130,16 +1131,16 @@
     );
     box-shadow:
       inset 0 1px 2px rgba(255, 255, 255, 0.75),
-      inset 0 0 14px rgb(37 99 235 / 0.08),
-      inset 0 -4px 8px rgba(15, 23, 42, 0.04);
+      inset 0 0 14px rgb(var(--cr-blue) / 0.08),
+      inset 0 -4px 8px rgba(24, 35, 59, 0.04);
   }
 
   [data-theme="light"] .theme-segment-bubble-ring {
-    border-color: rgb(37 99 235 / 0.28);
+    border-color: rgb(var(--cr-blue) / 0.28);
     box-shadow:
       0 0 0 1px rgb(255 255 255 / 0.7),
-      0 0 10px rgb(37 99 235 / 0.18),
-      0 3px 8px rgb(15 23 42 / 0.08);
+      0 0 10px rgb(var(--cr-blue) / 0.18),
+      0 3px 8px rgb(24 35 59 / 0.08);
   }
 
   [data-theme="light"] .theme-segment-tab.is-active {
@@ -1254,10 +1255,11 @@
     );
     backdrop-filter: blur(8px) saturate(130%);
     -webkit-backdrop-filter: blur(8px) saturate(130%);
-    border: 1px solid rgb(var(--cr-blue) / 0.22);
+    /* Dock palette frozen — content tokens may change without restyling nav */
+    border: 1px solid rgb(120 170 255 / 0.22);
     box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.08),
-      inset 0 0 24px rgb(var(--cr-blue) / 0.05),
+      inset 0 0 24px rgb(120 170 255 / 0.05),
       inset 0 -12px 20px rgba(0, 0, 0, 0.12),
       0 8px 24px rgba(0, 0, 0, 0.2);
     z-index: 0;
@@ -1272,7 +1274,7 @@
     pointer-events: none;
     background: radial-gradient(
       ellipse 90% 85% at 50% 12%,
-      rgb(var(--cr-blue) / 0.08) 0%,
+      rgb(120 170 255 / 0.08) 0%,
       transparent 58%
     );
   }
@@ -1284,8 +1286,8 @@
     border-radius: inherit;
     pointer-events: none;
     box-shadow:
-      inset 0 0 0 1px rgb(var(--cr-accent) / 0.14),
-      inset 0 1px 10px rgb(var(--cr-blue) / 0.06);
+      inset 0 0 0 1px rgb(147 180 255 / 0.14),
+      inset 0 1px 10px rgb(120 170 255 / 0.06);
     background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.04) 0%,
@@ -1304,7 +1306,7 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgb(var(--cr-accent) / 0.34) 50%,
+      rgb(147 180 255 / 0.34) 50%,
       transparent 100%
     );
     pointer-events: none;
@@ -1460,7 +1462,7 @@
     -webkit-backdrop-filter: blur(10px) saturate(145%);
     box-shadow:
       inset 0 1px 2px rgba(255, 255, 255, 0.14),
-      inset 0 0 20px rgb(var(--cr-blue) / 0.08),
+      inset 0 0 20px rgb(120 170 255 / 0.08),
       inset 0 -6px 12px rgba(0, 0, 0, 0.08);
   }
 
@@ -1473,14 +1475,14 @@
     background:
       radial-gradient(
         ellipse 90% 85% at 50% 12%,
-        rgb(var(--cr-blue) / 0.14) 0%,
+        rgb(120 170 255 / 0.14) 0%,
         transparent 58%
       ),
       radial-gradient(
         ellipse 105% 95% at 50% 50%,
         transparent 52%,
-        rgb(var(--cr-accent) / 0.1) 72%,
-        rgb(var(--cr-blue) / 0.16) 100%
+        rgb(147 180 255 / 0.1) 72%,
+        rgb(120 170 255 / 0.16) 100%
       );
   }
 
@@ -1491,9 +1493,9 @@
     border-radius: inherit;
     pointer-events: none;
     box-shadow:
-      inset 0 0 0 1px rgb(var(--cr-accent) / 0.28),
-      inset 0 1px 12px rgb(var(--cr-blue) / 0.12),
-      inset 0 0 14px rgb(var(--cr-accent) / 0.08);
+      inset 0 0 0 1px rgb(147 180 255 / 0.28),
+      inset 0 1px 12px rgb(120 170 255 / 0.12),
+      inset 0 0 14px rgb(147 180 255 / 0.08);
     background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.08) 0%,
@@ -1506,11 +1508,11 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    border: 1px solid rgb(var(--cr-accent) / 0.38);
+    border: 1px solid rgb(147 180 255 / 0.38);
     box-shadow:
-      0 0 0 1px rgb(var(--cr-blue) / 0.14),
-      0 0 14px rgb(var(--cr-blue) / 0.28),
-      0 0 24px rgb(var(--cr-accent) / 0.14),
+      0 0 0 1px rgb(120 170 255 / 0.14),
+      0 0 14px rgb(120 170 255 / 0.28),
+      0 0 24px rgb(147 180 255 / 0.14),
       0 4px 14px rgba(0, 0, 0, 0.14);
     pointer-events: none;
   }
@@ -1615,26 +1617,31 @@
   }
 
   [data-theme="light"] .level-bar-track {
-    background: rgb(168 176 188);
+    background: rgb(232 236 243);
   }
 
   [data-theme="light"] .level-bar-fill {
-    background: linear-gradient(90deg, rgb(59 130 246) 0%, rgb(37 99 235) 55%, rgb(29 78 216) 100%);
+    background: linear-gradient(
+      90deg,
+      rgb(var(--cr-accent)) 0%,
+      rgb(var(--cr-blue)) 55%,
+      rgb(61 108 242) 100%
+    );
   }
 
   [data-theme="light"] .page-title {
-    color: rgb(15 23 42);
+    color: rgb(var(--cr-text));
     text-shadow: none;
   }
 
   [data-theme="light"] .page-subtitle,
   [data-theme="light"] .section-title {
-    color: rgb(71 85 105);
+    color: rgb(var(--cr-muted));
     text-shadow: none;
   }
 
   [data-theme="light"] .shadow-glow {
-    box-shadow: 0 0 18px rgb(37 99 235 / 0.22);
+    box-shadow: 0 0 18px rgb(var(--cr-blue) / 0.22);
   }
 
   /* Kill leftover strokes / hard halos on light surfaces */
@@ -1673,8 +1680,8 @@
   [data-theme="light"] .collection-filter-tab.collection-filter-tab--active {
     color: rgb(var(--cr-gold));
     --pb-glow-active:
-      0 0 10px rgba(196, 140, 18, 0.18),
-      0 0 3px rgba(196, 140, 18, 0.12);
+      0 0 10px rgba(200, 148, 18, 0.18),
+      0 0 3px rgba(200, 148, 18, 0.12);
   }
 
   /* Keep rarity chip colors like dark theme (fade / stroke to dark). */
@@ -1697,7 +1704,7 @@
 
   [data-theme="light"] .chart-section-title,
   [data-theme="light"] .profile-stat-label {
-    color: #000 !important;
+    color: rgb(var(--cr-text)) !important;
     text-shadow: none !important;
   }
 
@@ -1705,31 +1712,31 @@
   [data-theme="light"] .profile-stat-collection,
   [data-theme="light"] .recommendation-accent,
   [data-theme="light"] .recommendations-panel .text-cr-gold {
-    color: rgb(37 99 235) !important;
+    color: rgb(var(--cr-blue)) !important;
     text-shadow: none !important;
   }
 
   [data-theme="light"] .loader-title,
   [data-theme="light"] .loader-item {
-    color: rgb(15 23 42) !important;
+    color: rgb(var(--cr-text)) !important;
     text-shadow: none !important;
   }
 
   [data-theme="light"] .card-name-glow,
   [data-theme="light"] .card-name-deck,
   [data-theme="light"] .card-name-deck-overlay {
-    color: rgb(37 99 235) !important;
+    color: rgb(var(--cr-blue)) !important;
   }
 
   [data-theme="light"] .card-level-chip {
-    color: rgb(15 23 42) !important;
+    color: rgb(var(--cr-text)) !important;
     background: rgba(255, 255, 255, 0.96) !important;
-    border-color: rgb(37 99 235 / 0.45) !important;
+    border-color: rgb(var(--cr-blue) / 0.45) !important;
   }
 
   [data-theme="light"] .card-frame-base {
-    background: linear-gradient(180deg, #f5f7fb 0%, #dce3ef 100%);
-    box-shadow: inset 0 0 0 2px rgba(100, 116, 139, 0.55);
+    background: linear-gradient(180deg, #f5f8ff 0%, #e8ecf3 100%);
+    box-shadow: inset 0 0 0 2px rgba(232, 236, 243, 0.95);
   }
 
   [data-theme="light"] .card-frame-evo {
@@ -1752,25 +1759,25 @@
   }
 
   [data-theme="light"] .deck-passport-backdrop {
-    background: rgb(15 23 42 / 0.28);
+    background: rgb(var(--cr-text) / 0.28);
   }
 
   [data-theme="light"] .deck-passport-sheet {
     background: var(--cr-glass-bg-strong);
     backdrop-filter: var(--cr-glass-blur);
     -webkit-backdrop-filter: var(--cr-glass-blur);
-    border-color: rgb(100 116 139 / 0.22);
+    border-color: rgb(var(--ui-border) / 0.22);
     box-shadow:
-      0 12px 40px rgb(15 23 42 / 0.18),
-      0 0 0 1px rgb(100 116 139 / 0.08);
+      0 12px 40px rgb(var(--cr-text) / 0.18),
+      0 0 0 1px rgb(var(--ui-border) / 0.08);
   }
 
   [data-theme="light"] .deck-passport-sheet .text-cr-text {
-    color: rgb(15 23 42) !important;
+    color: rgb(var(--cr-text)) !important;
   }
 
   [data-theme="light"] .deck-passport-sheet .recommendation-accent {
-    color: rgb(37 99 235) !important;
+    color: rgb(var(--cr-blue)) !important;
   }
 
   .recommendation-card {
@@ -1916,9 +1923,9 @@
   }
 
   [data-theme="light"] .card-name-caption {
-    color: rgb(37 99 235);
+    color: rgb(var(--cr-blue));
     background: rgba(255, 255, 255, 0.96);
-    border-color: rgb(37 99 235 / 0.28);
+    border-color: rgb(var(--cr-blue) / 0.28);
     text-shadow: none;
   }
 
@@ -2157,14 +2164,14 @@
     -webkit-backdrop-filter: var(--cr-glass-blur);
     box-shadow:
       0 0 0 1px rgb(var(--cr-border) / 0.22),
-      0 3px 10px rgba(15, 23, 42, 0.08);
+      0 3px 10px rgba(24, 35, 59, 0.08);
   }
 
   [data-theme="light"] .collection-card-wrap {
     box-shadow:
       0 0 0 2px rgb(var(--cr-blue) / 0.55),
       0 0 12px rgb(var(--cr-blue) / 0.22),
-      0 2px 8px rgb(15 23 42 / 0.1);
+      0 2px 8px rgb(var(--cr-text) / 0.1);
   }
 
   [data-theme="light"] .collection-card-wrap .card-frame-base {
@@ -2176,7 +2183,7 @@
     box-shadow:
       inset 0 0 0 1px rgb(var(--cr-border) / 0.35),
       inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.08);
+      inset 0 -1px 0 rgba(24, 35, 59, 0.08);
   }
 
   .settings-data-btn {
