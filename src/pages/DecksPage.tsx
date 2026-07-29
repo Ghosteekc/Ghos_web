@@ -145,7 +145,7 @@ export function DecksPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="page-title">Колоды</h1>
-        <span className="wallpaper-plain-text text-sm">
+        <span className="wallpaper-plain-text text-base">
           {filter === DECK_HOME
             ? "Мои колоды"
             : filter === "random"
@@ -162,7 +162,7 @@ export function DecksPage() {
         </span>
       </div>
 
-      <p className="decks-tab-description text-xs -mt-2">
+      <p className="decks-tab-description text-sm -mt-2">
         {filter === DECK_HOME ? (
           "Винрейт, победы и поражения по каждой колоде из ваших боёв."
         ) : filter === "meta" ? (
@@ -185,7 +185,7 @@ export function DecksPage() {
       <FeatureNavGrid items={[...DECK_NAV]} activeId={navActiveId} onSelect={handleNavSelect} />
 
       {copyHint && (
-        <Card className="text-center text-cr-win text-sm">{copyHint}</Card>
+        <Card className="text-center text-cr-win text-base">{copyHint}</Card>
       )}
 
       {error && <ErrorState title={error} />}
@@ -417,7 +417,7 @@ function TopPlayersPanel({
   return (
     <div className="space-y-4">
       {updatedLabel && (
-        <p className="text-xs text-cr-muted text-center">Обновлено: {updatedLabel}</p>
+        <p className="text-sm text-cr-muted text-center">Обновлено: {updatedLabel}</p>
       )}
       {players.map((player, i) => (
         <motion.div
@@ -430,22 +430,22 @@ function TopPlayersPanel({
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-bold text-cr-gold bg-cr-gold/10 px-2 py-0.5 rounded-full border border-cr-gold/20">
+                  <span className="text-sm font-bold text-cr-gold bg-cr-gold/10 px-2 py-0.5 rounded-full border border-cr-gold/20">
                     #{player.rank}
                   </span>
-                  <h3 className="text-sm font-semibold text-cr-text truncate">{player.player_name}</h3>
+                  <h3 className="text-base font-semibold text-cr-text truncate">{player.player_name}</h3>
                 </div>
-                <p className="text-xs text-cr-muted truncate">
+                <p className="text-sm text-cr-muted truncate">
                   #{player.player_tag}
                   {player.clan_name ? ` · ${player.clan_name}` : ""}
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <div className="flex items-center justify-end gap-1 text-xs text-cr-muted">
+                <div className="flex items-center justify-end gap-1 text-sm text-cr-muted">
                   <Trophy className="w-3.5 h-3.5 text-cr-gold" />
                   <span className="font-semibold text-cr-text">{player.trophies}</span>
                 </div>
-                <p className={"text-xs font-bold mt-0.5 " + (player.total_games > 0 ? (player.winrate >= 50 ? "text-cr-win" : "text-cr-loss") : "text-cr-muted")}>
+                <p className={"text-sm font-bold mt-0.5 " + (player.total_games > 0 ? (player.winrate >= 50 ? "text-cr-win" : "text-cr-loss") : "text-cr-muted")}>
                   {player.total_games > 0
                     ? `${UI.winrateShort} ${player.winrate.toFixed(0)}%`
                     : "Винрейт: н/д"}
@@ -453,7 +453,7 @@ function TopPlayersPanel({
               </div>
             </div>
 
-            <div className="flex items-center gap-1 text-xs mb-3">
+            <div className="flex items-center gap-1 text-sm mb-3">
               <ElixirIcon size={14} />
               <span className="font-semibold text-cr-text">{player.avg_elixir.toFixed(1)}</span>
               {player.total_games > 0 ? (
@@ -467,7 +467,7 @@ function TopPlayersPanel({
               <div className="grid grid-cols-2 gap-2 mt-0 mb-2">
                 <Button
                   variant="secondary"
-                  className="!py-2 text-sm flex items-center justify-center gap-2"
+                  className="!py-2 text-base flex items-center justify-center gap-2"
                   onClick={() => {
                     const deck = deckFromCardNames(
                       player.cards.map((c) => c.name),
@@ -491,7 +491,7 @@ function TopPlayersPanel({
                 </Button>
                 <Button
                   variant="secondary"
-                  className="!py-2 text-sm flex items-center justify-center gap-2"
+                  className="!py-2 text-base flex items-center justify-center gap-2"
                   onClick={() => {
                     const deck = deckFromCardNames(
                       player.cards.map((c) => c.name),
@@ -520,14 +520,14 @@ function TopPlayersPanel({
               {player.deck_link ? (
                 <Button
                   variant="secondary"
-                  className="flex-1 !py-2 text-sm flex items-center justify-center gap-2"
+                  className="flex-1 !py-2 text-base flex items-center justify-center gap-2"
                   onClick={() => void importDeck(player.deck_link)}
                 >
                   <ExternalLink className="w-4 h-4" />
                   Импорт колоды
                 </Button>
               ) : (
-                <p className="flex-1 text-xs text-cr-muted text-center self-center">
+                <p className="flex-1 text-sm text-cr-muted text-center self-center">
                   Импорт недоступен
                 </p>
               )}
@@ -558,7 +558,7 @@ function RoflModeBar({
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3 px-0.5">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-sm font-medium text-cr-text flex items-center gap-1.5">
+          <span className="text-base font-medium text-cr-text flex items-center gap-1.5">
             <span aria-hidden>🤡</span>
             Рофл
           </span>
@@ -567,7 +567,7 @@ function RoflModeBar({
             aria-label="Что такое режим Рофл"
             aria-expanded={showHelp}
             onClick={() => setShowHelp((v) => !v)}
-            className="w-6 h-6 shrink-0 rounded-full border border-cr-border bg-cr-card/60 text-xs font-bold text-cr-muted transition-colors"
+            className="w-6 h-6 shrink-0 rounded-full border border-cr-border bg-cr-card/60 text-sm font-bold text-cr-muted transition-colors"
           >
             ?
           </button>
@@ -592,14 +592,14 @@ function RoflModeBar({
         </button>
       </div>
       {showHelp ? (
-        <p className="text-xs text-cr-muted leading-snug px-0.5">
+        <p className="text-sm text-cr-muted leading-snug px-0.5">
           Готовые абсурдные колоды. Не мета. Не скилл. Просто рофл.
           <br />
           Обычный рандом рядом не трогали — выключи тумблер и всё как было.
         </p>
       ) : null}
       {rofl ? (
-        <p className="text-[11px] text-cr-gold/90 leading-snug px-0.5">
+        <p className="text-xs text-cr-gold/90 leading-snug px-0.5">
           Режим «Рофл» · жми «Заново», если не смешно
         </p>
       ) : null}
@@ -697,7 +697,7 @@ function RandomDeckPanel({
         <div className="flex items-center justify-between mb-2 gap-2">
           <span
             className={
-              "text-xs font-medium px-2.5 py-1 rounded-full border flex items-center gap-1 shrink-0 " +
+              "text-sm font-medium px-2.5 py-1 rounded-full border flex items-center gap-1 shrink-0 " +
               (deck.rofl
                 ? "text-cr-gold bg-cr-gold/15 border-cr-gold/35"
                 : "text-cr-gold bg-cr-gold/10 border-cr-gold/20")
@@ -706,13 +706,13 @@ function RandomDeckPanel({
             {deck.rofl ? <span aria-hidden>🤡</span> : <Shuffle className="w-3 h-3" />}
             {deck.rofl ? (deck.rofl_name ?? "Рофл") : "Случайная колода"}
           </span>
-          <div className="flex items-center gap-1 text-xs shrink-0">
+          <div className="flex items-center gap-1 text-sm shrink-0">
             <ElixirIcon size={14} />
             <span className="font-semibold text-cr-text">{deck.avg_elixir.toFixed(1)}</span>
           </div>
         </div>
 
-        <p className="text-xs text-cr-muted mb-4">
+        <p className="text-sm text-cr-muted mb-4">
           {deck.rofl
             ? (deck.rofl_tagline ?? "не задавай вопросов")
             : "8 случайных карт, как в игре. Нажмите «Заново», если колода не нравится."}
@@ -731,7 +731,7 @@ function RandomDeckPanel({
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant="secondary"
-                className="!py-2 text-sm flex items-center justify-center gap-2"
+                className="!py-2 text-base flex items-center justify-center gap-2"
                 onClick={() => {
                   const payload: Deck = {
                     id: 0,
@@ -759,7 +759,7 @@ function RandomDeckPanel({
               </Button>
               <Button
                 variant="secondary"
-                className="!py-2 text-sm flex items-center justify-center gap-2"
+                className="!py-2 text-base flex items-center justify-center gap-2"
                 onClick={() => {
                   const payload: Deck = {
                     id: 0,
@@ -790,7 +790,7 @@ function RandomDeckPanel({
           <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 items-stretch">
             <Button
               variant="secondary"
-              className="min-w-0 !px-2.5 !py-2 text-xs sm:text-sm flex items-center justify-center gap-1.5"
+              className="min-w-0 !px-2.5 !py-2 text-sm sm:text-base flex items-center justify-center gap-1.5"
               onClick={() => void roll()}
               disabled={loading}
             >
@@ -800,7 +800,7 @@ function RandomDeckPanel({
             {deck.deck_link ? (
               <Button
                 variant="secondary"
-                className="min-w-0 !px-2.5 !py-2 text-xs sm:text-sm flex items-center justify-center gap-1.5"
+                className="min-w-0 !px-2.5 !py-2 text-sm sm:text-base flex items-center justify-center gap-1.5"
                 onClick={() => void importDeck()}
               >
                 <ExternalLink className="w-4 h-4 shrink-0" />
@@ -870,26 +870,26 @@ export function DeckCard({
     >
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-cr-blue bg-cr-blue/10 px-2.5 py-1 rounded-full border border-cr-blue/20">
+          <span className="text-sm font-medium text-cr-blue bg-cr-blue/10 px-2.5 py-1 rounded-full border border-cr-blue/20">
             {CATEGORY_LABELS[category] ?? category}
           </span>
-          <div className="flex items-center gap-1 text-xs">
+          <div className="flex items-center gap-1 text-sm">
             <ElixirIcon size={14} />
             <span className="font-semibold text-cr-text">{avgElixir.toFixed(1)}</span>
           </div>
         </div>
 
         {deck.name && (
-          <h3 className="text-sm font-semibold text-cr-text mb-1">{deck.name}</h3>
+          <h3 className="text-base font-semibold text-cr-text mb-1">{deck.name}</h3>
         )}
         {deck.description && (
-          <p className="text-xs text-cr-muted mb-3">{deck.description}</p>
+          <p className="text-sm text-cr-muted mb-3">{deck.description}</p>
         )}
 
         <DeckCardsGrid cards={cards} useVariants={deck.type === "constructor"} />
 
         {deck.type === "meta" && deck.total_games > 0 && (
-          <div className="flex items-center justify-between text-sm mb-3">
+          <div className="flex items-center justify-between text-base mb-3">
             <span className="text-cr-muted">{UI.winrate} топов</span>
             <span className={"font-bold " + (winrate >= 50 ? "text-cr-win" : "text-cr-loss")}>
               {winrate.toFixed(1)}%
@@ -899,13 +899,13 @@ export function DeckCard({
 
         {deck.type === "mine" && (
           <>
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-base">
               <span className="text-cr-muted">{UI.winrate}</span>
               <span className={"font-bold " + (winrate >= 50 ? "text-cr-win" : "text-cr-loss")}>
                 {winrate.toFixed(1)}%
               </span>
             </div>
-            <div className="flex items-center justify-between text-sm mt-1 mb-3">
+            <div className="flex items-center justify-between text-base mt-1 mb-3">
               <span className="text-cr-muted">{UI.games}</span>
               <span className="font-semibold text-cr-text">{deck.total_games ?? 0}</span>
             </div>
@@ -914,14 +914,14 @@ export function DeckCard({
 
         {deck.type === "constructor" && (
           <>
-            <div className="flex items-center justify-between text-sm mb-2">
+            <div className="flex items-center justify-between text-base mb-2">
               <span className="text-cr-muted">Синергия</span>
               <span className="font-bold text-cr-gold">
                 {(deck.synergy_score ?? deck.winrate).toFixed(0)}%
               </span>
             </div>
             {deck.synergy_notes && deck.synergy_notes.length > 0 ? (
-              <ul className="text-[11px] text-cr-muted space-y-0.5 mb-3">
+              <ul className="text-xs text-cr-muted space-y-0.5 mb-3">
                 {deck.synergy_notes.slice(0, 2).map((note, i) => (
                   <li key={i}>{note}</li>
                 ))}
@@ -933,26 +933,26 @@ export function DeckCard({
         {deck.type === "arena" && (
           deck.total_games > 0 ? (
             <>
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-base">
                 <span className="text-cr-muted">{UI.winrate}</span>
                 <span className={"font-bold " + (winrate >= 50 ? "text-cr-win" : "text-cr-loss")}>
                   {winrate.toFixed(1)}%
                 </span>
               </div>
-              <div className="flex items-center justify-between text-sm mt-1 mb-3">
+              <div className="flex items-center justify-between text-base mt-1 mb-3">
                 <span className="text-cr-muted">{UI.games}</span>
                 <span className="font-semibold text-cr-text">{deck.total_games ?? 0}</span>
               </div>
             </>
           ) : (
-            <p className="text-xs text-cr-muted mb-3">Винрейт по боям пока недоступен · текущая колода TV Royale</p>
+            <p className="text-sm text-cr-muted mb-3">Винрейт по боям пока недоступен · текущая колода TV Royale</p>
           )
         )}
 
         {deck.type === "mine" && onOpenStats ? (
           <Button
             variant="secondary"
-            className="w-full !py-2 text-sm flex items-center justify-center gap-2 mb-3"
+            className="w-full !py-2 text-base flex items-center justify-center gap-2 mb-3"
             onClick={onOpenStats}
           >
             <BarChart3 className="w-4 h-4" />
@@ -970,7 +970,7 @@ export function DeckCard({
             {onAnalyze ? (
               <Button
                 variant="secondary"
-                className="!py-2 text-sm flex items-center justify-center gap-2"
+                className="!py-2 text-base flex items-center justify-center gap-2"
                 onClick={onAnalyze}
               >
                 <ScanSearch className="w-4 h-4" />
@@ -980,7 +980,7 @@ export function DeckCard({
             {showCompare && onCompare ? (
               <Button
                 variant="secondary"
-                className="!py-2 text-sm flex items-center justify-center gap-2"
+                className="!py-2 text-base flex items-center justify-center gap-2"
                 onClick={onCompare}
               >
                 <Swords className="w-4 h-4" />
@@ -995,14 +995,14 @@ export function DeckCard({
             {canImport ? (
               <Button
                 variant="secondary"
-                className="flex-1 !py-2 text-sm flex items-center justify-center gap-2"
+                className="flex-1 !py-2 text-base flex items-center justify-center gap-2"
                 onClick={() => void importDeck()}
               >
                 <ExternalLink className="w-4 h-4" />
                 Импорт в игру
               </Button>
             ) : (
-              <p className="flex-1 text-xs text-cr-muted text-center self-center leading-snug px-1">
+              <p className="flex-1 text-sm text-cr-muted text-center self-center leading-snug px-1">
                 Импорт недоступен — не все карты распознаны
               </p>
             )}

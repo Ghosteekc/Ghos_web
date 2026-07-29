@@ -20,7 +20,7 @@ export function MorePage() {
   return (
     <div className="space-y-6">
       <h1 className="page-title">Ещё</h1>
-      <p className="text-xs text-cr-muted -mt-2">Поиск, избранное и настройки</p>
+      <p className="text-sm text-cr-muted -mt-2">Поиск, избранное и настройки</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {links.map((item) => (
@@ -34,8 +34,8 @@ export function MorePage() {
               <item.icon className="w-5 h-5 text-cr-muted" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-cr-text">{item.label}</p>
-              <p className="text-[11px] text-cr-muted truncate">{item.hint}</p>
+              <p className="text-base font-semibold text-cr-text">{item.label}</p>
+              <p className="text-xs text-cr-muted truncate">{item.hint}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-cr-muted/50 shrink-0" />
           </button>
@@ -45,7 +45,7 @@ export function MorePage() {
       <Card className="border-cr-border/60">
         <div className="flex items-start gap-3">
           <Trophy className="w-5 h-5 text-cr-gold shrink-0 mt-0.5" />
-          <p className="text-xs text-cr-muted leading-relaxed">
+          <p className="text-sm text-cr-muted leading-relaxed">
             Основные разделы — в нижнем меню: Профиль, Бои, Колоды, Аналитика.
           </p>
         </div>

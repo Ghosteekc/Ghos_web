@@ -53,15 +53,15 @@ export function PlayerCard({ profile, loading }: PlayerCardProps) {
           <h2 className="text-xl font-bold text-cr-text tracking-tight truncate">
             {profile.player_name ?? "Игрок"}
           </h2>
-          <p className="text-cr-accent text-sm font-bold font-mono mt-0.5">
+          <p className="text-cr-accent text-base font-bold font-mono mt-0.5">
             {formatPlayerTag(profile.player_tag)}
           </p>
-          <span className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-cr-blue/10 border border-cr-blue/20 text-cr-blue text-xs font-medium max-w-full">
+          <span className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-cr-blue/10 border border-cr-blue/20 text-cr-blue text-sm font-medium max-w-full">
             <Flame className="w-3 h-3 shrink-0" />
             <span className="truncate">{profile.arena_name ?? "Арена неизвестна"}</span>
           </span>
           {profile.favorite_card && (
-            <p className="text-xs text-cr-gold font-bold mt-2 truncate">
+            <p className="text-sm text-cr-gold font-bold mt-2 truncate">
               ★ {nameRu(profile.favorite_card)}
             </p>
           )}

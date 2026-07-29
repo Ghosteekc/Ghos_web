@@ -15,7 +15,7 @@ export function Sidebar() {
         </div>
         <div className="min-w-0">
           <h1 className="text-lg font-cr text-cr-text tracking-tight truncate">Ghosteek</h1>
-          <p className="text-xs text-cr-muted -mt-1 truncate">CR Assistant</p>
+          <p className="text-sm text-cr-muted -mt-1 truncate">CR Assistant</p>
         </div>
       </div>
 
@@ -35,7 +35,7 @@ export function Sidebar() {
                   isActive ? "text-cr-gold" : "text-cr-muted"
                 )}
               />
-              <span className="text-sm font-medium tracking-wide truncate">{item.label}</span>
+              <span className="text-base font-medium tracking-wide truncate">{item.label}</span>
             </NavLink>
           );
         })}

@@ -81,7 +81,7 @@ export function FavoritesPanel({ onAnalyze, onCompare }: FavoritesPanelProps) {
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div className="flex items-center gap-2">
                     <Star className="w-5 h-5 text-cr-gold shrink-0" />
-                    <p className="text-sm font-medium text-cr-text">Колода #{i + 1}</p>
+                    <p className="text-base font-medium text-cr-text">Колода #{i + 1}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {entry.deck_link && (
@@ -116,7 +116,7 @@ export function FavoritesPanel({ onAnalyze, onCompare }: FavoritesPanelProps) {
                     {onAnalyze ? (
                       <Button
                         variant="secondary"
-                        className="!py-2 text-sm flex items-center justify-center gap-2"
+                        className="!py-2 text-base flex items-center justify-center gap-2"
                         onClick={() => {
                           const deck = toDeck(entry, i);
                           if (deck) onAnalyze(deck);
@@ -129,7 +129,7 @@ export function FavoritesPanel({ onAnalyze, onCompare }: FavoritesPanelProps) {
                     {onCompare ? (
                       <Button
                         variant="secondary"
-                        className="!py-2 text-sm flex items-center justify-center gap-2"
+                        className="!py-2 text-base flex items-center justify-center gap-2"
                         onClick={() => {
                           const deck = toDeck(entry, i);
                           if (deck) onCompare(deck);

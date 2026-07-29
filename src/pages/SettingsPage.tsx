@@ -244,8 +244,8 @@ export function SettingsPage() {
                 <div className="flex items-center gap-3 min-w-0">
                   <Palette className="w-5 h-5 text-cr-blue shrink-0" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-cr-text">Тема</p>
-                    <p className="text-xs text-cr-muted">Тёмная, светлая или как на устройстве</p>
+                    <p className="text-base font-semibold text-cr-text">Тема</p>
+                    <p className="text-sm text-cr-muted">Тёмная, светлая или как на устройстве</p>
                   </div>
                 </div>
                 <ThemeSegment
@@ -264,10 +264,10 @@ export function SettingsPage() {
               <div className="flex items-center gap-3 min-w-0">
                 <Vibrate className="w-5 h-5 text-cr-blue shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-cr-text">
+                  <p className="text-base font-semibold text-cr-text">
                     {translate("settings.haptic.title", settings.language)}
                   </p>
-                  <p className="text-xs text-cr-muted">
+                  <p className="text-sm text-cr-muted">
                     {settings.haptic_enabled
                       ? translate("settings.haptic.enabled", settings.language)
                       : translate("settings.haptic.disabled", settings.language)}
@@ -297,14 +297,14 @@ export function SettingsPage() {
           <Card className="space-y-3">
             <div className="flex items-center gap-4">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-cr-muted">Username</p>
+                <p className="text-base font-semibold text-cr-muted">Username</p>
                 <p className="text-cr-text font-semibold">@{tg?.initDataUnsafe?.user?.username ?? "—"}</p>
                 {profile?.player_tag ? (
-                  <p className="text-xs text-cr-muted mt-1 font-mono">
+                  <p className="text-sm text-cr-muted mt-1 font-mono">
                     CR: {formatPlayerTag(profile.player_tag)}
                   </p>
                 ) : (
-                  <p className="text-xs text-cr-muted mt-1">Clash Royale не привязан</p>
+                  <p className="text-sm text-cr-muted mt-1">Clash Royale не привязан</p>
                 )}
               </div>
               <motion.button
@@ -315,7 +315,7 @@ export function SettingsPage() {
                 onClick={() => tg?.close?.()}
               >
                 <LogOut className="w-5 h-5 text-cr-loss shrink-0" />
-                <span className="text-xs font-semibold text-cr-loss leading-tight text-left">
+                <span className="text-sm font-semibold text-cr-loss leading-tight text-left">
                   Закрыть
                   <br />
                   приложение
@@ -339,7 +339,7 @@ export function SettingsPage() {
                     : "Аккаунт уже отвязан"}
               </span>
             </button>
-            <p className="text-[11px] text-cr-muted leading-snug px-0.5">
+            <p className="text-xs text-cr-muted leading-snug px-0.5">
               Аккаунт Clash Royale будет отвязан от текущего Telegram. Выход сработает и в боте.
               Чтобы снова зайти в профиль — /link #ТЕГ в боте.
             </p>
@@ -353,8 +353,8 @@ export function SettingsPage() {
               <div className="flex items-center gap-3">
                 <Bell className="w-5 h-5 text-cr-gold" />
                 <div>
-                  <p className="text-sm font-semibold text-cr-text">Уведомления</p>
-                  <p className="text-xs text-cr-muted">Внутри приложения</p>
+                  <p className="text-base font-semibold text-cr-text">Уведомления</p>
+                  <p className="text-sm text-cr-muted">Внутри приложения</p>
                 </div>
               </div>
               <Toggle
@@ -366,8 +366,8 @@ export function SettingsPage() {
               <div className="flex items-center gap-3">
                 <BellOff className="w-5 h-5 text-cr-blue" />
                 <div>
-                  <p className="text-sm font-semibold text-cr-text">Telegram</p>
-                  <p className="text-xs text-cr-muted">Уведомления в чате</p>
+                  <p className="text-base font-semibold text-cr-text">Telegram</p>
+                  <p className="text-sm text-cr-muted">Уведомления в чате</p>
                 </div>
               </div>
               <Toggle
@@ -416,12 +416,12 @@ export function SettingsPage() {
             <span>{clearingHistory ? "Удаление…" : "Удалить историю боёв"}</span>
           </button>
           {lastSyncLabel ? (
-            <p className="text-center text-sm font-semibold text-cr-win mt-3">{lastSyncLabel}</p>
+            <p className="text-center text-base font-semibold text-cr-win mt-3">{lastSyncLabel}</p>
           ) : null}
         </section>
       </div>
 
-      <p className="app-footer-version text-center text-xs pt-4 font-medium">
+      <p className="app-footer-version text-center text-sm pt-4 font-medium">
         Ghosteek CR Assistant v1.0
       </p>
     </div>

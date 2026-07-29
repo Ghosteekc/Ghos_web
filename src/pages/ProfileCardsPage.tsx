@@ -163,7 +163,7 @@ export function ProfileCardsPage() {
         />
 
         <div className="flex flex-wrap items-center justify-between gap-2 mt-5 mb-3 pt-4 border-t border-cr-border">
-          <p className="text-sm text-cr-text font-semibold">
+          <p className="text-base text-cr-text font-semibold">
             {rarityFilter !== "all"
               ? `${visibleCards.length} карт · ${FILTER_LABELS[rarityFilter]}`
               : `${data.cards_owned} / ${data.cards_total} карт`}
@@ -180,7 +180,7 @@ export function ProfileCardsPage() {
             )}
             <button
               type="button"
-              className="text-xs text-cr-accent underline"
+              className="text-sm text-cr-accent underline"
               onClick={() => setShowLockedCards((v) => !v)}
             >
               {showLockedCards ? "Только мои" : "Показать все"}
@@ -234,7 +234,7 @@ export function ProfileCardsPage() {
 
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
           {visibleCards.length === 0 ? (
-            <p className="col-span-full text-center text-sm text-cr-muted py-6">
+            <p className="col-span-full text-center text-base text-cr-muted py-6">
               Нет карт для фильтра «{FILTER_LABELS[rarityFilter]}»
             </p>
           ) : (

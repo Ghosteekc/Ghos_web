@@ -35,14 +35,14 @@ export function ErrorState({
       ) : null}
       <p
         className={cn(
-          "text-sm text-cr-loss",
+          "text-base text-cr-loss",
           (description || button) && "mb-2 font-semibold",
         )}
       >
         {title}
       </p>
       {description ? (
-        <p className="mb-4 text-xs text-cr-muted leading-relaxed">{description}</p>
+        <p className="mb-4 text-sm text-cr-muted leading-relaxed">{description}</p>
       ) : null}
       {button && onAction ? <Button onClick={onAction}>{button}</Button> : null}
     </Card>

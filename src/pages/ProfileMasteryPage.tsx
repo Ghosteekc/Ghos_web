@@ -123,9 +123,9 @@ export function ProfileMasteryPage() {
 
                     <div className="flex items-center justify-between gap-2 mb-1">
 
-                      <p className="text-sm font-semibold text-cr-text truncate">{m.card_name_ru}</p>
+                      <p className="text-base font-semibold text-cr-text truncate">{m.card_name_ru}</p>
 
-                      <span className="text-xs text-cr-gold font-bold shrink-0">
+                      <span className="text-sm text-cr-gold font-bold shrink-0">
 
                         Ур. {m.level}/{m.max_level}
 
@@ -139,7 +139,7 @@ export function ProfileMasteryPage() {
 
                         <LinearProgress value={m.progress_percent} max={100} showLabel={false} className="mb-1" />
 
-                        <p className="text-[11px] text-cr-muted">
+                        <p className="text-xs text-cr-muted">
 
                           {m.progress} / {m.target} ({m.progress_percent.toFixed(0)}%)
 
@@ -149,11 +149,11 @@ export function ProfileMasteryPage() {
 
                     ) : (
 
-                      <p className="text-[11px] text-cr-win">Максимальный уровень</p>
+                      <p className="text-xs text-cr-win">Максимальный уровень</p>
 
                     )}
 
-                    <p className="text-[11px] text-cr-accent mt-1 leading-snug">{m.next_hint}</p>
+                    <p className="text-xs text-cr-accent mt-1 leading-snug">{m.next_hint}</p>
 
                   </div>
 

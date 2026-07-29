@@ -61,7 +61,7 @@ export function CircularProgress({
             {label}
           </motion.span>
         )}
-        {sublabel && <span className="text-xs text-cr-muted mt-1">{sublabel}</span>}
+        {sublabel && <span className="text-sm text-cr-muted mt-1">{sublabel}</span>}
       </div>
     </div>
   );
@@ -88,8 +88,8 @@ export function LinearProgress({
     <div className={cn("w-full", className)}>
       {showLabel && (
         <div className="flex justify-between mb-2">
-          <span className="text-xs text-cr-muted">{UI.winrate}</span>
-          <span className="text-xs font-semibold text-cr-text">{percent.toFixed(1)}%</span>
+          <span className="text-sm text-cr-muted">{UI.winrate}</span>
+          <span className="text-sm font-semibold text-cr-text">{percent.toFixed(1)}%</span>
         </div>
       )}
       <div className="h-2 bg-cr-border rounded-full overflow-hidden">

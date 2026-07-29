@@ -187,7 +187,7 @@ export function AnalyticsPage() {
         <h1 className="page-title">Аналитика</h1>
         <p className="page-subtitle mt-1">Статистика, соперники и улучшение колод</p>
         {refreshing && (
-          <p className="text-[11px] text-cr-muted mt-1">Обновление данных…</p>
+          <p className="text-xs text-cr-muted mt-1">Обновление данных…</p>
         )}
       </div>
 
@@ -223,36 +223,36 @@ export function AnalyticsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <Card>
               <div className="flex items-start justify-between gap-3 mb-2">
-                <h3 className="chart-section-title text-sm font-semibold text-cr-text">Рост трофеев</h3>
+                <h3 className="chart-section-title text-base font-semibold text-cr-text">Рост трофеев</h3>
                 {lastResults.length > 0 ? (
                   <div className="text-right shrink-0 leading-tight">
-                    <p className="text-xs font-bold text-cr-win">+{trophyTotals.gained}</p>
-                    <p className="text-xs font-bold text-cr-loss">−{trophyTotals.lost}</p>
+                    <p className="text-sm font-bold text-cr-win">+{trophyTotals.gained}</p>
+                    <p className="text-sm font-bold text-cr-loss">−{trophyTotals.lost}</p>
                   </div>
                 ) : null}
               </div>
-              <p className="text-[11px] text-cr-muted mb-3">
+              <p className="text-xs text-cr-muted mb-3">
                 Рейтинговые 1v1 · до 40 последних · ведите пальцем, тап — закрепить
               </p>
               <ChartTooltipAnchor className="h-[190px]" pointCount={lastResults.length}>
                 {lastResults.length > 0 ? (
                   <TrophyGrowthChart data={lastResults} />
                 ) : (
-                  <p className="text-cr-muted text-sm text-center pt-10">Недостаточно рейтинговых боёв</p>
+                  <p className="text-cr-muted text-base text-center pt-10">Недостаточно рейтинговых боёв</p>
                 )}
               </ChartTooltipAnchor>
             </Card>
 
             <Card className="lg:col-span-2">
-              <h3 className="chart-section-title text-sm font-semibold text-cr-text mb-2">Винрейт по дням</h3>
-              <p className="text-[11px] text-cr-muted mb-3">
+              <h3 className="chart-section-title text-base font-semibold text-cr-text mb-2">Винрейт по дням</h3>
+              <p className="text-xs text-cr-muted mb-3">
                 Фиолетовая линия — процент побед · ведите пальцем, тап — закрепить
               </p>
               <ChartTooltipAnchor className="h-[220px]" pointCount={winrateByDay.length}>
                 {winrateByDay.length > 0 ? (
                   <WinrateDayChart data={winrateByDay} />
                 ) : (
-                  <p className="text-cr-muted text-sm text-center pt-16">Нет данных по дням</p>
+                  <p className="text-cr-muted text-base text-center pt-16">Нет данных по дням</p>
                 )}
               </ChartTooltipAnchor>
             </Card>

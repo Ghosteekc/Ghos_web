@@ -30,18 +30,18 @@ export function RecommendationCard({ card }: RecommendationCardProps) {
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-cr-text truncate">{card.nameRu}</p>
-        <p className="text-xs text-cr-muted mt-0.5">
+        <p className="text-base font-semibold text-cr-text truncate">{card.nameRu}</p>
+        <p className="text-sm text-cr-muted mt-0.5">
           Уровень:{" "}
           <span className="text-cr-text tabular-nums">
             {card.currentLevel ?? "—"}
           </span>
         </p>
-        <p className="text-xs text-cr-muted">
+        <p className="text-sm text-cr-muted">
           Рекомендуемый:{" "}
           <span className="text-cr-gold tabular-nums recommendation-accent">{card.recommendedLevel}</span>
         </p>
-        <p className={cn("text-xs font-medium mt-1.5 leading-snug", statusClass)}>
+        <p className={cn("text-sm font-medium mt-1.5 leading-snug", statusClass)}>
           {statusLabel(card.status)}
         </p>
       </div>

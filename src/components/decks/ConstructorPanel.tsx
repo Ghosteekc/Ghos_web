@@ -324,11 +324,11 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
           <Wand2 className="w-5 h-5 text-cr-gold" />
 
-          <h3 className="text-sm font-semibold text-cr-text">4 карты — основа колоды</h3>
+          <h3 className="text-base font-semibold text-cr-text">4 карты — основа колоды</h3>
 
         </div>
 
-        <p className="text-xs text-cr-text/85 mb-4 leading-relaxed">
+        <p className="text-sm text-cr-text/85 mb-4 leading-relaxed">
 
           Ячейки 1 и 3 — эволюция (если доступна), ячейка 2 — героическая версия, ячейка 4 — обычная карта.
 
@@ -370,7 +370,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
               >
 
-                <span className="text-[9px] font-semibold text-cr-muted mb-1 uppercase tracking-wide">
+                <span className="text-3xs font-semibold text-cr-muted mb-1 uppercase tracking-wide">
 
                   {SLOT_HINTS[index]}
 
@@ -418,7 +418,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
                 ) : (
 
-                  <div className="flex flex-1 w-full items-center justify-center rounded-lg border border-dashed border-cr-border/50 text-[10px] text-cr-muted px-1 text-center">
+                  <div className="flex flex-1 w-full items-center justify-center rounded-lg border border-dashed border-cr-border/50 text-2xs text-cr-muted px-1 text-center">
 
                     + карта
 
@@ -438,7 +438,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
         {filledCount > 0 ? (
 
-          <Button variant="ghost" className="w-full mt-3 !py-2 text-xs" onClick={resetAll}>
+          <Button variant="ghost" className="w-full mt-3 !py-2 text-sm" onClick={resetAll}>
 
             Сбросить выбор
 
@@ -468,7 +468,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
               placeholder="Поиск карты…"
 
-              className="w-full rounded-xl border border-cr-border/60 info-glass py-2.5 pl-10 pr-3 text-sm text-cr-text placeholder:text-cr-muted focus:border-cr-gold/50 focus:outline-none"
+              className="w-full rounded-xl border border-cr-border/60 info-glass py-2.5 pl-10 pr-3 text-base text-cr-text placeholder:text-cr-muted focus:border-cr-gold/50 focus:outline-none"
 
             />
 
@@ -518,7 +518,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
 
 
-          <Card className="text-center text-sm text-cr-muted py-4 mt-3">
+          <Card className="text-center text-base text-cr-muted py-4 mt-3">
 
             Выберите ещё {4 - filledCount} {4 - filledCount === 1 ? "карту" : "карты"} — ниже появятся готовые колоды
 
@@ -546,7 +546,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
             <Sparkles className="w-5 h-5 text-cr-gold" />
 
-            <h3 className="text-sm font-semibold text-cr-text">
+            <h3 className="text-base font-semibold text-cr-text">
 
               Варианты колод ({decks.length})
 

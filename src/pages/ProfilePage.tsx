@@ -83,14 +83,14 @@ export function ProfilePage() {
               <h2 className="text-xl font-extrabold text-cr-text truncate">
                 {profile.player_name ?? "Игрок"}
               </h2>
-              <p className="text-cr-accent text-sm font-bold font-mono mt-1">
+              <p className="text-cr-accent text-base font-bold font-mono mt-1">
                 {formatPlayerTag(profile.player_tag)}
               </p>
-              <p className="text-xs text-cr-accent font-semibold mt-2 truncate">
+              <p className="text-sm text-cr-accent font-semibold mt-2 truncate">
                 {profile.arena_name ?? "Арена не указана"}
               </p>
               {profile.favorite_card && (
-                <p className="text-xs text-cr-gold font-bold mt-1 truncate">
+                <p className="text-sm text-cr-gold font-bold mt-1 truncate">
                   ★ {nameRu(profile.favorite_card)}
                 </p>
               )}
@@ -106,11 +106,11 @@ export function ProfilePage() {
           </div>
           <div className="min-w-0">
           <p className="text-label mb-1">Telegram</p>
-          <h2 className="text-base font-bold text-cr-text truncate">
+          <h2 className="text-[16px] font-bold text-cr-text truncate">
             {user?.first_name ?? user?.username ?? "—"}
           </h2>
-          <p className="text-cr-accent text-sm font-semibold mt-0.5 truncate">@{user?.username ?? "—"}</p>
-          <p className="text-xs text-cr-accent font-medium mt-1">ID: {user?.id ?? "—"}</p>
+          <p className="text-cr-accent text-base font-semibold mt-0.5 truncate">@{user?.username ?? "—"}</p>
+          <p className="text-sm text-cr-accent font-medium mt-1">ID: {user?.id ?? "—"}</p>
           </div>
         </div>
       </Card>
@@ -125,8 +125,8 @@ export function ProfilePage() {
 
       {(profile?.cards_by_level?.length ?? 0) > 0 && (
         <Card className="!p-3">
-          <h3 className="text-sm font-semibold text-cr-text mb-1">Карты по уровням</h3>
-          <p className="text-[11px] text-cr-muted mb-3">Сколько карт прокачано на каждый уровень</p>
+          <h3 className="text-base font-semibold text-cr-text mb-1">Карты по уровням</h3>
+          <p className="text-xs text-cr-muted mb-3">Сколько карт прокачано на каждый уровень</p>
           <CardLevelScale rows={profile!.cards_by_level} />
         </Card>
       )}

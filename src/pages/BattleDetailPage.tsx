@@ -33,7 +33,7 @@ function KeyCardsBlock({
         <Target className={`w-5 h-5 ${accent === "win" ? "text-cr-win" : "text-cr-loss"}`} />
         <h3 className="font-semibold text-cr-text">{title}</h3>
       </div>
-      <p className="text-[11px] text-cr-muted mb-3">
+      <p className="text-xs text-cr-muted mb-3">
         Оценка по колоде — точный урон по картам в статистике не показывается.
       </p>
       <div className="space-y-2">
@@ -44,8 +44,8 @@ function KeyCardsBlock({
                 <CardTile name={item.name} size="sm" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-cr-text">{item.name_ru}</p>
-                <p className="text-xs text-cr-muted leading-snug">{item.note}</p>
+                <p className="text-base font-semibold text-cr-text">{item.name_ru}</p>
+                <p className="text-sm text-cr-muted leading-snug">{item.note}</p>
               </div>
             </div>
           </div>
@@ -123,7 +123,7 @@ export function BattleDetailPage() {
         </Button>
         <div>
           <h1 className="text-xl font-bold text-cr-text">Детали боя</h1>
-          <p className="text-sm text-cr-muted">против {battle.opponent_name}</p>
+          <p className="text-base text-cr-muted">против {battle.opponent_name}</p>
         </div>
       </div>
 
@@ -142,12 +142,12 @@ export function BattleDetailPage() {
           {battle.trophy_change} 🏆
         </div>
         {battle.crown_score ? (
-          <div className="text-sm text-cr-accent font-semibold">Короны: {battle.crown_score}</div>
+          <div className="text-base text-cr-accent font-semibold">Короны: {battle.crown_score}</div>
         ) : null}
-        <div className="text-sm text-cr-muted font-semibold">
+        <div className="text-base text-cr-muted font-semibold">
           Матчап: {battle.matchup_score.toFixed(0)}/100
         </div>
-        <div className="text-cr-muted text-sm flex items-center gap-1">
+        <div className="text-cr-muted text-base flex items-center gap-1">
           <Clock className="w-4 h-4" />
           {battle.played_at ? battle.played_at : null}
           {battle.played_at && (battle.duration ?? 0) > 0 ? " · " : null}
@@ -160,7 +160,7 @@ export function BattleDetailPage() {
         <Card className="border-cr-gold/30 bg-cr-gold/5">
           <div className="flex items-start gap-2">
             <Swords className="w-5 h-5 text-cr-gold shrink-0 mt-0.5" />
-            <p className="text-sm text-cr-text leading-relaxed font-medium">{battle.outcome_summary}</p>
+            <p className="text-base text-cr-text leading-relaxed font-medium">{battle.outcome_summary}</p>
           </div>
         </Card>
       ) : null}
@@ -173,7 +173,7 @@ export function BattleDetailPage() {
           </div>
           <ul className="space-y-2">
             {detailReasons.map((reason, i) => (
-              <li key={i} className="text-sm text-cr-muted flex items-start gap-2">
+              <li key={i} className="text-base text-cr-muted flex items-start gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cr-gold mt-2 flex-shrink-0" />
                 {reason}
               </li>
@@ -200,14 +200,14 @@ export function BattleDetailPage() {
             <AlertTriangle className="w-5 h-5 text-cr-muted" />
             <h3 className="font-semibold text-cr-text">Мало повлияли на бой</h3>
           </div>
-          <p className="text-[11px] text-cr-muted mb-3">
+          <p className="text-xs text-cr-muted mb-3">
             Карты, которые не подходят под матчап — возможно, не были розыграны или не успели сработать.
           </p>
           <div className="flex flex-wrap gap-2">
             {battle.low_impact_cards!.map((c) => (
               <span
                 key={c.name}
-                className="px-3 py-1 rounded-lg bg-cr-border/20 border border-cr-border/40 text-xs text-cr-muted"
+                className="px-3 py-1 rounded-lg bg-cr-border/20 border border-cr-border/40 text-sm text-cr-muted"
                 title={c.note}
               >
                 {c.name_ru}
@@ -227,7 +227,7 @@ export function BattleDetailPage() {
             {battle.opponent_threats.map((threat, i) => (
               <span
                 key={i}
-                className="px-3 py-1 rounded-lg bg-cr-loss/10 border border-cr-loss/20 text-xs text-cr-loss"
+                className="px-3 py-1 rounded-lg bg-cr-loss/10 border border-cr-loss/20 text-sm text-cr-loss"
               >
                 {threat}
               </span>
@@ -246,7 +246,7 @@ export function BattleDetailPage() {
             className="mb-4"
           />
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-base">
               <span className="text-cr-muted">Ср. эликсир</span>
               <span className="font-semibold text-cr-text">{battle.user_stats.avg_elixir.toFixed(1)}</span>
             </div>
@@ -263,7 +263,7 @@ export function BattleDetailPage() {
             className="mb-4"
           />
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-base">
               <span className="text-cr-muted">Ср. эликсир</span>
               <span className="font-semibold text-cr-text">{battle.opponent_stats.avg_elixir.toFixed(1)}</span>
             </div>

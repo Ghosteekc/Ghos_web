@@ -35,14 +35,14 @@ export function EmptyState({
       ) : null}
       <p
         className={cn(
-          "text-sm text-cr-muted",
+          "text-base text-cr-muted",
           (description || button) && "font-semibold text-cr-text",
         )}
       >
         {title}
       </p>
       {description ? (
-        <p className="mt-2 text-xs text-cr-muted leading-relaxed">{description}</p>
+        <p className="mt-2 text-sm text-cr-muted leading-relaxed">{description}</p>
       ) : null}
       {button && onAction ? (
         <Button className="mt-4" onClick={onAction}>

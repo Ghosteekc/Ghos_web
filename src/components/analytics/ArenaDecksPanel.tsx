@@ -88,7 +88,7 @@ export function ArenaDecksPanel({ renderDeck }: ArenaDecksPanelProps) {
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-cr-muted text-center">{formatArenaSubtitle(arenaName, trophies, source)}</p>
+      <p className="text-sm text-cr-muted text-center">{formatArenaSubtitle(arenaName, trophies, source)}</p>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full overflow-x-hidden">
         {decks.map((deck, i) => (
           <div key={`${deck.id}-${deck.name}`} className="w-full">

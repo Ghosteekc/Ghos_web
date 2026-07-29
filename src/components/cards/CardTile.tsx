@@ -17,11 +17,11 @@ const sizeClasses: Record<CardTileSize, string> = {
 };
 
 const labelSizeClasses: Record<CardTileSize, string> = {
-  xs: "max-w-[2.25rem] text-[7px]",
-  sm: "max-w-[2.75rem] text-[7px]",
-  md: "max-w-[3.5rem] text-[8px]",
-  grid: "max-w-[3.5rem] text-[8px]",
-  lg: "max-w-[4rem] text-[8px]",
+  xs: "max-w-[2.25rem] text-3xs",
+  sm: "max-w-[2.75rem] text-3xs",
+  md: "max-w-[3.5rem] text-3xs",
+  grid: "max-w-[3.5rem] text-3xs",
+  lg: "max-w-[4rem] text-3xs",
   deck: "card-name-deck",
   collection: "card-name-deck",
 };
@@ -225,7 +225,7 @@ export function CardTile({
               fallbackSrc={fallbackSrc}
             />
           ) : (
-            <div className="relative z-10 flex h-full w-full items-center justify-center text-xs font-bold text-cr-text">
+            <div className="relative z-10 flex h-full w-full items-center justify-center text-sm font-bold text-cr-text">
               {name.charAt(0)}
             </div>
           )}
@@ -239,7 +239,7 @@ export function CardTile({
         {!isCollection && size !== "lg" && size !== "deck" && levelBadge != null && (
           <span
             className={cn(
-              "absolute top-0 z-50 min-w-[1.1rem] rounded-md border border-cr-gold/40 bg-cr-bg/95 px-1 py-0.5 text-[10px] font-sans font-extrabold leading-none text-white pointer-events-none card-level-chip",
+              "absolute top-0 z-50 min-w-[1.1rem] rounded-md border border-cr-gold/40 bg-cr-bg/95 px-1 py-0.5 text-2xs font-sans font-extrabold leading-none text-white pointer-events-none card-level-chip",
               levelBadgeAnchor === "top-left" ? "left-0" : "right-0",
             )}
           >
@@ -247,7 +247,7 @@ export function CardTile({
           </span>
         )}
         {badge != null && (
-          <span className="absolute bottom-0.5 right-0.5 z-20 rounded border border-cr-gold/30 bg-cr-bg/90 px-1 py-0.5 text-[10px] font-bold text-cr-gold">
+          <span className="absolute bottom-0.5 right-0.5 z-20 rounded border border-cr-gold/30 bg-cr-bg/90 px-1 py-0.5 text-2xs font-bold text-cr-gold">
             {badge}
           </span>
         )}
@@ -320,7 +320,7 @@ export function CardDeckGrid({
         ))}
       </div>
       {hidden > 0 ? (
-        <p className="mt-1 text-center text-xs font-semibold text-cr-muted">+{hidden}</p>
+        <p className="mt-1 text-center text-sm font-semibold text-cr-muted">+{hidden}</p>
       ) : null}
     </div>
   );
@@ -344,10 +344,10 @@ export function CardUsageCompactGrid({ items }: { items: CardUsageItem[] }) {
       {items.map((item) => (
         <div key={item.name} className="flex flex-col items-center gap-1.5 py-1">
           <CardTile name={item.name} size="grid" />
-          <p className="card-name-glow max-w-[5rem] truncate px-0.5 text-center text-xs" title={nameRu(item.name)}>
+          <p className="card-name-glow max-w-[5rem] truncate px-0.5 text-center text-sm" title={nameRu(item.name)}>
             {nameShort(item.name)}
           </p>
-          <p className="text-[10px] font-semibold text-cr-accent">
+          <p className="text-2xs font-semibold text-cr-accent">
             {item.count} игр
             {item.winrate != null ? ` · ${item.winrate.toFixed(0)}% WR` : ""}
           </p>

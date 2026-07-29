@@ -100,8 +100,8 @@ function LeagueSide({
     >
       {align === "left" ? <LeagueIcon src={icon} alt={name} /> : null}
       <div className="min-w-0">
-        <p className="text-[10px] uppercase tracking-wide text-cr-muted font-semibold">{label}</p>
-        <p className="text-sm font-bold text-cr-text truncate">{name}</p>
+        <p className="text-2xs uppercase tracking-wide text-cr-muted font-semibold">{label}</p>
+        <p className="text-base font-bold text-cr-text truncate">{name}</p>
       </div>
       {align === "right" ? <LeagueIcon src={icon} alt={name} /> : null}
     </div>
@@ -115,7 +115,7 @@ export function LeagueBanner({ league }: LeagueBannerProps) {
         <div className="w-10 h-10 shrink-0 rounded-lg bg-cr-surface border border-cr-border flex items-center justify-center">
           <Trophy className="w-5 h-5 text-cr-muted" />
         </div>
-        <p className="text-sm text-cr-muted font-medium leading-snug">
+        <p className="text-base text-cr-muted font-medium leading-snug">
           Лига открывается с{" "}
           <span className="text-cr-text font-bold tabular-nums">
             {formatNumber(league.unlock_trophies)}
@@ -133,12 +133,12 @@ export function LeagueBanner({ league }: LeagueBannerProps) {
         <div className="flex items-center gap-2.5 min-w-0">
           <LeagueIcon src={league.current_league_icon} alt={name} />
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-wide text-cr-muted font-semibold">Текущая лига</p>
-            <p className="text-sm font-bold text-cr-text truncate">{name}</p>
+            <p className="text-2xs uppercase tracking-wide text-cr-muted font-semibold">Текущая лига</p>
+            <p className="text-base font-bold text-cr-text truncate">{name}</p>
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <p className="text-[10px] uppercase tracking-wide text-violet-400 font-semibold">Кубки лиги</p>
+          <p className="text-2xs uppercase tracking-wide text-violet-400 font-semibold">Кубки лиги</p>
           <p className="text-lg font-extrabold tabular-nums text-violet-400 leading-none mt-0.5">
             {formatNumber(league.absolute_trophies ?? 0)}
           </p>

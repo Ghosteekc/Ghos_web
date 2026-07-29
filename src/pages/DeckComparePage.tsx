@@ -41,8 +41,8 @@ function CompareNoteRow({
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-cr-text">{note.card_ru || note.card}</p>
-        <p className="text-xs text-cr-muted mt-1 leading-relaxed">{note.text}</p>
+        <p className="text-base font-semibold text-cr-text">{note.card_ru || note.card}</p>
+        <p className="text-sm text-cr-muted mt-1 leading-relaxed">{note.text}</p>
       </div>
     </li>
   );
@@ -53,10 +53,10 @@ function SummaryList({ title, items, tone }: { title: string; items: string[]; t
   const color = tone === "win" ? "text-cr-win" : "text-cr-loss";
   return (
     <div>
-      <p className={`text-xs font-semibold mb-2 ${color}`}>{title}</p>
+      <p className={`text-sm font-semibold mb-2 ${color}`}>{title}</p>
       <ul className="space-y-1.5">
         {items.map((line) => (
-          <li key={line} className="text-xs text-cr-text leading-snug">
+          <li key={line} className="text-sm text-cr-text leading-snug">
             {line}
           </li>
         ))}
@@ -143,38 +143,38 @@ export function DeckComparePage() {
         </Button>
         <div className="min-w-0">
           <h1 className="page-title truncate">Сравнение колод</h1>
-          <p className="text-xs text-cr-muted truncate">против «{referenceName || data.reference_name}»</p>
+          <p className="text-sm text-cr-muted truncate">против «{referenceName || data.reference_name}»</p>
         </div>
       </div>
 
       <Card className="border-cr-gold/25 bg-gradient-to-br from-cr-gold/10 to-cr-bg/20 !p-4">
         <div className="flex items-center gap-2 mb-3">
           <Swords className="w-5 h-5 text-cr-gold" />
-          <p className="text-sm font-semibold text-cr-text">Матчап</p>
+          <p className="text-base font-semibold text-cr-text">Матчап</p>
         </div>
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="rounded-xl border border-cr-win/30 bg-cr-win/10 p-3 text-center">
-            <p className="text-[11px] text-cr-muted">Ваша колода</p>
+            <p className="text-xs text-cr-muted">Ваша колода</p>
             <p className="text-2xl font-bold text-cr-win tabular-nums">{userScore.toFixed(0)}%</p>
             {data.user_synergy_score != null && (
-              <p className="text-[10px] text-cr-muted mt-1">Синергия: {data.user_synergy_score.toFixed(0)}%</p>
+              <p className="text-2xs text-cr-muted mt-1">Синергия: {data.user_synergy_score.toFixed(0)}%</p>
             )}
           </div>
           <div className="rounded-xl border border-cr-loss/30 bg-cr-loss/10 p-3 text-center">
-            <p className="text-[11px] text-cr-muted">{refLabel}</p>
+            <p className="text-xs text-cr-muted">{refLabel}</p>
             <p className="text-2xl font-bold text-cr-loss tabular-nums">{refScore.toFixed(0)}%</p>
             {data.reference_synergy_score != null && (
-              <p className="text-[10px] text-cr-muted mt-1">Синергия: {data.reference_synergy_score.toFixed(0)}%</p>
+              <p className="text-2xs text-cr-muted mt-1">Синергия: {data.reference_synergy_score.toFixed(0)}%</p>
             )}
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <p className="text-[11px] text-cr-muted mb-2">Ваша колода</p>
+            <p className="text-xs text-cr-muted mb-2">Ваша колода</p>
             <DeckGrid cards={data.user_deck} />
           </div>
           <div>
-            <p className="text-[11px] text-cr-muted mb-2">{refLabel}</p>
+            <p className="text-xs text-cr-muted mb-2">{refLabel}</p>
             <DeckGrid cards={data.reference_deck} />
           </div>
         </div>
@@ -191,7 +191,7 @@ export function DeckComparePage() {
             type="button"
             onClick={() => setTab(id)}
             className={
-              "shrink-0 rounded-full px-4 py-2 text-xs font-semibold border transition-colors " +
+              "shrink-0 rounded-full px-4 py-2 text-sm font-semibold border transition-colors " +
               (tab === id
                 ? "border-cr-gold/50 bg-cr-gold/15 text-cr-gold"
                 : "border-cr-border bg-cr-card text-cr-muted")
@@ -207,7 +207,7 @@ export function DeckComparePage() {
           <Card className="!p-4">
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="w-4 h-4 text-cr-win" />
-              <p className="text-sm font-semibold text-cr-text">Ваши преимущества</p>
+              <p className="text-base font-semibold text-cr-text">Ваши преимущества</p>
             </div>
             <SummaryList title="Сильнее" items={data.user_better} tone="win" />
             <div className="mt-3">
@@ -222,7 +222,7 @@ export function DeckComparePage() {
           <Card className="!p-4">
             <div className="flex items-center gap-2 mb-3">
               <TrendingDown className="w-4 h-4 text-cr-loss" />
-              <p className="text-sm font-semibold text-cr-text">{refLabel}</p>
+              <p className="text-base font-semibold text-cr-text">{refLabel}</p>
             </div>
             <SummaryList title="Сильнее вашей" items={data.reference_better} tone="win" />
             <div className="mt-3">
@@ -234,7 +234,7 @@ export function DeckComparePage() {
 
       {tab === "user" && (
         <Card className="!p-4">
-          <p className="text-sm font-semibold text-cr-text mb-3">Ваша колода — карта за картой</p>
+          <p className="text-base font-semibold text-cr-text mb-3">Ваша колода — карта за картой</p>
           <ul className="space-y-2">
             {(data.user_card_notes ?? []).map((note) => (
               <CompareNoteRow key={note.card} note={note} icon={userIcons.get(note.card)} />
@@ -245,7 +245,7 @@ export function DeckComparePage() {
 
       {tab === "reference" && (
         <Card className="!p-4">
-          <p className="text-sm font-semibold text-cr-text mb-3">{refLabel} — карта за картой</p>
+          <p className="text-base font-semibold text-cr-text mb-3">{refLabel} — карта за картой</p>
           <ul className="space-y-2">
             {(data.reference_card_notes ?? []).map((note) => (
               <CompareNoteRow key={note.card} note={note} icon={refIcons.get(note.card)} />

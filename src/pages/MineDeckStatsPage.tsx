@@ -28,8 +28,8 @@ function MatchupList({
   if (!items.length) {
     return (
       <Card>
-        <h3 className="text-sm font-semibold text-cr-text mb-2">{title}</h3>
-        <p className="text-sm text-cr-muted">Недостаточно боёв для выводов</p>
+        <h3 className="text-base font-semibold text-cr-text mb-2">{title}</h3>
+        <p className="text-base text-cr-muted">Недостаточно боёв для выводов</p>
       </Card>
     );
   }
@@ -44,7 +44,7 @@ function MatchupList({
         ) : (
           <TrendingDown className="w-5 h-5 text-cr-loss" />
         )}
-        <h3 className="text-sm font-semibold text-cr-text">{title}</h3>
+        <h3 className="text-base font-semibold text-cr-text">{title}</h3>
       </div>
       <div className="space-y-2">
         {items.map((item) => (
@@ -55,12 +55,12 @@ function MatchupList({
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-cr-text truncate">{item.card_ru}</p>
-                  <span className={`text-xs font-bold shrink-0 ${tone === "win" ? "text-cr-win" : "text-cr-loss"}`}>
+                  <p className="text-base font-semibold text-cr-text truncate">{item.card_ru}</p>
+                  <span className={`text-sm font-bold shrink-0 ${tone === "win" ? "text-cr-win" : "text-cr-loss"}`}>
                     {item.winrate.toFixed(0)}% · {item.games} {UI.games.toLowerCase()}
                   </span>
                 </div>
-                <p className="text-xs text-cr-muted mt-1 leading-snug">{item.reason}</p>
+                <p className="text-sm text-cr-muted mt-1 leading-snug">{item.reason}</p>
               </div>
             </div>
           </div>
@@ -129,7 +129,7 @@ export function MineDeckStatsPage() {
       <Header onBack={() => navigate("/decks")} title={data.name || "Моя колода"} />
 
       {data.sample_note ? (
-        <Card className="text-sm text-cr-muted">{data.sample_note}</Card>
+        <Card className="text-base text-cr-muted">{data.sample_note}</Card>
       ) : null}
 
       <Card>
@@ -150,7 +150,7 @@ export function MineDeckStatsPage() {
         </div>
 
         {winConditionsRu.length > 0 ? (
-          <p className="text-xs text-cr-muted mt-3">
+          <p className="text-sm text-cr-muted mt-3">
             Условие победы:{" "}
             <span className="text-cr-gold font-semibold">{winConditionsRu.join(", ")}</span>
           </p>
@@ -163,15 +163,15 @@ export function MineDeckStatsPage() {
       <Card>
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-5 h-5 text-cr-gold" />
-          <h3 className="text-sm font-semibold text-cr-text">Рекомендации по улучшению</h3>
+          <h3 className="text-base font-semibold text-cr-text">Рекомендации по улучшению</h3>
         </div>
 
         {data.balanced ? (
           <div className="flex items-start gap-3 rounded-xl border border-cr-win/30 bg-cr-win/10 p-4">
             <CheckCircle2 className="w-5 h-5 text-cr-win shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-cr-text">Колода сбалансирована</p>
-              <p className="text-xs text-cr-muted mt-1">
+              <p className="text-base font-semibold text-cr-text">Колода сбалансирована</p>
+              <p className="text-sm text-cr-muted mt-1">
                 Защита, заклинания, сплеш и темп на хорошем уровне — улучшения не требуются.
               </p>
             </div>
@@ -186,13 +186,13 @@ export function MineDeckStatsPage() {
                 <div className="flex items-start gap-2">
                   <Shield className="w-4 h-4 text-cr-blue shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-sm text-cr-text leading-snug">{item.message}</p>
+                    <p className="text-base text-cr-text leading-snug">{item.message}</p>
                     {item.suggested_cards.length > 0 ? (
                       <div className="flex flex-wrap gap-2 mt-3">
                         {item.suggested_cards.map((card) => (
                           <div key={card} className="w-10">
                             <CardTile name={card} size="xs" />
-                            <p className="text-[9px] text-cr-muted text-center mt-0.5 truncate">
+                            <p className="text-3xs text-cr-muted text-center mt-0.5 truncate">
                               {nameRu(card)}
                             </p>
                           </div>
@@ -226,7 +226,7 @@ function StatBox({
 }) {
   return (
     <div className="rounded-xl bg-cr-bg/50 px-3 py-2 text-center">
-      <p className="text-[10px] text-cr-muted uppercase tracking-wide">{label}</p>
+      <p className="text-2xs text-cr-muted uppercase tracking-wide">{label}</p>
       <p className={`text-lg font-bold tabular-nums mt-0.5 ${valueClass}`}>{value}</p>
     </div>
   );

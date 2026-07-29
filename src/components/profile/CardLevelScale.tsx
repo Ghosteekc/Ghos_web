@@ -12,7 +12,7 @@ interface CardLevelScaleProps {
 
 export function CardLevelScale({ rows, className }: CardLevelScaleProps) {
   if (rows.length === 0) {
-    return <p className="text-xs text-cr-muted">Нет прокачанных карт</p>;
+    return <p className="text-sm text-cr-muted">Нет прокачанных карт</p>;
   }
 
   const maxCount = Math.max(...rows.map((r) => r.count), 1);
@@ -22,7 +22,7 @@ export function CardLevelScale({ rows, className }: CardLevelScaleProps) {
       {rows.map((row) => {
         const width = Math.max(6, Math.round((row.count / maxCount) * 100));
         return (
-          <div key={row.level} className="grid grid-cols-[2.5rem_1fr_2.75rem] items-center gap-2 text-xs">
+          <div key={row.level} className="grid grid-cols-[2.5rem_1fr_2.75rem] items-center gap-2 text-sm">
             <span className="text-cr-muted font-semibold tabular-nums">{row.level}</span>
             <div className="level-bar-track h-2 rounded-full bg-cr-bg/80 overflow-hidden">
               <div

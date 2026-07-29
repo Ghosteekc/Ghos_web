@@ -23,10 +23,10 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
   return (
     <Card delay={index * 0.04} className="cursor-pointer overflow-hidden relative" onClick={onOpen}>
       <div className="flex items-center justify-between mb-4">
-        <span className="text-xs font-medium text-cr-blue bg-cr-blue/10 px-2.5 py-1 rounded-full border border-cr-blue/20">
+        <span className="text-sm font-medium text-cr-blue bg-cr-blue/10 px-2.5 py-1 rounded-full border border-cr-blue/20">
           {deck.type === "rated" ? "Рейтинговые" : deck.type === "classic" ? "Обычные" : deck.type === "2v2" ? "2v2" : deck.type === "tournament" ? "Турнир" : "Путь Легенд"}
         </span>
-        <div className="flex items-center gap-1 text-xs">
+        <div className="flex items-center gap-1 text-sm">
           <ElixirIcon size={14} />
           <span
             className={
@@ -60,7 +60,7 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-base">
           <span className="text-cr-muted">{UI.winrate}</span>
           <div className="flex items-center gap-2">
             <LinearProgress
@@ -74,7 +74,7 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
             </span>
           </div>
         </div>
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-base">
           <span className="text-cr-muted">Игр</span>
           <span className="font-semibold text-cr-text">{formatNumber(deck.total_games)}</span>
         </div>
@@ -82,11 +82,11 @@ export function DeckCard({ deck, index, onOpen }: DeckCardProps) {
 
       <div className="mt-4 pt-4 border-t border-cr-border flex items-center justify-between">
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={handleCopy} className="!px-3 !py-2 text-xs">
+          <Button variant="ghost" onClick={handleCopy} className="!px-3 !py-2 text-sm">
             <Copy className="w-4 h-4 mr-1.5" />
             Копировать
           </Button>
-          <Button variant="ghost" className="!px-3 !py-2 text-xs">
+          <Button variant="ghost" className="!px-3 !py-2 text-sm">
             <BarChart3 className="w-4 h-4 mr-1.5" />
             Статистика
           </Button>

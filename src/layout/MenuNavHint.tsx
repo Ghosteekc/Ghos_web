@@ -31,7 +31,7 @@ export function MenuNavHint({ visible }: { visible: boolean }) {
       aria-label="Подсказка о меню навигации"
     >
       <Menu className="w-4 h-4 shrink-0 text-cr-gold" aria-hidden />
-      <p className="text-[11px] leading-snug text-cr-text">
+      <p className="text-xs leading-snug text-cr-text">
         Кнопка меню слева открывает дополнительные разделы: профиль, аналитика, колоды и настройки.
       </p>
       <button

@@ -459,7 +459,7 @@
   }
 
   .pixel-btn--tile .pixel-btn-label {
-    font-size: 0.8125rem;
+    font-size: 14px;
     font-weight: 800;
     line-height: 1.25;
     white-space: normal;
@@ -551,11 +551,11 @@
   }
 
   .pixel-btn-label {
-    @apply text-sm font-bold leading-snug truncate;
+    @apply text-base font-bold leading-snug truncate;
   }
 
   .pixel-btn-hint {
-    @apply text-[11px] font-medium text-cr-muted truncate mt-0.5;
+    @apply text-xs font-medium text-cr-muted truncate mt-0.5;
     text-shadow: none;
   }
 
@@ -612,7 +612,7 @@
   }
 
   .filter-tab {
-    @apply pixel-btn pixel-btn--chip flex-1 justify-center whitespace-nowrap text-sm font-semibold text-cr-text;
+    @apply pixel-btn pixel-btn--chip flex-1 justify-center whitespace-nowrap text-base font-semibold text-cr-text;
   }
 
   .filter-tab.filter-tab--active {
@@ -708,11 +708,11 @@
   }
 
   .pixel-btn--chip-sm {
-    @apply pixel-btn pixel-btn--chip px-2.5 py-1 min-h-[2rem] text-xs gap-1;
+    @apply pixel-btn pixel-btn--chip px-2.5 py-1 min-h-[2rem] text-sm gap-1;
   }
 
   .pixel-btn--text {
-    @apply pixel-btn pixel-btn--ghost text-xs text-cr-accent underline-offset-2 min-h-0 px-1 py-0.5;
+    @apply pixel-btn pixel-btn--ghost text-sm text-cr-accent underline-offset-2 min-h-0 px-1 py-0.5;
     text-shadow: none;
   }
 
@@ -793,7 +793,7 @@
     border-radius: 999px;
     color: rgba(255, 255, 255, 0.95);
     text-shadow: none !important;
-    font-size: 0.75rem;
+    font-size: 12px;
     line-height: 1.25;
     transform-origin: center center;
     /* Same frosted glass recipe as .bottom-nav-liquid-bubble-glass / bar */
@@ -1881,20 +1881,20 @@
   }
 
   .page-subtitle {
-    @apply text-sm leading-snug;
+    @apply text-base leading-snug;
     color: rgb(var(--cr-muted));
     text-shadow: var(--cr-stroke-body);
   }
 
   .section-title {
-    @apply text-sm font-semibold uppercase tracking-wider;
+    @apply text-base font-semibold uppercase tracking-wider;
     color: rgb(var(--cr-gold));
     letter-spacing: 0.06em;
     line-height: 1.3;
   }
 
   .text-label {
-    @apply text-xs font-cr uppercase tracking-wide;
+    @apply text-sm font-cr uppercase tracking-wide;
     color: rgb(var(--cr-accent));
     text-shadow: var(--cr-stroke-body);
     line-height: 1.25;
@@ -1907,7 +1907,7 @@
   }
 
   .stat-caption {
-    @apply text-[10px] leading-tight;
+    @apply text-2xs leading-tight;
     color: rgb(var(--cr-muted));
   }
 
@@ -1923,7 +1923,7 @@
 
   .card-name-deck {
     @apply font-cr leading-[1.05];
-    font-size: 8px;
+    font-size: 9px;
     letter-spacing: 0;
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-body);
@@ -1940,7 +1940,7 @@
     padding: 0.18rem 0.2rem;
     border-radius: 0.35rem;
     font-family: "Supercell Magic", sans-serif;
-    font-size: 7px;
+    font-size: 9px;
     line-height: 1;
     letter-spacing: 0;
     text-align: center;
@@ -1958,7 +1958,7 @@
 
   .card-name-caption--lg {
     min-height: 1.15rem;
-    font-size: 8px;
+    font-size: 9px;
     padding: 0.22rem 0.25rem;
   }
 
@@ -1982,7 +1982,7 @@
     min-height: 1rem;
     padding: 0.18rem 0.2rem;
     font-family: "Supercell Magic", sans-serif;
-    font-size: 7px;
+    font-size: 9px;
     line-height: 1;
     letter-spacing: 0;
     text-align: center;
@@ -2006,7 +2006,7 @@
 
   .card-name-lg-overlay {
     min-height: 1.15rem;
-    font-size: 8px;
+    font-size: 9px;
     padding: 0.22rem 0.25rem;
   }
 
@@ -2106,7 +2106,7 @@
     align-items: center;
     justify-content: center;
     padding: 0 0.22rem;
-    font-size: 0.62rem;
+    font-size: 10px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     line-height: 1;
@@ -2148,7 +2148,7 @@
     align-items: center;
     justify-content: center;
     padding-bottom: 3px;
-    font-size: 0.68rem;
+    font-size: 11px;
     font-weight: 900;
     line-height: 1;
     color: #fff;
@@ -2156,7 +2156,7 @@
   }
 
   .cr-elixir-badge--lg .cr-elixir-badge-num {
-    font-size: 0.78rem;
+    font-size: 12px;
     padding-bottom: 4px;
   }
 
@@ -2168,7 +2168,7 @@
     min-width: 1.25rem;
     padding: 0.08rem 0.26rem;
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    font-size: 0.68rem;
+    font-size: 11px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     line-height: 1.1;
@@ -2228,7 +2228,7 @@
 
   .settings-data-btn {
     @apply pixel-btn pixel-bevel w-full flex-col items-center justify-center gap-2;
-    @apply font-semibold text-sm min-h-[5.25rem] px-3 py-3;
+    @apply font-semibold text-base min-h-[5.25rem] px-3 py-3;
     color: rgb(var(--cr-text));
     text-align: center;
   }
@@ -2300,7 +2300,7 @@
   text-align: left;
   border: none;
   border-radius: 1rem;
-  font-size: 0.875rem;
+  font-size: 14px;
   font-weight: 600;
   transition:
     transform 85ms ease-out,

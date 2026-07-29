@@ -758,7 +758,7 @@ function ChartTooltipLegacyShell({
   return createPortal(
     <div
       ref={shellRef}
-      className={`chart-tooltip-glass px-3 py-2 text-xs shadow-lg${shown && position ? " is-shown" : ""}`}
+      className={`chart-tooltip-glass px-3 py-2 text-sm shadow-lg${shown && position ? " is-shown" : ""}`}
       role={pinned ? "button" : undefined}
       tabIndex={pinned ? 0 : undefined}
       aria-label={pinned ? "Закрыть подсказку" : undefined}

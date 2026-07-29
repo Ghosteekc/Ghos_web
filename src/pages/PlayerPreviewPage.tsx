@@ -172,10 +172,10 @@ export function PlayerPreviewPage() {
                 <h2 className="text-xl font-extrabold text-cr-text truncate">
                   {player.player_name}
                 </h2>
-                <p className="text-cr-accent text-sm font-bold font-mono mt-1">
+                <p className="text-cr-accent text-base font-bold font-mono mt-1">
                   {formatPlayerTag(player.player_tag)}
                 </p>
-                <span className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-cr-blue/10 border border-cr-blue/20 text-cr-blue text-xs font-medium max-w-full">
+                <span className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-cr-blue/10 border border-cr-blue/20 text-cr-blue text-sm font-medium max-w-full">
                   {player.arena_icon ? (
                     <img src={player.arena_icon} alt="" className="w-3.5 h-3.5 object-contain" />
                   ) : (
@@ -184,7 +184,7 @@ export function PlayerPreviewPage() {
                   <span className="truncate">{player.arena || "Арена неизвестна"}</span>
                 </span>
                 {player.favorite_card ? (
-                  <p className="text-xs text-cr-gold font-bold mt-2 truncate">
+                  <p className="text-sm text-cr-gold font-bold mt-2 truncate">
                     ★ {nameRu(player.favorite_card)}
                   </p>
                 ) : null}
@@ -209,19 +209,19 @@ export function PlayerPreviewPage() {
                 <item.icon className={`w-5 h-5 shrink-0 ${item.iconClass}`} />
                 <p
                   className={
-                    "text-base font-bold tabular-nums leading-tight truncate max-w-full px-1 " +
+                    "text-[16px] font-bold tabular-nums leading-tight truncate max-w-full px-1 " +
                     (item.valueClass ?? "text-cr-text")
                   }
                 >
                   {item.value}
                 </p>
-                <p className="text-[10px] text-cr-muted leading-tight">{item.label}</p>
+                <p className="text-2xs text-cr-muted leading-tight">{item.label}</p>
               </Card>
             ))}
           </div>
 
           {player.recent_games && player.recent_games > 0 && player.recent_winrate != null ? (
-            <p className="text-[11px] text-cr-muted text-center -mt-3">
+            <p className="text-xs text-cr-muted text-center -mt-3">
               Из последних {player.recent_games} боёв на лестнице:{" "}
               <span className={"font-semibold " + getWinColor(player.recent_winrate)}>
                 {player.recent_winrate.toFixed(0)}%
@@ -232,8 +232,8 @@ export function PlayerPreviewPage() {
           <Card className="!p-3">
             <div className="flex items-start justify-between gap-2 mb-3">
               <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-cr-text">Любимая колода</h3>
-                <p className="text-[11px] text-cr-muted mt-0.5">
+                <h3 className="text-base font-semibold text-cr-text">Любимая колода</h3>
+                <p className="text-xs text-cr-muted mt-0.5">
                   {hasDeck
                     ? "Текущая колода из профиля Clash Royale"
                     : "Колода пока недоступна"}
@@ -241,19 +241,19 @@ export function PlayerPreviewPage() {
               </div>
               {hasDeck ? (
                 <div className="text-right shrink-0 space-y-0.5">
-                  <div className="flex items-center justify-end gap-1 text-xs">
+                  <div className="flex items-center justify-end gap-1 text-sm">
                     <ElixirIcon size={14} />
                     <span className="font-semibold text-cr-text">
                       {(player.avg_elixir ?? 0).toFixed(1)}
                     </span>
                   </div>
                   {(player.deck_games ?? 0) > 0 && player.deck_winrate != null ? (
-                    <p className={"text-xs font-bold " + getWinColor(player.deck_winrate)}>
+                    <p className={"text-sm font-bold " + getWinColor(player.deck_winrate)}>
                       {UI.winrateShort} {player.deck_winrate.toFixed(0)}% · {player.deck_games}{" "}
                       {UI.battles}
                     </p>
                   ) : (
-                    <p className="text-[11px] text-cr-muted">Винрейт колоды: н/д</p>
+                    <p className="text-xs text-cr-muted">Винрейт колоды: н/д</p>
                   )}
                 </div>
               ) : null}
@@ -266,14 +266,14 @@ export function PlayerPreviewPage() {
                   {player.deck_link ? (
                     <Button
                       variant="secondary"
-                      className="flex-1 !py-2 text-sm flex items-center justify-center gap-2"
+                      className="flex-1 !py-2 text-base flex items-center justify-center gap-2"
                       onClick={() => void importDeck(player.deck_link!)}
                     >
                       <ExternalLink className="w-4 h-4" />
                       Импорт колоды
                     </Button>
                   ) : (
-                    <p className="flex-1 text-xs text-cr-muted text-center self-center">
+                    <p className="flex-1 text-sm text-cr-muted text-center self-center">
                       Импорт недоступен
                     </p>
                   )}
@@ -292,7 +292,7 @@ export function PlayerPreviewPage() {
           </Card>
 
           {hint ? (
-            <p className="text-center text-xs text-cr-gold font-medium">{hint}</p>
+            <p className="text-center text-sm text-cr-gold font-medium">{hint}</p>
           ) : null}
         </>
       )}

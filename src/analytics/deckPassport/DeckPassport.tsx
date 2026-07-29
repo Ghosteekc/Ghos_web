@@ -16,7 +16,7 @@ function MetricBar({ label, value }: { label: string; value: number }) {
   const pct = Math.min(100, (value / 10) * 100);
   return (
     <div>
-      <div className="flex items-center justify-between text-xs mb-1">
+      <div className="flex items-center justify-between text-sm mb-1">
         <span className="text-cr-muted">{label}</span>
         <span className="text-cr-text font-semibold tabular-nums">
           {value.toFixed(1)} / 10
@@ -73,10 +73,10 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
       >
         <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3 border-b border-cr-border shrink-0">
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-wider text-cr-gold recommendation-accent">
+            <p className="text-2xs uppercase tracking-wider text-cr-gold recommendation-accent">
               Ghøsteek Deck Passport
             </p>
-            <h2 className="text-base font-semibold text-cr-text truncate">
+            <h2 className="text-[16px] font-semibold text-cr-text truncate">
               {deck.name || "Анализ колоды"}
             </h2>
           </div>
@@ -87,14 +87,14 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
 
         <div className="overflow-y-auto overscroll-contain flex-1 px-4 py-4 space-y-5">
           <Card className="!p-5 text-center">
-            <p className="text-xs text-cr-muted mb-1">Ghøsteek Score</p>
+            <p className="text-sm text-cr-muted mb-1">Ghøsteek Score</p>
             <p className="text-4xl font-bold text-cr-gold tabular-nums">{analysis.score}</p>
             <p className="text-lg text-cr-gold tracking-widest mt-1">{analysis.starsDisplay}</p>
-            <p className="text-xs text-cr-muted mt-2">{analysis.archetype} · {analysis.playStyle}</p>
+            <p className="text-sm text-cr-muted mt-2">{analysis.archetype} · {analysis.playStyle}</p>
           </Card>
 
           <Card className="!p-3">
-            <h3 className="text-sm font-semibold text-cr-text mb-3">Характеристики</h3>
+            <h3 className="text-base font-semibold text-cr-text mb-3">Характеристики</h3>
             <div className="space-y-3">
               {metrics.map((m) => (
                 <MetricBar key={m.key} label={m.label} value={m.value} />
@@ -103,8 +103,8 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
           </Card>
 
           <Card className="!p-3">
-            <h3 className="text-sm font-semibold text-cr-text mb-3">Основная информация</h3>
-            <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+            <h3 className="text-base font-semibold text-cr-text mb-3">Основная информация</h3>
+            <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
               {[
                 ["Средний эликсир", analysis.basicInfo.avgElixir.toFixed(1)],
                 ["Win Condition", nameRu(analysis.basicInfo.primaryWinCondition)],
@@ -124,10 +124,10 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
           </Card>
 
           <Card className="!p-3">
-            <h3 className="text-sm font-semibold text-cr-text mb-3">Баланс ролей</h3>
+            <h3 className="text-base font-semibold text-cr-text mb-3">Баланс ролей</h3>
             <ul className="space-y-2">
               {analysis.roleBalance.map((role) => (
-                <li key={role.id} className="flex items-center justify-between text-xs">
+                <li key={role.id} className="flex items-center justify-between text-sm">
                   <span className="text-cr-muted">{role.label}</span>
                   <span className={role.present ? "text-cr-win" : "text-cr-gold"}>
                     {role.present ? "✅ Есть" : "⚠ Отсутствует"}
@@ -138,38 +138,38 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
           </Card>
 
           <Card className="!p-3 border-cr-border">
-            <h3 className="text-sm font-semibold text-cr-text mb-2">Практичность</h3>
+            <h3 className="text-base font-semibold text-cr-text mb-2">Практичность</h3>
             <p className="text-2xl font-bold text-cr-gold tabular-nums">{analysis.practicality}%</p>
             <div className="mt-3 space-y-1">
               {analysis.practicalityReasons.positive.map((r) => (
-                <p key={r} className="text-xs text-cr-win">✔ {r}</p>
+                <p key={r} className="text-sm text-cr-win">✔ {r}</p>
               ))}
               {analysis.practicalityReasons.negative.map((r) => (
-                <p key={r} className="text-xs text-cr-muted">− {r}</p>
+                <p key={r} className="text-sm text-cr-muted">− {r}</p>
               ))}
             </div>
           </Card>
 
           <Card className="!p-3">
-            <h3 className="text-sm font-semibold text-cr-text mb-1">Сложность освоения</h3>
-            <p className="text-base font-semibold text-cr-text">{analysis.difficulty}</p>
-            <p className="text-xs text-cr-muted mt-1">Игровой стиль: {analysis.playStyle}</p>
+            <h3 className="text-base font-semibold text-cr-text mb-1">Сложность освоения</h3>
+            <p className="text-[16px] font-semibold text-cr-text">{analysis.difficulty}</p>
+            <p className="text-sm text-cr-muted mt-1">Игровой стиль: {analysis.playStyle}</p>
           </Card>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Card className="!p-3">
-              <h3 className="text-sm font-semibold text-cr-win mb-2">Сильные стороны</h3>
+              <h3 className="text-base font-semibold text-cr-win mb-2">Сильные стороны</h3>
               <ul className="space-y-1">
                 {analysis.strengths.map((s) => (
-                  <li key={s} className="text-xs text-cr-text">✔ {s}</li>
+                  <li key={s} className="text-sm text-cr-text">✔ {s}</li>
                 ))}
               </ul>
             </Card>
             <Card className="!p-3">
-              <h3 className="text-sm font-semibold text-cr-gold mb-2">Слабые стороны</h3>
+              <h3 className="text-base font-semibold text-cr-gold mb-2">Слабые стороны</h3>
               <ul className="space-y-1">
                 {analysis.weaknesses.map((w) => (
-                  <li key={w} className="text-xs text-cr-muted">⚠ {w}</li>
+                  <li key={w} className="text-sm text-cr-muted">⚠ {w}</li>
                 ))}
               </ul>
             </Card>
@@ -177,26 +177,26 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Card className="!p-3">
-              <h3 className="text-sm font-semibold text-cr-text mb-2">Сильна против</h3>
+              <h3 className="text-base font-semibold text-cr-text mb-2">Сильна против</h3>
               <ul className="space-y-1">
                 {analysis.matchups.strong.map((m) => (
-                  <li key={m} className="text-xs text-cr-win">{m}</li>
+                  <li key={m} className="text-sm text-cr-win">{m}</li>
                 ))}
               </ul>
             </Card>
             <Card className="!p-3">
-              <h3 className="text-sm font-semibold text-cr-text mb-2">Слаба против</h3>
+              <h3 className="text-base font-semibold text-cr-text mb-2">Слаба против</h3>
               <ul className="space-y-1">
                 {analysis.matchups.weak.map((m) => (
-                  <li key={m} className="text-xs text-cr-loss">{m}</li>
+                  <li key={m} className="text-sm text-cr-loss">{m}</li>
                 ))}
               </ul>
             </Card>
           </div>
 
           <Card className="!p-3 border-cr-blue/20 bg-cr-blue/5">
-            <h3 className="text-sm font-semibold text-cr-text mb-2">Заключение</h3>
-            <p className="text-xs text-cr-text leading-relaxed">{analysis.summary}</p>
+            <h3 className="text-base font-semibold text-cr-text mb-2">Заключение</h3>
+            <p className="text-sm text-cr-text leading-relaxed">{analysis.summary}</p>
           </Card>
 
           <div className="pb-2">

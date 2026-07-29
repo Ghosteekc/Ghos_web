@@ -112,7 +112,7 @@ export function SearchPage() {
         )}
       </div>
 
-      <p className="text-xs text-cr-muted -mt-2">
+      <p className="text-sm text-cr-muted -mt-2">
         Поиск работает только по тегу игрока — по нику найти нельзя.
       </p>
 
@@ -124,7 +124,7 @@ export function SearchPage() {
             animate={{ y: 0 }}
             className="space-y-3"
           >
-            <h3 className="text-sm text-cr-muted">Результаты</h3>
+            <h3 className="text-base text-cr-muted">Результаты</h3>
             {results.map((result, i) => (
               <Card
                 key={result.player_tag}
@@ -138,17 +138,17 @@ export function SearchPage() {
                       <User className="w-5 h-5 text-cr-muted" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-cr-text">{result.player_name}</p>
-                      <p className="text-xs text-cr-muted font-mono">#{result.player_tag}</p>
+                      <p className="text-base font-semibold text-cr-text">{result.player_name}</p>
+                      <p className="text-sm text-cr-muted font-mono">#{result.player_tag}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="text-right">
                       <div className="flex items-center gap-1 text-cr-gold justify-end">
                         <Trophy className="w-4 h-4" />
-                        <span className="text-sm font-semibold">{result.trophies}</span>
+                        <span className="text-base font-semibold">{result.trophies}</span>
                       </div>
-                      <p className="text-xs text-cr-muted">{result.arena}</p>
+                      <p className="text-sm text-cr-muted">{result.arena}</p>
                     </div>
                     <ChevronRight className="w-5 h-5 text-cr-muted" />
                   </div>
@@ -165,8 +165,8 @@ export function SearchPage() {
       {history.length > 0 && !loading && results.length === 0 && !query.trim() && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm text-cr-muted">История</h3>
-            <Button variant="ghost" onClick={() => setHistory([])} className="!px-2 !py-1 text-xs">
+            <h3 className="text-base text-cr-muted">История</h3>
+            <Button variant="ghost" onClick={() => setHistory([])} className="!px-2 !py-1 text-sm">
               Очистить
             </Button>
           </div>
@@ -174,7 +174,7 @@ export function SearchPage() {
             {history.map((item) => (
               <span
                 key={item}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-cr-card border border-cr-border text-xs text-cr-muted transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-cr-card border border-cr-border text-sm text-cr-muted transition-colors cursor-pointer"
                 onClick={() => setQuery(item)}
               >
                 {item}

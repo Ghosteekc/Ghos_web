@@ -18,24 +18,24 @@ import {
 function ArenaProgressHeader({ summary }: { summary: ArenaProgressSummary }) {
   return (
     <Card className="!p-4 border-cr-border">
-      <h3 className="text-sm font-semibold text-cr-text">Приоритет прокачки аккаунта</h3>
+      <h3 className="text-base font-semibold text-cr-text">Приоритет прокачки аккаунта</h3>
       <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
-          <p className="text-[11px] text-cr-muted">Ваш прогресс</p>
+          <p className="text-xs text-cr-muted">Ваш прогресс</p>
           <p className="text-xl font-bold text-cr-gold tabular-nums recommendation-accent">{summary.progressPercent}%</p>
         </div>
         <div>
-          <p className="text-[11px] text-cr-muted">Соответствуют арене</p>
+          <p className="text-xs text-cr-muted">Соответствуют арене</p>
           <p className="text-xl font-bold text-cr-win tabular-nums">
             {summary.meetingCount} из {summary.totalCount}
           </p>
         </div>
         <div>
-          <p className="text-[11px] text-cr-muted">Требуют улучшения</p>
+          <p className="text-xs text-cr-muted">Требуют улучшения</p>
           <p className="text-xl font-bold text-cr-gold tabular-nums recommendation-accent">{summary.needsUpgradeCount}</p>
         </div>
         <div>
-          <p className="text-[11px] text-cr-muted">Рекомендуемый уровень</p>
+          <p className="text-xs text-cr-muted">Рекомендуемый уровень</p>
           <p className="text-xl font-bold text-cr-text tabular-nums">{summary.recommendedLevel}+</p>
         </div>
       </div>
@@ -188,19 +188,19 @@ export function RecommendationsPanel() {
       <Card className="border-cr-border">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-cr-text">Рекомендации по прокачке</p>
-            <p className="text-xs text-cr-muted mt-1 leading-relaxed">
+            <p className="text-base font-semibold text-cr-text">Рекомендации по прокачке</p>
+            <p className="text-sm text-cr-muted mt-1 leading-relaxed">
               Приоритетные карты для каждой арены с учётом вашей коллекции
             </p>
             {playerArena != null && myArenaSummary ? (
-              <p className="text-xs text-cr-gold mt-2 recommendation-accent">
+              <p className="text-sm text-cr-gold mt-2 recommendation-accent">
                 Ваша арена: {myArenaSummary.arenaName} · {profile.trophies?.toLocaleString("ru-RU") ?? "—"} 🏆
               </p>
             ) : null}
           </div>
           <Button
             variant="primary"
-            className="shrink-0 !py-2 text-sm flex items-center justify-center gap-2"
+            className="shrink-0 !py-2 text-base flex items-center justify-center gap-2"
             onClick={goToMyArena}
             disabled={playerArena == null}
           >
@@ -213,7 +213,7 @@ export function RecommendationsPanel() {
       {myArenaSummary ? <ArenaProgressHeader summary={myArenaSummary} /> : null}
 
       <Card>
-        <h3 className="text-sm font-semibold text-cr-text mb-3">Все арены</h3>
+        <h3 className="text-base font-semibold text-cr-text mb-3">Все арены</h3>
         <div className="flex flex-wrap gap-2">
           {ARENA_RECOMMENDATIONS.map((arena) => (
             <button
@@ -227,8 +227,8 @@ export function RecommendationsPanel() {
                   : "border-cr-border",
               )}
             >
-              <span className="block text-[10px] text-cr-muted">Арена {arena.arena}</span>
-              <span className="block text-xs text-cr-text max-w-[9rem] truncate">{arena.name}</span>
+              <span className="block text-2xs text-cr-muted">Арена {arena.arena}</span>
+              <span className="block text-sm text-cr-text max-w-[9rem] truncate">{arena.name}</span>
             </button>
           ))}
         </div>

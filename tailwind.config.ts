@@ -23,6 +23,13 @@ const config: Config = {
         cr: ["Supercell Magic", "SC CCBackBeat", "sans-serif"],
         mono: ["SC CCBackBeat", "monospace"],
       },
+      fontSize: {
+        "3xs": ["9px", { lineHeight: "1.25" }],
+        "2xs": ["10px", { lineHeight: "1.3" }],
+        xs: ["11px", { lineHeight: "1.35" }],
+        sm: ["12px", { lineHeight: "1.4" }],
+        base: ["14px", { lineHeight: "1.5" }],
+      },
       boxShadow: {
         glow: "0 0 20px rgba(251, 191, 36, 0.15)",
         "glow-blue": "0 0 20px rgba(96, 165, 250, 0.15)",

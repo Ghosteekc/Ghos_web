@@ -32,7 +32,7 @@ function DeckImportButton({ deckLink, label }: { deckLink?: string | null; label
 
   if (!deckLink) {
     return (
-      <p className="text-[11px] text-cr-muted mt-3">
+      <p className="text-xs text-cr-muted mt-3">
         Импорт недоступен — не все карты распознаны
       </p>
     );
@@ -41,7 +41,7 @@ function DeckImportButton({ deckLink, label }: { deckLink?: string | null; label
   return (
     <Button
       variant="secondary"
-      className="mt-3 w-full !py-2 text-sm flex items-center justify-center gap-2"
+      className="mt-3 w-full !py-2 text-base flex items-center justify-center gap-2"
       onClick={() => void importDeck()}
     >
       <ExternalLink className="w-4 h-4" />
@@ -97,13 +97,13 @@ export function DeckWinratesPanel({ onAnalyze }: { onAnalyze?: (deck: Deck) => v
         return (
           <Card key={i} delay={i * 0.03}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-semibold text-cr-text">
+              <span className="text-base font-semibold text-cr-text">
                 <span className="text-cr-win">{row.wins} побед</span>
                 <span className="text-cr-muted"> · </span>
                 <span className="text-cr-loss">{row.losses} поражений</span>
                 <span className="text-cr-muted"> · {row.total} игр</span>
               </span>
-              <span className={`text-sm font-bold ${row.winrate >= 50 ? "text-cr-win" : "text-cr-loss"}`}>
+              <span className={`text-base font-bold ${row.winrate >= 50 ? "text-cr-win" : "text-cr-loss"}`}>
                 {row.winrate.toFixed(1)}%
               </span>
             </div>
@@ -132,7 +132,7 @@ export function DeckWinratesPanel({ onAnalyze }: { onAnalyze?: (deck: Deck) => v
             {canAnalyze ? (
               <Button
                 variant="secondary"
-                className="w-full !py-2 text-sm flex items-center justify-center gap-2 mt-3"
+                className="w-full !py-2 text-base flex items-center justify-center gap-2 mt-3"
                 onClick={() =>
                   onAnalyze?.({
                     id: i + 1,
@@ -228,18 +228,18 @@ export function OpponentsPanel() {
           <Card key={opp.index}>
             <div className="flex items-start justify-between gap-2 mb-2">
               <div>
-                <p className="text-sm font-semibold text-cr-text flex items-center gap-2">
+                <p className="text-base font-semibold text-cr-text flex items-center gap-2">
                   <Shield className="w-4 h-4 text-cr-loss" />
                   {opp.name}
                 </p>
-                <p className="text-xs text-cr-muted mt-0.5">
+                <p className="text-sm text-cr-muted mt-0.5">
                   {opp.won_against ? "Вы побеждали эту колоду" : "Проигрывали этой колоде"} · эликсир {opp.avg_elixir.toFixed(1)}
                 </p>
               </div>
               <Button
                 variant="secondary"
                 className={cn(
-                  "!py-1.5 !px-3 text-xs shrink-0",
+                  "!py-1.5 !px-3 text-sm shrink-0",
                   isOpen && "border-cr-gold/60 text-cr-gold bg-cr-gold/10 active:bg-cr-gold/20",
                 )}
                 disabled={isLoadingCounter}
@@ -252,7 +252,7 @@ export function OpponentsPanel() {
             {opp.threats.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {opp.threats.map((t) => (
-                  <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-cr-loss/10 text-cr-loss border border-cr-loss/20">
+                  <span key={t} className="text-2xs px-2 py-0.5 rounded-full bg-cr-loss/10 text-cr-loss border border-cr-loss/20">
                     {t}
                   </span>
                 ))}
@@ -267,13 +267,13 @@ export function OpponentsPanel() {
             {isOpen && (
               <div className="mt-3 pt-3 border-t border-cr-win/20 rounded-lg bg-cr-win/5 px-3 pb-3 -mx-1">
                 {isLoadingCounter ? (
-                  <p className="text-xs text-cr-muted text-center py-2">Подбираем контр-колоду…</p>
+                  <p className="text-sm text-cr-muted text-center py-2">Подбираем контр-колоду…</p>
                 ) : counter ? (
                   <>
-                    <h3 className="text-sm font-semibold text-cr-text mb-1">
+                    <h3 className="text-base font-semibold text-cr-text mb-1">
                       Контр-колода vs {counter.opponent_name}
                     </h3>
-                    <p className="text-xs text-cr-muted mb-3">Под ваш арсенал и арену</p>
+                    <p className="text-sm text-cr-muted mb-3">Под ваш арсенал и арену</p>
                     <CardDeckGrid cards={counter.counter_deck} size="lg" showLabels maxVisible={8} />
                   </>
                 ) : null}
@@ -343,7 +343,7 @@ export function DeckToolsPanel() {
       <div className="flex justify-end">
         <Button
           variant="ghost"
-          className="text-cr-muted px-3 py-2 text-xs"
+          className="text-cr-muted px-3 py-2 text-sm"
           disabled={refreshing}
           onClick={() => {
             setRefreshing(true);
@@ -360,13 +360,13 @@ export function DeckToolsPanel() {
             <Wand2 className="w-5 h-5 text-cr-gold" />
             <h3 className="font-semibold text-cr-text">Улучшение колоды</h3>
           </div>
-          <p className="text-xs text-cr-muted mb-1">
+          <p className="text-sm text-cr-muted mb-1">
             Ср. эликсир: {customize.avg_elixir.toFixed(1)}
             {customize.recommended_level ? (
               <> · рекоменд. ур. для арены: {customize.recommended_level}</>
             ) : null}
           </p>
-          <p className="text-xs text-cr-muted mb-2 mt-3">Было</p>
+          <p className="text-sm text-cr-muted mb-2 mt-3">Было</p>
           <CardDeckGrid
             cards={customize.original}
             icons={deckIcons(customize.original_cards)}
@@ -378,17 +378,17 @@ export function DeckToolsPanel() {
 
           {upgrades.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs text-cr-gold mb-2 recommendation-accent">Рекомендуемый уровень карт</p>
+              <p className="text-sm text-cr-gold mb-2 recommendation-accent">Рекомендуемый уровень карт</p>
               <ul className="space-y-1.5">
                 {upgrades.map((u) => (
                   <li
                     key={`${u.name}-${u.level}`}
-                    className="flex items-center gap-2 text-xs text-cr-text"
+                    className="flex items-center gap-2 text-sm text-cr-text"
                   >
                     {u.icon ? (
                       <img src={u.icon} alt="" className="h-7 w-7 rounded object-cover" />
                     ) : (
-                      <span className="flex h-7 w-7 items-center justify-center rounded bg-cr-surface text-[10px] font-bold">
+                      <span className="flex h-7 w-7 items-center justify-center rounded bg-cr-surface text-2xs font-bold">
                         {(u.name_ru || u.name).charAt(0)}
                       </span>
                     )}
@@ -406,7 +406,7 @@ export function DeckToolsPanel() {
 
           {synergyNeeded ? (
             <>
-              <p className="text-xs text-cr-muted mb-2 mt-4">По синергии</p>
+              <p className="text-sm text-cr-muted mb-2 mt-4">По синергии</p>
               <CardDeckGrid
                 cards={customize.customized}
                 icons={deckIcons(customize.customized_cards)}
@@ -421,9 +421,9 @@ export function DeckToolsPanel() {
 
           {levelAltNeeded && customize.level_alt_deck?.length ? (
             <>
-              <p className="text-xs text-cr-muted mb-1 mt-4">Сильнее по уровням (тот же стиль)</p>
+              <p className="text-sm text-cr-muted mb-1 mt-4">Сильнее по уровням (тот же стиль)</p>
               {typeof customize.level_alt_avg_elixir === "number" ? (
-                <p className="text-[11px] text-cr-muted mb-2">
+                <p className="text-xs text-cr-muted mb-2">
                   Ср. эликсир: {customize.level_alt_avg_elixir.toFixed(1)}
                 </p>
               ) : null}
@@ -443,7 +443,7 @@ export function DeckToolsPanel() {
           ) : null}
 
           {balanced ? (
-            <p className="text-xs text-cr-muted mt-4">
+            <p className="text-sm text-cr-muted mt-4">
               Колода подходит для вашей арены — обязательных замен нет
             </p>
           ) : null}
@@ -451,7 +451,7 @@ export function DeckToolsPanel() {
           {customize.issues.length > 0 && (
             <button
               type="button"
-              className="mt-3 flex items-center gap-1 text-xs text-cr-gold"
+              className="mt-3 flex items-center gap-1 text-sm text-cr-gold"
               onClick={() => setShowIssues((v) => !v)}
             >
               {showIssues ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -459,7 +459,7 @@ export function DeckToolsPanel() {
             </button>
           )}
           {showIssues && (
-            <ul className="mt-2 space-y-1 text-xs text-cr-muted">
+            <ul className="mt-2 space-y-1 text-sm text-cr-muted">
               {customize.issues.map((issue, i) => (
                 <li key={i}>· {issue}</li>
               ))}
@@ -518,7 +518,7 @@ export function LossAnalysisPanel() {
     <Card>
       <div className="flex items-center gap-2 mb-4">
         <Brain className="w-5 h-5 text-cr-blue" />
-        <h3 className="text-sm font-semibold text-cr-text">Разбор поражений</h3>
+        <h3 className="text-base font-semibold text-cr-text">Разбор поражений</h3>
       </div>
 
       {insights.patterns.length ? (
@@ -526,7 +526,7 @@ export function LossAnalysisPanel() {
           {insights.patterns.map((pattern, index) => (
             <p
               key={index}
-              className="text-xs text-cr-gold bg-cr-gold/10 border border-cr-gold/20 rounded-lg px-3 py-2"
+              className="text-sm text-cr-gold bg-cr-gold/10 border border-cr-gold/20 rounded-lg px-3 py-2"
             >
               {pattern}
             </p>
@@ -549,10 +549,10 @@ export function LossAnalysisPanel() {
             <div className="flex items-start gap-2 mb-1.5">
               <Swords className="w-4 h-4 text-cr-loss shrink-0 mt-0.5" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-cr-accent font-semibold mb-0.5">против {item.opponent_name}</p>
-                <p className="text-sm text-cr-text leading-snug">{item.summary}</p>
+                <p className="text-sm text-cr-accent font-semibold mb-0.5">против {item.opponent_name}</p>
+                <p className="text-base text-cr-text leading-snug">{item.summary}</p>
                 {item.matchup_score > 0 ? (
-                  <p className="text-[11px] text-cr-muted mt-1">Матчап: {item.matchup_score.toFixed(0)}/100</p>
+                  <p className="text-xs text-cr-muted mt-1">Матчап: {item.matchup_score.toFixed(0)}/100</p>
                 ) : null}
               </div>
               <ChevronRight className="w-5 h-5 text-cr-muted shrink-0 mt-0.5" />
@@ -560,7 +560,7 @@ export function LossAnalysisPanel() {
             {item.details.length > 0 && (
               <ul className="mt-2 space-y-1 pl-6">
                 {item.details.slice(0, 2).map((detail, detailIndex) => (
-                  <li key={detailIndex} className="text-[11px] text-cr-accent/90 font-medium leading-snug">
+                  <li key={detailIndex} className="text-xs text-cr-accent/90 font-medium leading-snug">
                     {detail}
                   </li>
                 ))}

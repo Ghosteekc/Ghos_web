@@ -89,7 +89,7 @@ export function CollectionStatsGrid({
   return (
     <div className="space-y-3">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-xs text-cr-muted uppercase tracking-wide">Уровень коллекции</p>
+        <p className="text-sm text-cr-muted uppercase tracking-wide">Уровень коллекции</p>
         <p className="text-lg font-bold text-cr-gold tabular-nums collection-level-value">{stats.collection_level}</p>
       </div>
       <div className="grid grid-cols-2 gap-2">
@@ -107,10 +107,10 @@ export function CollectionStatsGrid({
                 (isActive ? " collection-filter-tab--active" : "")
               }
             >
-              <span className={`text-[11px] font-bold uppercase tracking-wide leading-tight ${tone}`}>
+              <span className={`text-xs font-bold uppercase tracking-wide leading-tight ${tone}`}>
                 {label}
               </span>
-              <span className={`text-base font-extrabold tabular-nums leading-none mt-1 ${tone}`}>
+              <span className={`text-[16px] font-extrabold tabular-nums leading-none mt-1 ${tone}`}>
                 {stats[key]}
               </span>
             </button>
