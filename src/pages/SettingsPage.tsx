@@ -421,7 +421,7 @@ export function SettingsPage() {
         </section>
       </div>
 
-      <p className="text-center text-xs text-cr-muted pt-4 font-medium">
+      <p className="app-footer-version text-center text-xs pt-4 font-medium">
         Ghosteek CR Assistant v1.0
       </p>
     </div>

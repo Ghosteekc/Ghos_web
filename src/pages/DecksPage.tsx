@@ -145,7 +145,7 @@ export function DecksPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="page-title">Колоды</h1>
-        <span className="text-sm text-cr-muted">
+        <span className="wallpaper-plain-text text-sm">
           {filter === DECK_HOME
             ? "Мои колоды"
             : filter === "random"
@@ -162,7 +162,7 @@ export function DecksPage() {
         </span>
       </div>
 
-      <p className="decks-tab-description text-xs text-cr-muted -mt-2">
+      <p className="decks-tab-description text-xs -mt-2">
         {filter === DECK_HOME ? (
           "Винрейт, победы и поражения по каждой колоде из ваших боёв."
         ) : filter === "meta" ? (

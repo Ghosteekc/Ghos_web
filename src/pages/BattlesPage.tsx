@@ -72,7 +72,7 @@ export function BattlesPage() {
         </Button>
       </div>
 
-      <p className="text-xs text-cr-muted -mt-4">Кнопка обновления подтягивает свежие бои из Clash Royale</p>
+      <p className="wallpaper-plain-text text-xs -mt-4">Кнопка обновления подтягивает свежие бои из Clash Royale</p>
 
       <div className="filter-tab-row">
         {(["all", "wins", "losses"] as const).map((f) => (

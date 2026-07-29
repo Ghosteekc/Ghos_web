@@ -28,23 +28,9 @@
     --cr-glass-bg-strong: rgb(var(--cr-card) / 0.55);
     --cr-glass-blur: blur(18px) saturate(150%);
     --cr-chart-grid: rgba(255, 255, 255, 0.08);
-    --cr-stroke-title:
-      -1px 2px 0 #000,
-      0 2px 0 #000,
-      1px 2px 0 #000,
-      -2px 0 0 #000,
-      2px 0 0 #000,
-      -1px -1px 0 #000,
-      1px -1px 0 #000,
-      -1px 1px 0 #000,
-      1px 1px 0 #000,
-      0 3px 0 rgba(0, 0, 0, 0.35);
-    --cr-stroke-body:
-      -1px 1px 0 #000,
-      0 1px 0 #000,
-      1px 1px 0 #000,
-      -1px 0 0 #000,
-      1px 0 0 #000;
+    /* No text outline — keep letterforms clean in both themes */
+    --cr-stroke-title: none;
+    --cr-stroke-body: none;
 
     /* Content UI tokens (NOT used by DockBar — keep dock on --cr-* only) */
     --ui-panel: 14 28 68;
@@ -91,14 +77,9 @@
     --cr-glass-bg-strong: rgb(var(--cr-card) / 0.88);
     --cr-glass-blur: blur(18px) saturate(140%);
     --cr-chart-grid: rgba(102, 112, 133, 0.28);
-    /* No CR stroke on light cards — wallpaper-only text uses --cr-stroke-wallpaper */
+    /* No CR stroke on light (cards and wallpaper) */
     --cr-stroke-title: none;
     --cr-stroke-body: none;
-    --cr-stroke-wallpaper:
-      -1px 0 0 rgba(0, 0, 0, 0.5),
-      1px 0 0 rgba(0, 0, 0, 0.5),
-      0 -1px 0 rgba(0, 0, 0, 0.5),
-      0 1px 0 rgba(0, 0, 0, 0.5);
 
     /* Soft panels (DockBar keeps its own light overrides below) */
     --ui-panel: 255 255 255;
@@ -325,11 +306,12 @@
     box-shadow: var(--ui-inset-highlight), var(--ui-inset-depth), var(--ui-shadow-soft);
   }
 
+  /* Light: sky-blue glass, keep blur */
   [data-theme="light"] .constructor-seed-card.glass-card {
-    background: rgb(var(--cr-gold) / 0.14);
+    background: rgb(135 206 250 / 0.32);
     backdrop-filter: blur(15px) saturate(140%);
     -webkit-backdrop-filter: blur(15px) saturate(140%);
-    border-color: rgb(var(--cr-gold) / 0.35);
+    border-color: rgb(100 180 235 / 0.42);
   }
 
   /* Buttons stay fully opaque - no glass / no backdrop blur */
@@ -675,6 +657,7 @@
   .decks-tab-description {
     min-height: 3.75rem;
     line-height: 1.35;
+    color: rgb(var(--cr-muted));
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 4;
@@ -1652,22 +1635,36 @@
   }
 
   [data-theme="light"] .page-title {
-    color: rgb(var(--cr-text));
-    text-shadow: var(--cr-stroke-wallpaper);
+    color: #000;
+    text-shadow: none;
   }
 
   [data-theme="light"] .page-subtitle {
-    color: rgb(var(--cr-muted));
-    text-shadow: var(--cr-stroke-wallpaper);
+    color: #000;
+    text-shadow: none;
   }
 
   [data-theme="light"] .section-title {
-    color: rgb(var(--cr-gold));
-    text-shadow: var(--cr-stroke-wallpaper);
+    color: #000;
+    text-shadow: none;
   }
 
   [data-theme="light"] .decks-tab-description {
-    text-shadow: var(--cr-stroke-wallpaper);
+    color: #000;
+    text-shadow: none;
+  }
+
+  [data-theme="light"] .supercell-disclaimer,
+  [data-theme="light"] .supercell-disclaimer p,
+  [data-theme="light"] .supercell-disclaimer a {
+    color: #000 !important;
+    text-shadow: none !important;
+  }
+
+  [data-theme="light"] .app-footer-version,
+  [data-theme="light"] .wallpaper-plain-text {
+    color: #000;
+    text-shadow: none;
   }
 
   [data-theme="light"] .shadow-glow {
@@ -1703,17 +1700,6 @@
   [data-theme="light"] .btn-gold,
   [data-theme="light"] .btn-blue {
     text-shadow: none !important;
-  }
-
-  /* Wallpaper-only copy: thin black outline (cards keep stroke killed above) */
-  [data-theme="light"] .page-title,
-  [data-theme="light"] .section-title,
-  [data-theme="light"] .page-subtitle,
-  [data-theme="light"] .decks-tab-description,
-  [data-theme="light"] .supercell-disclaimer,
-  [data-theme="light"] .supercell-disclaimer p,
-  [data-theme="light"] .supercell-disclaimer a {
-    text-shadow: var(--cr-stroke-wallpaper) !important;
   }
 
   [data-theme="light"] .filter-tab.filter-tab--active,
@@ -1871,6 +1857,19 @@
 
   .page-shell {
     @apply space-y-5 w-full min-w-0 max-w-6xl mx-auto;
+  }
+
+  .supercell-disclaimer {
+    color: rgb(var(--cr-muted));
+  }
+
+  .supercell-disclaimer a {
+    color: inherit;
+  }
+
+  .app-footer-version,
+  .wallpaper-plain-text {
+    color: rgb(var(--cr-muted));
   }
 
   .page-title {

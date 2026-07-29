@@ -318,7 +318,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
     <div className="space-y-5">
 
-      <Card className="constructor-seed-card border-cr-gold/30 bg-cr-gold/10">
+      <Card className="constructor-seed-card">
 
         <div className="flex items-center gap-2 mb-3">
 
