@@ -2,6 +2,9 @@
  * Centralized Telegram Mini App haptic feedback.
  * Never throws; silently skips when disabled or unsupported.
  * All UI haptics must go through this module — never call Telegram.WebApp.HapticFeedback directly.
+ *
+ * Intensity is one soft→light→medium family: same character, only saturation changes.
+ * Never stacks pulses, never mixes selection/notification styles into everyday UI ticks.
  */
 
 export type HapticImpact = "light" | "medium" | "heavy" | "rigid" | "soft";
@@ -26,6 +29,16 @@ export type HapticEvent =
 
 let userHapticEnabled = true;
 let userHapticIntensity: HapticIntensity = "standard";
+
+/**
+ * Single tactile family for the whole app.
+ * soft → light → medium = gentle density steps, never heavy/rigid.
+ */
+const INTENSITY_STYLE: Record<HapticIntensity, HapticImpact> = {
+  weak: "soft",
+  standard: "light",
+  strong: "medium",
+};
 
 export function setHapticEnabled(enabled: boolean): void {
   userHapticEnabled = enabled;
@@ -52,134 +65,37 @@ function canPlayHaptic(): boolean {
   return userHapticEnabled && Boolean(tgHaptic());
 }
 
-/** Map a logical impact style through the selected intensity (never uses rigid = max). */
-function resolveImpact(base: HapticImpact): HapticImpact {
-  switch (userHapticIntensity) {
-    case "weak":
-      if (base === "soft" || base === "light") return "soft";
-      return "light";
-    case "strong":
-      // ~80–85% of max: upgrade toward heavy, never rigid
-      if (base === "soft") return "medium";
-      if (base === "light") return "medium";
-      if (base === "medium") return "heavy";
-      return "heavy";
-    default:
-      return base === "rigid" ? "heavy" : base;
-  }
-}
-
-function safeImpact(style: HapticImpact): void {
+/** One soft tick for the current intensity — same character for every UI event. */
+function playTick(): void {
   if (!canPlayHaptic()) return;
   try {
-    tgHaptic()?.impactOccurred?.(resolveImpact(style));
+    tgHaptic()?.impactOccurred?.(INTENSITY_STYLE[userHapticIntensity]);
   } catch {
     /* ignore */
-  }
-}
-
-function safeSelection(): void {
-  if (!canPlayHaptic()) return;
-  try {
-    tgHaptic()?.selectionChanged?.();
-  } catch {
-    /* ignore */
-  }
-}
-
-function safeNotification(type: HapticNotify): void {
-  if (!canPlayHaptic()) return;
-  try {
-    tgHaptic()?.notificationOccurred?.(type);
-  } catch {
-    /* ignore */
-  }
-}
-
-function scheduleImpact(style: HapticImpact, delayMs: number): void {
-  if (!canPlayHaptic()) return;
-  window.setTimeout(() => {
-    if (!canPlayHaptic()) return;
-    safeImpact(style);
-  }, delayMs);
-}
-
-function playNotify(type: HapticNotify): void {
-  switch (userHapticIntensity) {
-    case "weak":
-      // Short soft pulse instead of full notification
-      safeImpact("soft");
-      break;
-    case "strong":
-      // Confident but not max: notification + brief medium accent
-      safeNotification(type);
-      scheduleImpact("medium", 50);
-      break;
-    default:
-      safeNotification(type);
-      break;
   }
 }
 
 /**
  * Trigger a semantic haptic event.
- * Respects user setting, intensity, and Telegram API availability.
+ * Every event is a single family tick; intensity only changes saturation.
  */
 export function triggerHaptic(event: HapticEvent): void {
   if (!canPlayHaptic()) return;
 
   switch (event) {
     case "lightTap":
-    case "button":
-      safeImpact("light");
-      break;
     case "mediumTap":
-      safeImpact("medium");
-      break;
     case "heavyTap":
-      safeImpact("heavy");
-      break;
     case "selection":
     case "toggle":
-      if (userHapticIntensity === "weak") {
-        safeImpact("soft");
-      } else if (userHapticIntensity === "strong") {
-        safeSelection();
-        scheduleImpact("light", 40);
-      } else {
-        safeSelection();
-      }
-      break;
-    case "success":
-      playNotify("success");
-      break;
-    case "warning":
-      playNotify("warning");
-      break;
-    case "error":
-      playNotify("error");
-      break;
+    case "button":
     case "confirm":
-      if (userHapticIntensity === "weak") {
-        safeImpact("light");
-      } else if (userHapticIntensity === "strong") {
-        safeImpact("heavy");
-      } else {
-        safeImpact("medium");
-      }
-      break;
+    case "success":
+    case "warning":
+    case "error":
     case "double":
     case "important":
-      if (userHapticIntensity === "weak") {
-        safeImpact("soft");
-        scheduleImpact("soft", 70);
-      } else if (userHapticIntensity === "strong") {
-        safeImpact("heavy");
-        scheduleImpact("medium", 75);
-      } else {
-        safeImpact("medium");
-        scheduleImpact("light", 90);
-      }
+      playTick();
       break;
     default:
       break;

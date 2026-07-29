@@ -48,20 +48,29 @@ async function main() {
     selectionCalls = 0;
   }
 
+  function assertSingleFamilyTick(expectedStyle: string, label: string) {
+    if (impactCalls !== 1) throw new Error(`${label}: expected exactly 1 impact, got ${impactCalls}`);
+    if (impactStyles[0] !== expectedStyle) {
+      throw new Error(`${label}: expected style ${expectedStyle}, got ${impactStyles[0]}`);
+    }
+    if (selectionCalls !== 0) throw new Error(`${label}: must not call selectionChanged`);
+    if (notificationCalls !== 0) throw new Error(`${label}: must not call notificationOccurred`);
+  }
+
   installTelegram();
   setHapticEnabled(true);
   setHapticIntensity("standard");
 
   resetCounts();
   haptic.light();
-  if (impactCalls !== 1) throw new Error("haptic.light should call impactOccurred once");
-  if (impactStyles[0] !== "light") throw new Error("standard light should stay light");
+  assertSingleFamilyTick("light", "standard light");
 
   resetCounts();
   setHapticEnabled(false);
   haptic.medium();
   haptic.button();
   haptic.toggle();
+  haptic.success();
   if (impactCalls !== 0 || selectionCalls !== 0 || notificationCalls !== 0) {
     throw new Error("disabled haptic must not call any Telegram haptic API");
   }
@@ -70,49 +79,34 @@ async function main() {
   resetCounts();
   setHapticEnabled(true);
   haptic.success();
-  if (notificationCalls !== 0) throw new Error("missing Telegram API must skip silently");
-
-  installTelegram();
-  resetCounts();
-  haptic.double();
-  if (impactCalls < 1) throw new Error("double should trigger at least one impact");
-
-  resetCounts();
-  haptic.confirm();
-  if (impactCalls !== 1) throw new Error("confirm should trigger medium impact once");
-
-  resetCounts();
-  triggerHaptic("selection");
-  if (impactCalls !== 0) throw new Error("selection should not use impactOccurred in standard mode");
-  if (selectionCalls !== 1) throw new Error("selection should call selectionChanged");
-
-  resetCounts();
-  hapticManager.important();
-  if (impactCalls < 1) throw new Error("important alias should still work");
-
-  resetCounts();
-  setHapticIntensity("weak");
-  haptic.button();
-  if (impactStyles[0] !== "soft") throw new Error("weak button should resolve to soft");
-
-  resetCounts();
-  haptic.toggle();
-  if (selectionCalls !== 0 || impactStyles[0] !== "soft") {
-    throw new Error("weak toggle should use soft impact");
+  if (impactCalls !== 0 || notificationCalls !== 0) {
+    throw new Error("missing Telegram API must skip silently");
   }
 
-  resetCounts();
-  setHapticIntensity("strong");
-  haptic.light();
-  if (impactStyles[0] !== "medium") throw new Error("strong light should resolve to medium");
+  installTelegram();
 
-  resetCounts();
-  haptic.heavy();
-  if (impactStyles[0] !== "heavy") throw new Error("strong heavy should stay heavy (not rigid)");
+  const events = [
+    () => haptic.button(),
+    () => haptic.toggle(),
+    () => haptic.selection(),
+    () => haptic.confirm(),
+    () => haptic.success(),
+    () => haptic.warning(),
+    () => haptic.error(),
+    () => haptic.double(),
+    () => hapticManager.important(),
+    () => triggerHaptic("selection"),
+  ] as const;
 
-  resetCounts();
-  haptic.success();
-  if (notificationCalls !== 1) throw new Error("strong success should notify");
+  for (const intensity of ["weak", "standard", "strong"] as const) {
+    const expected = intensity === "weak" ? "soft" : intensity === "standard" ? "light" : "medium";
+    setHapticIntensity(intensity);
+    for (const play of events) {
+      resetCounts();
+      play();
+      assertSingleFamilyTick(expected, `${intensity} ${play.name || "event"}`);
+    }
+  }
 
   if (!isHapticEnabled()) throw new Error("haptic should remain enabled");
   if (getHapticIntensity() !== "strong") throw new Error("intensity should remain strong");
