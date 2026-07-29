@@ -322,7 +322,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
         <div className="flex items-center gap-2 mb-3">
 
-          <Wand2 className="w-5 h-5 text-cr-gold" />
+          <Wand2 className="constructor-wand w-5 h-5" />
 
           <h3 className="text-base font-semibold text-cr-text">4 карты — основа колоды</h3>
 
@@ -357,15 +357,8 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
                 onClick={() => setActiveSlot(index)}
 
                 className={
-
-                  "relative flex flex-col items-center rounded-xl border-2 p-1.5 transition-colors min-h-[5.5rem] " +
-
-                  (isActive
-
-                    ? "border-cr-gold bg-cr-gold/10"
-
-                    : "border-cr-border/60 bg-cr-bg/40")
-
+                  "constructor-slot relative flex flex-col items-center rounded-xl border-2 p-1.5 transition-colors min-h-[5.5rem] " +
+                  (isActive ? "constructor-slot--active" : "")
                 }
 
               >
@@ -468,7 +461,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
               placeholder="Поиск карты…"
 
-              className="w-full rounded-xl border border-cr-border/60 info-glass py-2.5 pl-10 pr-3 text-base text-cr-text placeholder:text-cr-muted focus:border-cr-gold/50 focus:outline-none"
+              className="w-full rounded-3xl border border-cr-border/60 info-glass py-2.5 pl-10 pr-3 text-base text-cr-text placeholder:text-cr-muted focus:border-cr-gold/50 focus:outline-none"
 
             />
 

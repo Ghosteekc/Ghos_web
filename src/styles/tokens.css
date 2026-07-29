@@ -203,13 +203,16 @@
   --ui-radius: 1.25rem;
   --ui-radius-lg: 1.5rem;
   --ui-shadow:
-    0 1px 0 rgb(var(--palette-white) / 0.04),
-    0 8px 22px rgb(var(--palette-black) / 0.28);
+    0 2px 6px rgb(var(--palette-black) / 0.18);
   --ui-shadow-soft:
-    0 1px 0 rgb(var(--palette-white) / 0.05),
-    0 4px 14px rgb(var(--palette-black) / 0.22);
-  --ui-inset-highlight: inset 0 1px 0 rgb(var(--palette-white) / 0.07);
-  --ui-inset-depth: inset 0 -1px 0 rgb(var(--palette-black) / 0.22);
+    0 1px 4px rgb(var(--palette-black) / 0.14);
+  /* Convex bevel: bright top face + darker bottom lip */
+  --ui-inset-highlight:
+    inset 0 1px 0 rgb(var(--palette-white) / 0.22),
+    inset 0 2px 3px rgb(var(--palette-white) / 0.06);
+  --ui-inset-depth:
+    inset 0 -1px 0 rgb(var(--palette-black) / 0.45),
+    inset 0 -3px 8px rgb(var(--palette-black) / 0.28);
   --ui-active-ring: var(--palette-active-ring);
   --ui-active-ring-alpha: var(--palette-active-ring-alpha);
   --ui-active-fill: var(--palette-active-fill);
@@ -220,8 +223,13 @@
   --cr-glass-blur: blur(18px) saturate(150%);
   --cr-chart-grid: rgb(var(--palette-white) / 0.08);
 
-  --comp-constructor-seed-bg: rgb(var(--cr-gold) / 0.12);
-  --comp-constructor-seed-border: rgb(var(--cr-gold) / 0.32);
+  --comp-constructor-seed-bg: linear-gradient(
+    180deg,
+    rgb(251 191 36 / 0.2) 0%,
+    rgb(200 148 18 / 0.14) 45%,
+    rgb(28 22 10 / 0.42) 100%
+  );
+  --comp-constructor-seed-border: rgb(var(--cr-gold) / 0.42);
   --comp-constructor-seed-blur: blur(15px) saturate(140%);
 
   --comp-glow-gold: 0 0 20px rgb(var(--palette-glow-gold) / 0.15);
@@ -263,14 +271,17 @@
   --ui-border-alpha: var(--palette-ui-line-alpha);
   --ui-radius: 1.25rem;
   --ui-radius-lg: 1.5rem;
+  /* Convex bevel inside the tile — soft outer contact only */
   --ui-shadow:
-    0 1px 2px rgb(var(--palette-ink) / 0.04),
-    0 6px 16px rgb(var(--palette-ink) / 0.05);
+    0 2px 6px rgb(120 145 190 / 0.12);
   --ui-shadow-soft:
-    0 1px 2px rgb(var(--palette-ink) / 0.03),
-    0 3px 10px rgb(var(--palette-ink) / 0.04);
-  --ui-inset-highlight: inset 0 1px 0 rgb(var(--palette-white) / 0.85);
-  --ui-inset-depth: inset 0 -1px 0 rgb(var(--palette-ink) / 0.04);
+    0 1px 4px rgb(120 145 190 / 0.1);
+  --ui-inset-highlight:
+    inset 0 1px 0 rgb(var(--palette-white) / 1),
+    inset 0 2px 4px rgb(var(--palette-white) / 0.75);
+  --ui-inset-depth:
+    inset 0 -1px 0 rgb(120 145 190 / 0.22),
+    inset 0 -3px 8px rgb(110 140 185 / 0.16);
   --ui-active-ring: var(--palette-active-ring);
   --ui-active-ring-alpha: var(--palette-active-ring-alpha);
   --ui-active-fill: var(--palette-active-fill);

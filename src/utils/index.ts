@@ -111,6 +111,7 @@ export {
 } from "./lastSync";
 
 export {
+  getHapticIntensity,
   haptic,
   hapticImpact,
   hapticManager,
@@ -118,10 +119,11 @@ export {
   hapticSelection,
   isHapticEnabled,
   setHapticEnabled,
+  setHapticIntensity,
   triggerHaptic,
   withHaptic,
 } from "./haptics";
-export type { HapticEvent, HapticImpact, HapticNotify } from "./haptics";
+export type { HapticEvent, HapticImpact, HapticIntensity, HapticNotify } from "./haptics";
 export {
   formatUserFacingError,
   toUserFacingError,

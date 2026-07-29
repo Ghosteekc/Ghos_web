@@ -1,11 +1,15 @@
 import { api } from "@/api/client";
 import { applyTheme, loadStoredTheme, type AppTheme } from "@/hooks/useTheme";
-import type { Settings } from "@/types";
-import { setHapticEnabled } from "@/utils/hapticManager";
+import type { HapticIntensity, Settings } from "@/types";
+import { setHapticEnabled, setHapticIntensity } from "@/utils/hapticManager";
 
 const STORAGE_KEY = "ghosteek-settings-v1";
 
 type Listener = () => void;
+
+function normalizeIntensity(value: unknown, fallback: HapticIntensity): HapticIntensity {
+  return value === "weak" || value === "standard" || value === "strong" ? value : fallback;
+}
 
 function defaultSettings(): Settings {
   return {
@@ -14,6 +18,7 @@ function defaultSettings(): Settings {
     notifications: true,
     telegram_notifications: true,
     haptic_enabled: true,
+    haptic_intensity: "standard",
   };
 }
 
@@ -32,6 +37,7 @@ function readStoredSettings(): Settings | null {
       notifications: parsed.notifications ?? base.notifications,
       telegram_notifications: parsed.telegram_notifications ?? base.telegram_notifications,
       haptic_enabled: parsed.haptic_enabled ?? base.haptic_enabled,
+      haptic_intensity: normalizeIntensity(parsed.haptic_intensity, base.haptic_intensity),
     };
   } catch {
     return null;
@@ -49,6 +55,7 @@ function writeStoredSettings(settings: Settings) {
 function applySettingsSideEffects(settings: Settings) {
   applyTheme(settings.theme as AppTheme);
   setHapticEnabled(settings.haptic_enabled);
+  setHapticIntensity(normalizeIntensity(settings.haptic_intensity, "standard"));
 }
 
 let current: Settings = readStoredSettings() ?? defaultSettings();
@@ -94,7 +101,13 @@ export async function ensureSettingsLoaded(force = false): Promise<Settings> {
     .getSettings({ fresh: force })
     .then((server) => {
       const theme = (server.theme as AppTheme) || current.theme;
-      const merged: Settings = { ...server, theme };
+      const merged: Settings = {
+        ...current,
+        ...server,
+        theme,
+        haptic_intensity: normalizeIntensity(server.haptic_intensity, current.haptic_intensity),
+        haptic_enabled: server.haptic_enabled ?? current.haptic_enabled,
+      };
       loadedFromServer = true;
       setCurrent(merged);
       return merged;
@@ -121,7 +134,13 @@ export function patchSettings(patch: Partial<Settings>): Promise<Settings> {
     try {
       const saved = await api.updateSettings(patch);
       const theme = (saved.theme as AppTheme) || optimistic.theme;
-      const merged: Settings = { ...saved, theme };
+      const merged: Settings = {
+        ...optimistic,
+        ...saved,
+        theme,
+        haptic_intensity: normalizeIntensity(saved.haptic_intensity, optimistic.haptic_intensity),
+        haptic_enabled: saved.haptic_enabled ?? optimistic.haptic_enabled,
+      };
       setCurrent(merged);
       return merged;
     } catch (error) {

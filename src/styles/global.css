@@ -235,6 +235,52 @@
     border-color: var(--comp-constructor-seed-border);
   }
 
+  .constructor-slot {
+    border-color: rgb(var(--cr-border) / 0.6);
+    background: rgb(var(--cr-bg) / 0.4);
+  }
+
+  .constructor-slot--active {
+    border-color: rgb(var(--cr-gold));
+    background: rgb(var(--cr-gold) / 0.1);
+  }
+
+  .constructor-wand {
+    color: rgb(var(--cr-gold));
+  }
+
+  [data-theme="light"] .constructor-wand {
+    color: rgb(var(--palette-blue));
+  }
+
+  [data-theme="light"] .constructor-seed-card .text-cr-text,
+  [data-theme="light"] .constructor-seed-card .text-cr-muted,
+  [data-theme="light"] .constructor-seed-card .text-cr-accent,
+  [data-theme="light"] .constructor-seed-card .text-cr-blue,
+  [data-theme="light"] .constructor-seed-card h3,
+  [data-theme="light"] .constructor-seed-card p,
+  [data-theme="light"] .constructor-seed-card span:not(:has(svg)),
+  [data-theme="light"] .constructor-seed-card .card-name-caption,
+  [data-theme="light"] .constructor-seed-card .card-name-deck,
+  [data-theme="light"] .constructor-seed-card .card-name-deck-overlay,
+  [data-theme="light"] .constructor-seed-card .card-name-glow {
+    color: #000 !important;
+    text-shadow: none !important;
+  }
+
+  [data-theme="light"] .constructor-slot {
+    border-color: rgb(var(--palette-blue) / 0.28);
+    background: rgb(var(--palette-white) / 0.55);
+  }
+
+  [data-theme="light"] .constructor-slot--active {
+    border-color: rgb(var(--palette-blue));
+    background: rgb(var(--palette-blue) / 0.12);
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--palette-blue) / 0.2),
+      0 0 0 1px rgb(var(--palette-blue) / 0.12);
+  }
+
   /* Buttons stay fully opaque - no glass / no backdrop blur */
   .pixel-btn,
   .pixel-btn.pixel-bevel,
@@ -519,40 +565,27 @@
     @apply pixel-btn pixel-btn--chip flex-1 justify-center whitespace-nowrap text-base font-semibold text-cr-text;
   }
 
-  .filter-tab.filter-tab--active {
+  /* Match decks FeatureNav active: gold label + pressed volume (keep both classes) */
+  .filter-tab.filter-tab--active,
+  .filter-tab.pixel-btn--active {
     transform: translate(1px, 1px);
     background: var(--pb-bg-pressed);
-    /* Soft glow only — hard drop-shadow rings look clipped in overflow rows */
-    filter: none;
-    --pb-glow-active:
-      0 0 14px rgb(var(--palette-glow-gold) / 0.32),
-      0 0 5px rgb(var(--palette-glow-gold) / 0.2);
     box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
+    filter: var(--pb-filter-pressed);
     color: rgb(var(--cr-gold));
     text-shadow: var(--cr-stroke-title);
   }
 
-  .filter-tab.filter-tab--active:active:not(:disabled) {
-    transform: translate(1px, 2px);
-  }
-
-  .filter-tab:active:not(:disabled) {
-    transform: translate(1px, 2px);
-    background: var(--pb-bg-pressed);
-    filter: none;
-    --pb-glow-active:
-      0 0 14px rgb(var(--palette-glow-gold) / 0.32),
-      0 0 5px rgb(var(--palette-glow-gold) / 0.2);
-    box-shadow: var(--pb-shadow-pressed), var(--pb-glow-active);
-    color: rgb(var(--cr-gold));
-    text-shadow: var(--cr-stroke-title);
+  .filter-tab.filter-tab--active::after,
+  .filter-tab.pixel-btn--active::after {
+    opacity: 0;
   }
 
   .filter-tab-row {
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
-    /* Room for soft gold glow — overflow clips box-shadow without padding */
+    /* Room for soft glow — overflow clips box-shadow without padding */
     padding: 0.75rem 0.375rem;
     margin: -0.75rem -0.375rem 0;
     -webkit-overflow-scrolling: touch;
@@ -578,10 +611,16 @@
 
   [data-theme="light"] .pixel-bevel,
   [data-theme="light"] .pixel-btn--chip {
-    --pb-light: rgb(var(--palette-white) / 0.7);
-    --pb-dark: rgb(var(--palette-ink-muted) / 0.28);
+    --pb-light: rgb(var(--palette-white) / 0.92);
+    --pb-dark: rgb(120 145 190 / 0.18);
     --pb-bg: rgb(var(--ui-panel));
     --pb-bg-pressed: rgb(var(--ui-panel-sunken));
+    --pb-shadow-raised:
+      inset 0 1px 0 rgb(var(--palette-white) / 0.95),
+      inset 0 -1px 0 rgb(120 145 190 / 0.1),
+      0 1px 2px rgb(120 145 190 / 0.12),
+      0 6px 14px rgb(140 165 205 / 0.18);
+    --pb-filter-raised: none;
   }
 
   [data-theme="light"] .pixel-btn--nav-row,
@@ -1056,6 +1095,38 @@
     color: rgb(var(--cr-gold));
   }
 
+  .theme-segment-track--intensity {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .theme-segment-track--intensity.is-disabled {
+    opacity: 0.48;
+    pointer-events: none;
+  }
+
+  .theme-segment-bubble--pill {
+    top: 0.25rem;
+    left: 0;
+    height: calc(100% - 0.5rem);
+    width: 0;
+    margin-left: 0;
+    margin-top: 0;
+    border-radius: 999px;
+    transform-origin: center center;
+  }
+
+  .theme-segment-tab--label {
+    min-width: 0;
+    padding: 0 0.2rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
   .sidebar-item {
     @apply pixel-btn pixel-bevel pixel-btn--nav-row gap-3 px-3 py-2 min-h-[2.75rem];
     color: rgb(var(--cr-muted));
@@ -1520,9 +1591,54 @@
   [data-theme="light"] .glass-panel,
   [data-theme="light"] .glass-card,
   [data-theme="light"] .info-glass {
-    background: rgb(var(--ui-panel));
-    border-color: rgb(var(--ui-border) / var(--ui-border-alpha));
-    box-shadow: var(--ui-inset-highlight), var(--ui-inset-depth), var(--ui-shadow);
+    background: linear-gradient(
+      180deg,
+      rgb(255 255 255) 0%,
+      rgb(248 250 253) 55%,
+      rgb(242 246 252) 100%
+    );
+    border-color: rgb(170 195 230 / 0.34);
+    box-shadow:
+      var(--ui-inset-highlight),
+      var(--ui-inset-depth),
+      var(--ui-shadow);
+  }
+
+  [data-theme="dark"] .glass-panel,
+  [data-theme="dark"] .glass-card,
+  [data-theme="dark"] .info-glass {
+    background: linear-gradient(
+      180deg,
+      rgb(20 36 78) 0%,
+      rgb(14 28 68) 48%,
+      rgb(10 22 56) 100%
+    );
+    border-color: rgb(var(--ui-border) / 0.2);
+    box-shadow:
+      var(--ui-inset-highlight),
+      var(--ui-inset-depth),
+      var(--ui-shadow);
+  }
+
+  /* Constructor / tinted glass: keep translucent gold + blur (don't use solid panel fill) */
+  [data-theme="dark"] .constructor-seed-card.glass-card,
+  [data-theme="dark"] .tint-glass-card.glass-card {
+    background: var(--comp-constructor-seed-bg);
+    backdrop-filter: var(--comp-constructor-seed-blur);
+    -webkit-backdrop-filter: var(--comp-constructor-seed-blur);
+    border-color: var(--comp-constructor-seed-border);
+    box-shadow:
+      inset 0 1px 0 rgb(251 191 36 / 0.18),
+      inset 0 -1px 0 rgb(0 0 0 / 0.35),
+      var(--ui-shadow-soft);
+  }
+
+  [data-theme="light"] .constructor-seed-card.glass-card,
+  [data-theme="light"] .tint-glass-card.glass-card {
+    background: var(--comp-constructor-seed-bg);
+    backdrop-filter: var(--comp-constructor-seed-blur);
+    -webkit-backdrop-filter: var(--comp-constructor-seed-blur);
+    border-color: var(--comp-constructor-seed-border);
   }
 
   [data-theme="light"] .level-bar-track {
@@ -1609,10 +1725,7 @@
   [data-theme="light"] .filter-tab.filter-tab--active,
   [data-theme="light"] .filter-tab:active:not(:disabled),
   [data-theme="light"] .collection-filter-tab.collection-filter-tab--active {
-    color: rgb(var(--cr-gold));
-    --pb-glow-active:
-      0 0 10px rgba(200, 148, 18, 0.18),
-      0 0 3px rgba(200, 148, 18, 0.12);
+    color: rgb(200 148 18);
   }
 
   /* Keep rarity chip colors like dark theme (fade / stroke to dark). */
@@ -2274,8 +2387,25 @@
   .settings-data-btn {
     @apply pixel-btn pixel-bevel w-full flex-col items-center justify-center gap-2;
     @apply font-semibold text-base min-h-[5.25rem] px-3 py-3;
+    --pb-radius: var(--ui-radius-lg);
     color: rgb(var(--cr-text));
     text-align: center;
+  }
+
+  /* Unlink/logout: distinct from card, without flooding the whole control in red */
+  .settings-data-btn--danger {
+    --pb-bg: rgb(22 28 58);
+    --pb-bg-pressed: rgb(16 22 48);
+    color: rgb(var(--cr-text));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.08),
+      inset 0 0 0 1px rgb(var(--cr-loss) / 0.28),
+      0 6px 16px rgb(0 0 0 / 0.28);
+  }
+
+  .settings-data-btn--danger .pixel-btn-icon-slot,
+  .settings-data-btn--danger .pixel-btn-icon-slot svg {
+    color: rgb(var(--cr-muted));
   }
 
   /* Only "unlink/logout" button: in light theme make it visually distinct. */
@@ -2284,13 +2414,20 @@
     --pb-bg-pressed: rgb(var(--palette-danger-soft-pressed));
     color: rgb(var(--cr-loss));
     box-shadow:
+      inset 0 1px 0 rgb(var(--palette-white) / 0.9),
       inset 0 0 0 1px rgb(var(--cr-loss) / 0.22),
       0 10px 26px rgb(var(--cr-loss) / 0.10);
+  }
+
+  [data-theme="light"] .settings-data-btn--danger .pixel-btn-icon-slot,
+  [data-theme="light"] .settings-data-btn--danger .pixel-btn-icon-slot svg {
+    color: rgb(var(--cr-muted));
   }
 
   .settings-data-btn .pixel-btn-icon-slot {
     width: 2.75rem;
     height: 2.75rem;
+    border-radius: 1rem;
   }
 
   .settings-data-btn > span:last-child {

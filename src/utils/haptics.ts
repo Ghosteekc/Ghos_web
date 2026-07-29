@@ -1,5 +1,6 @@
-export type { HapticEvent, HapticImpact, HapticNotify } from "./hapticManager";
+export type { HapticEvent, HapticImpact, HapticIntensity, HapticNotify } from "./hapticManager";
 export {
+  getHapticIntensity,
   haptic,
   hapticImpact,
   hapticManager,
@@ -7,6 +8,7 @@ export {
   hapticSelection,
   isHapticEnabled,
   setHapticEnabled,
+  setHapticIntensity,
   triggerHaptic,
   withHaptic,
 } from "./hapticManager";

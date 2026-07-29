@@ -19,9 +19,18 @@ function shouldUseSelectionHaptic(target: Element) {
 }
 
 function triggerElementHaptic(target: Element) {
+  if (
+    target.getAttribute("role") === "switch" ||
+    target.classList.contains("toggle-switch")
+  ) {
+    triggerHaptic("toggle");
+    return;
+  }
   if (shouldUseSelectionHaptic(target)) {
     triggerHaptic("selection");
+    return;
   }
+  triggerHaptic("button");
 }
 
 export function useGlobalButtonHaptics() {

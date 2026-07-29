@@ -11,6 +11,7 @@ import {
   Unlink2,
 } from "lucide-react";
 import { Card, Loader, PageHeader } from "@/components/ui";
+import { HapticSegment } from "@/components/settings/HapticSegment";
 import { ThemeSegment } from "@/components/settings/ThemeSegment";
 import { api } from "@/api/client";
 import { cacheInvalidate, lsClearAll } from "@/api/cache";
@@ -259,33 +260,40 @@ export function SettingsPage() {
         <section>
           <h3 className="section-title mb-3">Интерфейс</h3>
           <Card>
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <Vibrate className="w-5 h-5 text-cr-blue shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-base font-semibold text-cr-text">
-                    {translate("settings.haptic.title", settings.language)}
-                  </p>
-                  <p className="text-sm text-cr-muted">
-                    {settings.haptic_enabled
-                      ? translate("settings.haptic.enabled", settings.language)
-                      : translate("settings.haptic.disabled", settings.language)}
-                    {" · "}
-                    {settings.haptic_enabled
-                      ? translate("settings.haptic.subtitleOn", settings.language)
-                      : translate("settings.haptic.subtitleOff", settings.language)}
-                  </p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Vibrate className="w-5 h-5 text-cr-blue shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-base font-semibold text-cr-text">
+                      {translate("settings.haptic.title", settings.language)}
+                    </p>
+                    <p className="text-sm text-cr-muted">
+                      {settings.haptic_enabled
+                        ? translate("settings.haptic.enabled", settings.language)
+                        : translate("settings.haptic.disabled", settings.language)}
+                      {" · "}
+                      {settings.haptic_enabled
+                        ? translate("settings.haptic.subtitleOn", settings.language)
+                        : translate("settings.haptic.subtitleOff", settings.language)}
+                    </p>
+                  </div>
                 </div>
+                <Toggle
+                  checked={settings.haptic_enabled}
+                  noHaptic
+                  onChange={(c) => {
+                    void updateSetting({ haptic_enabled: c }, { skipHaptic: true });
+                    if (c) {
+                      haptic.toggle();
+                    }
+                  }}
+                />
               </div>
-              <Toggle
-                checked={settings.haptic_enabled}
-                noHaptic
-                onChange={(c) => {
-                  void updateSetting({ haptic_enabled: c }, { skipHaptic: true });
-                  if (c) {
-                    haptic.selection();
-                  }
-                }}
+              <HapticSegment
+                value={settings.haptic_intensity ?? "standard"}
+                disabled={!settings.haptic_enabled}
+                onChange={(intensity) => void updateSetting({ haptic_intensity: intensity })}
               />
             </div>
           </Card>
@@ -327,7 +335,7 @@ export function SettingsPage() {
               disabled={unlinking}
             >
               <span className="pixel-btn-icon-slot" aria-hidden>
-                <Unlink2 className="w-5 h-5 text-cr-loss" />
+                <Unlink2 className="w-5 h-5 text-cr-muted" />
               </span>
               <span>
                 {unlinking

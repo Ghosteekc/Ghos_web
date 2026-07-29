@@ -91,7 +91,7 @@ export function BattlesPage() {
             key={f}
             type="button"
             onClick={() => setFilter(f)}
-            className={cn("filter-tab", filter === f && "filter-tab--active")}
+            className={cn("filter-tab", filter === f && "filter-tab--active pixel-btn--active")}
             aria-pressed={filter === f}
           >
             {f === "all" ? "Все" : f === "wins" ? "Победы" : "Поражения"}

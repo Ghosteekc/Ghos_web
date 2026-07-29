@@ -9,6 +9,10 @@ const messages = {
     "settings.haptic.disabled": "Выключено",
     "settings.haptic.subtitleOn": "Тактильная отдача при действиях",
     "settings.haptic.subtitleOff": "Вибрация отключена",
+    "settings.haptic.intensity": "Мощность",
+    "settings.haptic.weak": "Слабая",
+    "settings.haptic.standard": "Стандартная",
+    "settings.haptic.strong": "Сильная",
   },
   en: {
     "settings.haptic.title": "Haptic feedback",
@@ -16,6 +20,10 @@ const messages = {
     "settings.haptic.disabled": "Disabled",
     "settings.haptic.subtitleOn": "Tactile feedback for actions",
     "settings.haptic.subtitleOff": "Haptics are off",
+    "settings.haptic.intensity": "Intensity",
+    "settings.haptic.weak": "Weak",
+    "settings.haptic.standard": "Standard",
+    "settings.haptic.strong": "Strong",
   },
 } as const;
 
