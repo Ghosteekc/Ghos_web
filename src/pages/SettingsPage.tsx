@@ -11,7 +11,7 @@ import {
   Vibrate,
   Unlink2,
 } from "lucide-react";
-import { Card, Loader } from "@/components/ui";
+import { Card, Loader, PageHeader } from "@/components/ui";
 import { ThemeSegment } from "@/components/settings/ThemeSegment";
 import { api } from "@/api/client";
 import { cacheInvalidate, lsClearAll } from "@/api/cache";
@@ -233,7 +233,7 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="page-title">Настройки</h1>
+      <PageHeader title="Настройки" />
 
       <div className="space-y-4">
         <section>

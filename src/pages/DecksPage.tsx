@@ -12,7 +12,7 @@ import {
   BarChart3,
   ScanSearch,
 } from "lucide-react";
-import { Card, Button, Loader, ElixirIcon, FeatureNavGrid, ScrollToTopButton, ErrorState, EmptyState } from "@/components/ui";
+import { Card, Button, Loader, ElixirIcon, FeatureNavGrid, ScrollToTopButton, ErrorState, EmptyState, PageHeader } from "@/components/ui";
 import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { ConstructorPanel, ConstructorDeckGrid } from "@/components/decks/ConstructorPanel";
 import { FavoriteDeckButton } from "@/components/decks/FavoriteDeckButton";
@@ -143,44 +143,47 @@ export function DecksPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="page-title">Колоды</h1>
-        <span className="wallpaper-plain-text text-base">
-          {filter === DECK_HOME
-            ? "Мои колоды"
-            : filter === "random"
-            ? "Генератор"
-            : filter === "constructor"
-              ? "Конструктор"
-              : filter === "top"
-              ? "Рейтинг"
-              : filter === "arena"
-                ? "Арена"
-                : filter === "favorites"
-                  ? "Избранное"
-                : `${decks.length} колод`}
-        </span>
-      </div>
-
-      <p className="decks-tab-description text-sm -mt-2">
-        {filter === DECK_HOME ? (
-          "Винрейт, победы и поражения по каждой колоде из ваших боёв."
-        ) : filter === "meta" ? (
-          <>Классические мета-колоды — проверенные архетипы Clash Royale.</>
-        ) : filter === "top" ? (
-          "Топ-10 игроков из глобального списка лидеров (Легендарный путь): колода, винрейт на ней и кубки."
-        ) : filter === "arena" ? (
-          "Колоды соперников с вашей арены: винрейт и число боёв, когда данные доступны."
-        ) : filter === "constructor" ? (
-          "Выберите 4 карты — бот соберёт полные колоды с лучшей синергией. Ячейки 1 и 3 — эволюция, 2 — герой, 4 — обычная карта."
-        ) : filter === "mine" ? (
-          "Ваши колоды из истории боёв. Нажмите «Статистика» для разбора матчапов и советов."
-        ) : filter === "favorites" ? (
-          "Сохранённые колоды — быстрый доступ к избранным сборкам."
-        ) : (
-          "Случайная колода из 8 карт."
-        )}
-      </p>
+      <PageHeader
+        title="Колоды"
+        subtitle={
+          <p className="decks-tab-description text-sm">
+            {filter === DECK_HOME ? (
+              "Винрейт, победы и поражения по каждой колоде из ваших боёв."
+            ) : filter === "meta" ? (
+              <>Классические мета-колоды — проверенные архетипы Clash Royale.</>
+            ) : filter === "top" ? (
+              "Топ-10 игроков из глобального списка лидеров (Легендарный путь): колода, винрейт на ней и кубки."
+            ) : filter === "arena" ? (
+              "Колоды соперников с вашей арены: винрейт и число боёв, когда данные доступны."
+            ) : filter === "constructor" ? (
+              "Выберите 4 карты — бот соберёт полные колоды с лучшей синергией. Ячейки 1 и 3 — эволюция, 2 — герой, 4 — обычная карта."
+            ) : filter === "mine" ? (
+              "Ваши колоды из истории боёв. Нажмите «Статистика» для разбора матчапов и советов."
+            ) : filter === "favorites" ? (
+              "Сохранённые колоды — быстрый доступ к избранным сборкам."
+            ) : (
+              "Случайная колода из 8 карт."
+            )}
+          </p>
+        }
+        action={
+          <span className="wallpaper-plain-text text-base">
+            {filter === DECK_HOME
+              ? "Мои колоды"
+              : filter === "random"
+              ? "Генератор"
+              : filter === "constructor"
+                ? "Конструктор"
+                : filter === "top"
+                ? "Рейтинг"
+                : filter === "arena"
+                  ? "Арена"
+                  : filter === "favorites"
+                    ? "Избранное"
+                  : `${decks.length} колод`}
+          </span>
+        }
+      />
 
       <FeatureNavGrid items={[...DECK_NAV]} activeId={navActiveId} onSelect={handleNavSelect} />
 

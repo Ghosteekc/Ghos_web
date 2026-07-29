@@ -9,7 +9,7 @@ import {
   Swords,
   Target,
 } from "lucide-react";
-import { Card, Button, Loader, LinearProgress, ErrorState } from "@/components/ui";
+import { Card, Button, Loader, LinearProgress, ErrorState, PageHeader } from "@/components/ui";
 import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { BattleDetail } from "@/types";
@@ -117,15 +117,15 @@ export function BattleDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={goBack} className="!p-2">
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div>
-          <h1 className="text-xl font-bold text-cr-text">Детали боя</h1>
-          <p className="text-base text-cr-muted">против {battle.opponent_name}</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Детали боя"
+        subtitle={<p className="text-base text-cr-muted">против {battle.opponent_name}</p>}
+        action={
+          <Button variant="ghost" onClick={goBack} className="!p-2" aria-label="Назад">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        }
+      />
 
       <div className="flex flex-wrap items-center gap-3">
         <div

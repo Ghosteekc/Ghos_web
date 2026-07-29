@@ -9,7 +9,7 @@ import {
   Swords,
   CheckCircle2,
 } from "lucide-react";
-import { Card, Button, Loader, ErrorState } from "@/components/ui";
+import { Card, Button, Loader, ErrorState, PageHeader } from "@/components/ui";
 import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { MineDeckStats } from "@/types";
@@ -114,7 +114,14 @@ export function MineDeckStatsPage() {
   if (error || !data) {
     return (
       <div className="space-y-4">
-        <Header onBack={() => navigate("/decks")} title="Статистика колоды" />
+        <PageHeader
+          title="Статистика колоды"
+          action={
+            <Button variant="ghost" onClick={() => navigate("/decks")} className="!p-2 shrink-0" aria-label="Назад">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          }
+        />
         <ErrorState
           title={error ?? "Нет данных"}
           button="К колодам"
@@ -126,7 +133,14 @@ export function MineDeckStatsPage() {
 
   return (
     <div className="space-y-4">
-      <Header onBack={() => navigate("/decks")} title={data.name || "Моя колода"} />
+      <PageHeader
+        title={data.name || "Моя колода"}
+        action={
+          <Button variant="ghost" onClick={() => navigate("/decks")} className="!p-2 shrink-0" aria-label="Назад">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        }
+      />
 
       {data.sample_note ? (
         <Card className="text-base text-cr-muted">{data.sample_note}</Card>
@@ -228,17 +242,6 @@ function StatBox({
     <div className="rounded-xl bg-cr-bg/50 px-3 py-2 text-center">
       <p className="text-2xs text-cr-muted uppercase tracking-wide">{label}</p>
       <p className={`text-lg font-bold tabular-nums mt-0.5 ${valueClass}`}>{value}</p>
-    </div>
-  );
-}
-
-function Header({ title, onBack }: { title: string; onBack: () => void }) {
-  return (
-    <div className="flex items-center gap-3">
-      <Button variant="ghost" onClick={onBack} className="!p-2 shrink-0">
-        <ArrowLeft className="w-5 h-5" />
-      </Button>
-      <h1 className="page-title !mb-0 truncate">{title}</h1>
     </div>
   );
 }

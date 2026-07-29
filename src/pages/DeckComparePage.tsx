@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Swords, TrendingDown, TrendingUp } from "lucide-react";
-import { Card, Button, Loader, ErrorState } from "@/components/ui";
+import { Card, Button, Loader, ErrorState, PageHeader } from "@/components/ui";
 import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import type { DeckCompareCardNote, DeckCompareResult } from "@/types";
@@ -137,15 +137,19 @@ export function DeckComparePage() {
 
   return (
     <div className="space-y-5 pb-8">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" className="!px-2" onClick={() => navigate(backPath)} aria-label="Назад">
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="min-w-0">
-          <h1 className="page-title truncate">Сравнение колод</h1>
-          <p className="text-sm text-cr-muted truncate">против «{referenceName || data.reference_name}»</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Сравнение колод"
+        subtitle={
+          <p className="text-sm text-cr-muted truncate">
+            против «{referenceName || data.reference_name}»
+          </p>
+        }
+        action={
+          <Button variant="ghost" className="!px-2" onClick={() => navigate(backPath)} aria-label="Назад">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        }
+      />
 
       <Card className="border-cr-gold/25 bg-gradient-to-br from-cr-gold/10 to-cr-bg/20 !p-4">
         <div className="flex items-center gap-2 mb-3">

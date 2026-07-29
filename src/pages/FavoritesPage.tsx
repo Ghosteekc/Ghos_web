@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FavoritesPanel } from "@/components/decks/FavoritesPanel";
+import { PageHeader } from "@/components/ui";
 import { DeckPassport } from "@/analytics/deckPassport";
 import type { Deck } from "@/types";
 import { deckToComparePath } from "@/utils/deckActions";
@@ -11,7 +12,7 @@ export function FavoritesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="page-title">Любимые колоды</h1>
+      <PageHeader title="Любимые колоды" />
       <FavoritesPanel
         onAnalyze={setPassportDeck}
         onCompare={(deck) => {

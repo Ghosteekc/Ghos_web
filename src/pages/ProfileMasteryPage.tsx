@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { ArrowLeft } from "lucide-react";
 
-import { Card, Button, Loader, LinearProgress, ErrorState, EmptyState } from "@/components/ui";
+import { Card, Button, Loader, LinearProgress, ErrorState, EmptyState, PageHeader } from "@/components/ui";
 
 import { CardTile } from "@/components/cards";
 
@@ -14,7 +14,13 @@ import { usePageRefresh, useCardCatalog } from "@/hooks";
 
 import type { CollectionCardEntry } from "@/types";
 
-
+function masteryBackAction(onBack: () => void) {
+  return (
+    <Button variant="ghost" onClick={onBack} className="!p-2 shrink-0" aria-label="Назад">
+      <ArrowLeft className="w-5 h-5" />
+    </Button>
+  );
+}
 
 export function ProfileMasteryPage() {
 
@@ -53,7 +59,7 @@ export function ProfileMasteryPage() {
   if (error || !data) {
     return (
       <div className="space-y-4">
-        <PageHeader title="Мастерство карт" onBack={() => navigate("/")} />
+        <PageHeader title="Мастерство карт" action={masteryBackAction(() => navigate("/"))} />
         <ErrorState
           title={error ?? "Нет данных"}
           button="Повторить"
@@ -69,7 +75,7 @@ export function ProfileMasteryPage() {
 
     <div className="space-y-4">
 
-      <PageHeader title="Мастерство карт" onBack={() => navigate("/")} />
+      <PageHeader title="Мастерство карт" action={masteryBackAction(() => navigate("/"))} />
 
 
 
@@ -168,28 +174,6 @@ export function ProfileMasteryPage() {
         </div>
 
       )}
-
-    </div>
-
-  );
-
-}
-
-
-
-function PageHeader({ title, onBack }: { title: string; onBack: () => void }) {
-
-  return (
-
-    <div className="flex items-center gap-3">
-
-      <Button variant="ghost" onClick={onBack} className="!p-2 shrink-0">
-
-        <ArrowLeft className="w-5 h-5" />
-
-      </Button>
-
-      <h1 className="page-title !mb-0">{title}</h1>
 
     </div>
 

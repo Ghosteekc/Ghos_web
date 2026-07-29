@@ -14,7 +14,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { api, ApiError } from "@/api/client";
 import { SearchResult } from "@/types";
-import { Button, Card, ElixirIcon, Loader, ErrorState, EmptyState } from "@/components/ui";
+import { Button, Card, ElixirIcon, Loader, ErrorState, EmptyState, PageHeader } from "@/components/ui";
 import { PlayerDeckGrid } from "@/components/cards";
 import { FavoriteDeckButton } from "@/components/decks/FavoriteDeckButton";
 import { LeagueBanner, resolveLeagueInfo } from "@/components/profile/LeagueBanner";
@@ -137,12 +137,14 @@ export function PlayerPreviewPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="!p-2 shrink-0">
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <h1 className="page-title !mb-0">Игрок</h1>
-      </div>
+      <PageHeader
+        title="Игрок"
+        action={
+          <Button variant="ghost" onClick={() => navigate(-1)} className="!p-2 shrink-0" aria-label="Назад">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        }
+      />
 
       {loading ? (
         <Loader />

@@ -4,7 +4,7 @@ import {
   Trophy,
   RefreshCw,
 } from "lucide-react";
-import { Card, Button, Loader, ScrollToTopButton, ErrorState, EmptyState } from "@/components/ui";
+import { Button, Loader, ScrollToTopButton, ErrorState, EmptyState, PageHeader } from "@/components/ui";
 import { BattleCardSimple } from "@/components/battles/BattleCard";
 import { api, ApiError } from "@/api/client";
 import { BattleSummary } from "@/types";
@@ -65,14 +65,25 @@ export function BattlesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="page-title">История боёв</h1>
-        <Button variant="ghost" onClick={() => void onRefresh()} className="!p-2" disabled={refreshing} aria-label="Синхронизировать">
-          <RefreshCw className={"w-5 h-5 " + (refreshing ? "animate-spin" : "")} />
-        </Button>
-      </div>
-
-      <p className="wallpaper-plain-text text-sm -mt-4">Кнопка обновления подтягивает свежие бои из Clash Royale</p>
+      <PageHeader
+        title="История боёв"
+        subtitle={
+          <p className="wallpaper-plain-text text-sm">
+            Кнопка обновления подтягивает свежие бои из Clash Royale
+          </p>
+        }
+        action={
+          <Button
+            variant="ghost"
+            onClick={() => void onRefresh()}
+            className="!p-2"
+            disabled={refreshing}
+            aria-label="Синхронизировать"
+          >
+            <RefreshCw className={"w-5 h-5 " + (refreshing ? "animate-spin" : "")} />
+          </Button>
+        }
+      />
 
       <div className="filter-tab-row">
         {(["all", "wins", "losses"] as const).map((f) => (

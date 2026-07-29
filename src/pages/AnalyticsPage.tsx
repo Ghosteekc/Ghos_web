@@ -14,7 +14,7 @@ import {
 } from "recharts";
 import { TrendingUp, TrendingDown, Swords } from "lucide-react";
 import { StatsOverview } from "@/types";
-import { Card, FeatureNavGrid, Loader, ScrollToTopButton, Button, ErrorState } from "@/components/ui";
+import { Card, FeatureNavGrid, Loader, ScrollToTopButton, Button, ErrorState, PageHeader } from "@/components/ui";
 import { api } from "@/api/client";
 import { cacheGet, lsGet, TTL } from "@/api/cache";
 import { getWinColor } from "@/utils";
@@ -183,13 +183,12 @@ export function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="page-title">Аналитика</h1>
-        <p className="page-subtitle mt-1">Статистика, соперники и улучшение колод</p>
-        {refreshing && (
-          <p className="text-xs text-cr-muted mt-1">Обновление данных…</p>
-        )}
-      </div>
+      <PageHeader
+        title="Аналитика"
+        subtitle={<p className="page-subtitle">Статистика, соперники и улучшение колод</p>}
+      >
+        {refreshing ? <p className="text-xs text-cr-muted">Обновление данных…</p> : null}
+      </PageHeader>
 
       <FeatureNavGrid
         items={[...ANALYTICS_NAV]}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { User } from "lucide-react";
-import { Card, Button, Loader, ErrorState } from "@/components/ui";
+import { Card, Button, Loader, ErrorState, PageHeader } from "@/components/ui";
 import { ProfileCollectionNav } from "@/components/profile/ProfileCollectionNav";
 import { CardLevelScale } from "@/components/profile/CardLevelScale";
 import { ProfileStatGrid } from "@/components/profile/ProfileStatGrid";
@@ -51,7 +51,7 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="page-title">Профиль</h1>
+      <PageHeader title="Профиль" />
 
       {error && (
         <ErrorState title={error} button="Повторить" onAction={() => void load()} />

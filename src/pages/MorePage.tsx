@@ -6,7 +6,7 @@ import {
   ChevronRight,
   Trophy,
 } from "lucide-react";
-import { Card } from "@/components/ui";
+import { Card, PageHeader } from "@/components/ui";
 
 const links = [
   { to: "/search", icon: Search, label: "Поиск", hint: "Игрок по тегу" },
@@ -19,8 +19,10 @@ export function MorePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="page-title">Ещё</h1>
-      <p className="text-sm text-cr-muted -mt-2">Поиск, избранное и настройки</p>
+      <PageHeader
+        title="Ещё"
+        subtitle={<p className="text-sm text-cr-muted">Поиск, избранное и настройки</p>}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {links.map((item) => (

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowDown, ArrowLeft, ArrowUp } from "lucide-react";
-import { Card, Button, Loader, ErrorState } from "@/components/ui";
+import { Card, Button, Loader, ErrorState, PageHeader } from "@/components/ui";
 import { CardTile } from "@/components/cards";
 import { CollectionStatsGrid, type CollectionRarityFilter } from "@/components/profile/CollectionStatsGrid";
 import { usePlayerCollection } from "@/hooks/usePlayerCollection";
@@ -141,7 +141,14 @@ export function ProfileCardsPage() {
   if (error || !data) {
     return (
       <div className="space-y-4">
-        <PageHeader title="Коллекция карт" onBack={() => navigate("/")} />
+        <PageHeader
+          title="Коллекция карт"
+          action={
+            <Button variant="ghost" onClick={() => navigate("/")} className="!p-2 shrink-0" aria-label="Назад">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          }
+        />
         <ErrorState
           title={error ?? "Нет данных"}
           button="Повторить"
@@ -153,7 +160,14 @@ export function ProfileCardsPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Коллекция карт" onBack={() => navigate("/")} />
+      <PageHeader
+        title="Коллекция карт"
+        action={
+          <Button variant="ghost" onClick={() => navigate("/")} className="!p-2 shrink-0" aria-label="Назад">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        }
+      />
 
       <Card>
         <CollectionStatsGrid
@@ -270,17 +284,6 @@ export function ProfileCardsPage() {
 
 function cnCardCell(owned: boolean) {
   return owned ? "min-w-0" : "min-w-0 opacity-45 grayscale";
-}
-
-function PageHeader({ title, onBack }: { title: string; onBack: () => void }) {
-  return (
-    <div className="flex items-center gap-3">
-      <Button variant="ghost" onClick={onBack} className="!p-2 shrink-0">
-        <ArrowLeft className="w-5 h-5" />
-      </Button>
-      <h1 className="page-title !mb-0">{title}</h1>
-    </div>
-  );
 }
 
 export { ProfileCardsPage as default };
