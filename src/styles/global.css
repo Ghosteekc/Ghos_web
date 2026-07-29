@@ -134,6 +134,11 @@
     --scroll-top-bottom: calc(var(--bottom-nav-shell-height) + var(--bottom-nav-dock-inset) + 0.75rem);
     --mobile-top-inset: calc(var(--app-content-top) + 0.75rem);
     --mobile-header-offset: var(--mobile-top-inset);
+    /* UI motion — Telegram / iOS-like (DockBar keeps its own timings) */
+    --ui-duration: 220ms;
+    --ui-duration-fast: 180ms;
+    --ui-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --ui-ease-out: cubic-bezier(0.22, 0.08, 0.24, 1);
   }
 
   html.dock-gesture-lock,
@@ -357,10 +362,10 @@
     box-shadow: var(--pb-shadow-raised);
     filter: var(--pb-filter-raised);
     transition:
-      transform 85ms ease-out,
-      box-shadow 85ms ease-out,
-      filter 85ms ease-out,
-      background 85ms ease-out;
+      transform var(--ui-duration-fast) var(--ui-ease-out),
+      box-shadow var(--ui-duration-fast) var(--ui-ease-out),
+      filter var(--ui-duration-fast) var(--ui-ease-out),
+      background var(--ui-duration-fast) var(--ui-ease-out);
   }
 
   .pixel-bevel--compact {
@@ -375,10 +380,10 @@
     color: rgb(var(--cr-text));
     text-shadow: var(--cr-stroke-body);
     transition:
-      transform 85ms ease-out,
-      box-shadow 85ms ease-out,
-      filter 85ms ease-out,
-      background 85ms ease-out;
+      transform var(--ui-duration-fast) var(--ui-ease-out),
+      box-shadow var(--ui-duration-fast) var(--ui-ease-out),
+      filter var(--ui-duration-fast) var(--ui-ease-out),
+      background var(--ui-duration-fast) var(--ui-ease-out);
   }
 
   .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active {
@@ -431,7 +436,7 @@
     box-shadow: var(--pb-inner-ring);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 85ms ease-out;
+    transition: opacity var(--ui-duration-fast) var(--ui-ease-out);
     z-index: 0;
   }
 
@@ -492,9 +497,9 @@
     pointer-events: none;
     z-index: 2;
     transition:
-      transform 85ms ease-out,
-      color 85ms ease-out,
-      opacity 85ms ease-out;
+      transform var(--ui-duration-fast) var(--ui-ease-out),
+      color var(--ui-duration-fast) var(--ui-ease-out),
+      opacity var(--ui-duration-fast) var(--ui-ease-out);
   }
 
   .pixel-btn:not(.pixel-btn--ghost).pixel-btn--active .pixel-btn-tile-chevron {
@@ -561,7 +566,7 @@
 
   .pixel-btn-chevron {
     @apply absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 shrink-0 text-cr-muted opacity-75;
-    transition: transform 85ms ease-out, color 85ms ease-out, opacity 85ms ease-out;
+    transition: transform var(--ui-duration-fast) var(--ui-ease-out), color var(--ui-duration-fast) var(--ui-ease-out), opacity var(--ui-duration-fast) var(--ui-ease-out);
   }
 
   .pixel-btn--primary {
@@ -729,9 +734,9 @@
     bottom: var(--scroll-top-bottom);
     transform: translateY(0.5rem);
     transition:
-      opacity 0.38s ease,
-      transform 0.38s ease,
-      visibility 0.38s ease;
+      opacity var(--ui-duration) var(--ui-ease),
+      transform var(--ui-duration) var(--ui-ease),
+      visibility var(--ui-duration) var(--ui-ease);
     visibility: hidden;
   }
 
@@ -767,9 +772,9 @@
     text-shadow: none !important;
     opacity: 0;
     transition:
-      left 140ms ease-out,
-      top 140ms ease-out,
-      opacity 160ms ease;
+      left var(--ui-duration-fast) var(--ui-ease-out),
+      top var(--ui-duration-fast) var(--ui-ease-out),
+      opacity var(--ui-duration) var(--ui-ease);
     will-change: left, opacity;
   }
 
@@ -887,7 +892,7 @@
   }
 
   .chart-tooltip-body--nudge {
-    animation: chart-tooltip-nudge 160ms ease;
+    animation: chart-tooltip-nudge var(--ui-duration) var(--ui-ease);
   }
 
   @keyframes chart-tooltip-nudge {
@@ -908,7 +913,7 @@
     }
 
     .chart-tooltip-bubble {
-      transition: opacity 120ms ease;
+      transition: opacity var(--ui-duration-fast) var(--ui-ease);
     }
   }
 
@@ -926,7 +931,7 @@
     word-break: normal;
     hyphens: none;
     padding-inline: 0.15rem;
-    transition: opacity 140ms ease;
+    transition: opacity var(--ui-duration-fast) var(--ui-ease);
   }
 
   [data-theme="light"] .chart-tooltip-glass {
@@ -1844,7 +1849,7 @@
     transform: translateX(-100%);
     pointer-events: none;
     visibility: hidden;
-    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), visibility 0.3s ease;
+    transition: transform var(--ui-duration) var(--ui-ease), visibility var(--ui-duration) var(--ui-ease);
   }
 
   @media (min-width: 1024px) {
@@ -1857,6 +1862,72 @@
 
   .page-shell {
     @apply space-y-5 w-full min-w-0 max-w-6xl mx-auto;
+  }
+
+  @keyframes ui-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .ui-enter {
+    animation: ui-enter var(--ui-duration) var(--ui-ease) both;
+  }
+
+  @keyframes ui-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .ui-fade {
+    animation: ui-fade var(--ui-duration) var(--ui-ease) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ui-enter,
+    .ui-fade,
+    .loader-item-enter {
+      animation: none !important;
+    }
+  }
+
+  .loader-item-enter {
+    animation: ui-fade var(--ui-duration) var(--ui-ease-out) both;
+  }
+
+  .ui-progress-fill {
+    transform-origin: left center;
+    animation: ui-progress-grow var(--ui-duration) var(--ui-ease-out) both;
+  }
+
+  @keyframes ui-progress-grow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .ui-progress-ring {
+    transition: stroke-dashoffset var(--ui-duration) var(--ui-ease-out);
+  }
+
+  .ui-tap {
+    transition: transform var(--ui-duration-fast) var(--ui-ease-out);
+  }
+
+  .ui-tap:active {
+    transform: scale(0.95);
   }
 
   .supercell-disclaimer {
@@ -2334,7 +2405,7 @@
     @apply relative inline-flex shrink-0 cursor-pointer items-center rounded-full p-0.5 box-border;
     width: 2.75rem;
     height: 1.625rem;
-    transition: background-color 0.2s ease;
+    transition: background-color var(--ui-duration) var(--ui-ease);
   }
 
   .toggle-switch[data-checked="true"] {
@@ -2350,7 +2421,7 @@
     width: 1.25rem;
     height: 1.25rem;
     transform: translateX(0);
-    transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition: transform var(--ui-duration) var(--ui-ease);
   }
 
   .toggle-switch[data-checked="true"] .toggle-switch-thumb {
@@ -2377,10 +2448,10 @@
   font-size: 14px;
   font-weight: 600;
   transition:
-    transform 85ms ease-out,
-    box-shadow 85ms ease-out,
-    filter 85ms ease-out,
-    background 85ms ease-out;
+    transform var(--ui-duration-fast) var(--ui-ease-out),
+    box-shadow var(--ui-duration-fast) var(--ui-ease-out),
+    filter var(--ui-duration-fast) var(--ui-ease-out),
+    background var(--ui-duration-fast) var(--ui-ease-out);
   --pb-filter-raised:
     drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.35))
     drop-shadow(0 0 0 1px rgba(0, 0, 0, 0.88));

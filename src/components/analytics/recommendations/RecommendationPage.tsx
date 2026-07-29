@@ -41,7 +41,7 @@ function ArenaProgressHeader({ summary }: { summary: ArenaProgressSummary }) {
       </div>
       <div className="mt-3 h-2 rounded-full bg-cr-border overflow-hidden">
         <div
-          className="h-full rounded-full bg-cr-gold transition-[width] duration-300 ease-out"
+          className="h-full rounded-full bg-cr-gold transition-[width] duration-[220ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]"
           style={{ width: `${summary.progressPercent}%` }}
         />
       </div>
@@ -65,7 +65,7 @@ function ArenaBlock({
       ref={blockRef}
       id={`arena-block-${summary.arena}`}
       className={cn(
-        "recommendation-arena-block scroll-mt-24 rounded-2xl border p-4 transition-colors duration-300 bg-cr-card",
+        "recommendation-arena-block scroll-mt-24 rounded-2xl border p-4 transition-colors duration-[220ms] bg-cr-card",
         highlighted
           ? "is-highlighted border-cr-gold/50 shadow-[0_0_0_1px_rgba(251,191,36,0.25)]"
           : "border-cr-border",

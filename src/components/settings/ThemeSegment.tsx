@@ -11,8 +11,8 @@ const THEME_OPTIONS: { id: AppTheme; label: string; Icon: LucideIcon }[] = [
   { id: "auto", label: "Системная", Icon: Smartphone },
 ];
 
-const MOVE_SPRING = { type: "spring" as const, stiffness: 480, damping: 34, mass: 0.72 };
-const RELEASE_TWEEN = { type: "tween" as const, duration: 0.16, ease: [0.22, 0.08, 0.24, 1] as const };
+const MOVE_TWEEN = { type: "tween" as const, duration: 0.22, ease: [0.25, 0.1, 0.25, 1] as const };
+const RELEASE_TWEEN = { type: "tween" as const, duration: 0.2, ease: [0.25, 0.1, 0.25, 1] as const };
 
 interface ThemeSegmentProps {
   value: AppTheme;
@@ -65,7 +65,7 @@ export function ThemeSegment({ value, onChange }: ThemeSegmentProps) {
 
       const tabSteps = Math.max(1, Math.abs(toIndex - fromIndex));
       void animate(bubbleX, target, {
-        ...MOVE_SPRING,
+        ...MOVE_TWEEN,
         onUpdate: (latest) => {
           const pull = Math.abs(latest - target);
           const stretch = Math.min(pull / 90, 0.14) * Math.min(tabSteps, 2);

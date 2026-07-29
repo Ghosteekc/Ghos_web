@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import {
   Palette,
   LogOut,
@@ -307,10 +306,9 @@ export function SettingsPage() {
                   <p className="text-sm text-cr-muted mt-1">Clash Royale не привязан</p>
                 )}
               </div>
-              <motion.button
+              <button
                 type="button"
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-cr-loss/10 transition-colors shrink-0"
+                className="ui-tap flex items-center gap-2 px-3 py-2.5 rounded-xl bg-cr-loss/10 transition-colors shrink-0"
                 aria-label="Закрыть приложение"
                 onClick={() => tg?.close?.()}
               >
@@ -320,7 +318,7 @@ export function SettingsPage() {
                   <br />
                   приложение
                 </span>
-              </motion.button>
+              </button>
             </div>
             <button
               type="button"

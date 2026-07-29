@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { cn } from "@/utils";
 import { UI } from "@/constants/labels";
 
@@ -23,7 +23,17 @@ export function CircularProgress({
 }: CircularProgressProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (Math.min(value, 100) / 100) * circumference;
+  const targetOffset = circumference - (Math.min(value, 100) / 100) * circumference;
+  const [offset, setOffset] = useState(circumference);
+  const [showLabel, setShowLabel] = useState(false);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setOffset(targetOffset);
+      setShowLabel(true);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [targetOffset]);
 
   return (
     <div className="relative inline-flex flex-col items-center">
@@ -36,7 +46,8 @@ export function CircularProgress({
           stroke={trackColor}
           strokeWidth={strokeWidth}
         />
-        <motion.circle
+        <circle
+          className="ui-progress-ring"
           cx={size / 2}
           cy={size / 2}
           r={radius}
@@ -45,21 +56,12 @@ export function CircularProgress({
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
+          strokeDashoffset={offset}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         {label && (
-          <motion.span
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-2xl font-bold text-cr-text"
-          >
-            {label}
-          </motion.span>
+          <span className={cn("text-2xl font-bold text-cr-text", showLabel && "ui-fade")}>{label}</span>
         )}
         {sublabel && <span className="text-sm text-cr-muted mt-1">{sublabel}</span>}
       </div>
@@ -93,11 +95,8 @@ export function LinearProgress({
         </div>
       )}
       <div className="h-2 bg-cr-border rounded-full overflow-hidden">
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="h-full rounded-full origin-left"
+        <div
+          className="h-full rounded-full ui-progress-fill"
           style={{ width: `${percent}%`, backgroundColor: color }}
         />
       </div>

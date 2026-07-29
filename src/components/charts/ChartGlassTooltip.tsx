@@ -64,11 +64,11 @@ const INDEX_HYSTERESIS = 0.45;
 
 /** Horizontal pull stretch while scrubbing — hard cap, never springs. */
 const STRETCH_MAX = 1.055;
-const POS_TWEEN = { type: "tween" as const, duration: 0.12, ease: [0.22, 0.08, 0.24, 1] as const };
-const STRETCH_RELEASE = { type: "tween" as const, duration: 0.22, ease: [0.22, 0.08, 0.24, 1] as const };
+const POS_TWEEN = { type: "tween" as const, duration: 0.18, ease: [0.25, 0.1, 0.25, 1] as const };
+const STRETCH_RELEASE = { type: "tween" as const, duration: 0.22, ease: [0.25, 0.1, 0.25, 1] as const };
 /** Fade-out only — appear is instant (no unfold) to avoid stuck partial scale. */
-const FADE_OUT = { type: "tween" as const, duration: 0.18, ease: [0.4, 0, 1, 1] as const };
-const FADE_OUT_MS = 200;
+const FADE_OUT = { type: "tween" as const, duration: 0.2, ease: [0.25, 0.1, 0.25, 1] as const };
+const FADE_OUT_MS = 220;
 
 function readDockTopPx(): number {
   const nav = document.querySelector(".bottom-nav");

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 
 const DEFAULT_LOADING_ITEMS = [
   "колод",
@@ -20,8 +19,6 @@ interface LoaderProps {
   /** Интервал смены подписи, мс */
   intervalMs?: number;
 }
-
-const LABEL_EASE = [0.22, 0.08, 0.24, 1] as const;
 
 const Loader = ({
   compact = false,
@@ -66,20 +63,14 @@ const Loader = ({
               compact ? "mt-0.5 min-h-[1.05rem]" : "mt-1 min-h-[1.35rem]"
             }`}
           >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.p
-                key={current}
-                className={`text-cr-gold/90 font-medium origin-center loader-item ${
-                  compact ? "text-xs" : "text-sm"
-                }`}
-                initial={{ opacity: 0, scaleY: 0.12, scaleX: 0.78 }}
-                animate={{ opacity: 1, scaleY: 1, scaleX: 1 }}
-                exit={{ opacity: 0, scaleY: 0.08, scaleX: 0.82 }}
-                transition={{ duration: 0.32, ease: LABEL_EASE }}
-              >
-                {current}
-              </motion.p>
-            </AnimatePresence>
+            <p
+              key={current}
+              className={`text-cr-gold/90 font-medium origin-center loader-item loader-item-enter ${
+                compact ? "text-xs" : "text-sm"
+              }`}
+            >
+              {current}
+            </p>
           </div>
         </div>
       )}

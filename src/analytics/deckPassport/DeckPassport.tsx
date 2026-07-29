@@ -24,7 +24,7 @@ function MetricBar({ label, value }: { label: string; value: number }) {
       </div>
       <div className="h-2 rounded-full bg-cr-border overflow-hidden">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-cr-gold/80 to-yellow-400 transition-[width] duration-500 ease-out"
+          className="h-full rounded-full bg-gradient-to-r from-cr-gold/80 to-yellow-400 transition-[width] duration-[220ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -68,7 +68,7 @@ export function DeckPassport({ deck, onClose }: DeckPassportProps) {
           "deck-passport-sheet relative w-full sm:max-w-lg",
           "max-h-[calc(100dvh-var(--device-safe-top)-1.75rem)] sm:max-h-[86vh]",
           "border border-cr-border rounded-t-2xl sm:rounded-2xl",
-          "shadow-2xl flex flex-col overflow-hidden transition-opacity duration-300",
+          "shadow-2xl flex flex-col overflow-hidden transition-opacity duration-[220ms]",
         )}
       >
         <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3 border-b border-cr-border shrink-0">

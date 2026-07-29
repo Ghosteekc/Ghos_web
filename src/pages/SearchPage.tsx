@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   X,
@@ -118,51 +117,45 @@ export function SearchPage() {
         Поиск работает только по тегу игрока — по нику найти нельзя.
       </p>
 
-      <AnimatePresence>
-        {!loading && error && <ErrorState title={error} />}
-        {!loading && !error && results.length > 0 && (
-          <motion.div
-            initial={{ y: 8 }}
-            animate={{ y: 0 }}
-            className="space-y-3"
-          >
-            <h3 className="text-base text-cr-muted">Результаты</h3>
-            {results.map((result, i) => (
-              <Card
-                key={result.player_tag}
-                delay={i * 0.05}
-                className="cursor-pointer"
-                onClick={() => navigate(`/player/${result.player_tag}`)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-cr-surface flex items-center justify-center">
-                      <User className="w-5 h-5 text-cr-muted" />
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold text-cr-text">{result.player_name}</p>
-                      <p className="text-sm text-cr-muted font-mono">#{result.player_tag}</p>
-                    </div>
+      {!loading && error && <ErrorState title={error} />}
+      {!loading && !error && results.length > 0 && (
+        <div className="space-y-3 ui-enter">
+          <h3 className="text-base text-cr-muted">Результаты</h3>
+          {results.map((result, i) => (
+            <Card
+              key={result.player_tag}
+              delay={i * 0.04}
+              className="cursor-pointer"
+              onClick={() => navigate(`/player/${result.player_tag}`)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-cr-surface flex items-center justify-center">
+                    <User className="w-5 h-5 text-cr-muted" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-cr-gold justify-end">
-                        <Trophy className="w-4 h-4" />
-                        <span className="text-base font-semibold">{result.trophies}</span>
-                      </div>
-                      <p className="text-sm text-cr-muted">{result.arena}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-cr-muted" />
+                  <div>
+                    <p className="text-base font-semibold text-cr-text">{result.player_name}</p>
+                    <p className="text-sm text-cr-muted font-mono">#{result.player_tag}</p>
                   </div>
                 </div>
-              </Card>
-            ))}
-          </motion.div>
-        )}
-        {!loading && !error && query.trim().length >= 2 && results.length === 0 && (
-          <EmptyState title="Игрок не найден" />
-        )}
-      </AnimatePresence>
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <div className="flex items-center gap-1 text-cr-gold justify-end">
+                      <Trophy className="w-4 h-4" />
+                      <span className="text-base font-semibold">{result.trophies}</span>
+                    </div>
+                    <p className="text-sm text-cr-muted">{result.arena}</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-cr-muted" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+      {!loading && !error && query.trim().length >= 2 && results.length === 0 && (
+        <EmptyState title="Игрок не найден" />
+      )}
 
       {history.length > 0 && !loading && results.length === 0 && !query.trim() && (
         <div className="space-y-3">

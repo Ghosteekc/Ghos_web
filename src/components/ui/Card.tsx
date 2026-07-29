@@ -1,13 +1,14 @@
-import { motion } from "framer-motion";
 import { cn } from "@/utils";
 import { haptic } from "@/utils/hapticManager";
+import type { CSSProperties } from "react";
 
 interface CardProps {
   children: React.ReactNode;
   className?: string;
+  /** Stagger delay in seconds (converted to CSS animation-delay). */
   delay?: number;
   onClick?: () => void;
-  /** Skip framer entrance — use for long scrollable lists. */
+  /** Skip entrance animation — use for long scrollable lists. */
   noMotion?: boolean;
 }
 
@@ -19,25 +20,19 @@ export function Card({ children, className = "", delay = 0, onClick, noMotion = 
       }
     : undefined;
 
-  const classes = cn("glass-card p-4 w-full min-w-0 overflow-hidden", onClick && "cursor-pointer", className);
+  const classes = cn(
+    "glass-card p-4 w-full min-w-0 overflow-hidden",
+    onClick && "cursor-pointer",
+    !noMotion && "ui-enter",
+    className,
+  );
 
-  if (noMotion) {
-    return (
-      <div className={classes} onClick={handleClick}>
-        {children}
-      </div>
-    );
-  }
+  const style: CSSProperties | undefined =
+    !noMotion && delay > 0 ? { animationDelay: `${Math.round(delay * 1000)}ms` } : undefined;
 
   return (
-    <motion.div
-      initial={{ y: 12 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.35, delay, ease: [0.25, 0.1, 0.25, 1] }}
-      onClick={handleClick}
-      className={classes}
-    >
+    <div className={classes} style={style} onClick={handleClick}>
       {children}
-    </motion.div>
+    </div>
   );
 }

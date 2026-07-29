@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
   SlidersHorizontal,
   ExternalLink,
@@ -423,13 +422,8 @@ function TopPlayersPanel({
         <p className="text-sm text-cr-muted text-center">Обновлено: {updatedLabel}</p>
       )}
       {players.map((player, i) => (
-        <motion.div
-          key={player.player_tag}
-          initial={{ y: 12 }}
-          animate={{ y: 0 }}
-          transition={{ delay: i * 0.04 }}
-        >
-          <Card>
+        <div key={player.player_tag} className="ui-enter" style={{ animationDelay: `${i * 40}ms` }}>
+          <Card noMotion>
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-1">
@@ -542,7 +536,7 @@ function TopPlayersPanel({
               ) : null}
             </div>
           </Card>
-        </motion.div>
+        </div>
       ))}
     </div>
   );
@@ -694,7 +688,7 @@ function RandomDeckPanel({
   }
 
   return (
-    <motion.div initial={{ y: 10 }} animate={{ y: 0 }} className="space-y-3">
+    <div className="space-y-3 ui-enter">
       <RoflModeBar rofl={rofl} onRoflChange={setRofl} />
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between mb-2 gap-2">
@@ -818,7 +812,7 @@ function RandomDeckPanel({
           </div>
         </div>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 
@@ -865,13 +859,8 @@ export function DeckCard({
   const cardNames = cards.map((c) => c.name);
 
   return (
-    <motion.div
-      initial={{ y: 14 }}
-      animate={{ y: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.5 }}
-      className="group"
-    >
-      <Card className="overflow-hidden">
+    <div className="group ui-enter" style={{ animationDelay: `${index * 40}ms` }}>
+      <Card className="overflow-hidden" noMotion>
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-cr-blue bg-cr-blue/10 px-2.5 py-1 rounded-full border border-cr-blue/20">
             {CATEGORY_LABELS[category] ?? category}
@@ -1015,6 +1004,6 @@ export function DeckCard({
           </div>
         ) : null}
       </Card>
-    </motion.div>
+    </div>
   );
 }
