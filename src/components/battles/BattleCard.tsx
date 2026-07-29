@@ -139,14 +139,16 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
         </div>
 
         <div className="battle-decks-stack relative">
-          <div className="min-w-0 pr-4">
-            <LightBattleDeckStripMemo cards={userCards} />
-            <div className="flex items-center justify-center py-1" aria-hidden>
-              <span className="text-3xs font-cr font-extrabold tracking-wide text-cr-gold leading-none">
-                VS
-              </span>
+          <div className="min-w-0 pr-4 space-y-1.5">
+            <div className="battle-deck-frame battle-deck-frame--mine">
+              <LightBattleDeckStripMemo cards={userCards} />
             </div>
-            <LightBattleDeckStripMemo cards={opponentCards} />
+            <div className="battle-decks-vs flex items-center justify-center" aria-hidden>
+              <span className="battle-decks-vs-label">VS</span>
+            </div>
+            <div className="battle-deck-frame battle-deck-frame--enemy">
+              <LightBattleDeckStripMemo cards={opponentCards} />
+            </div>
           </div>
           <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-cr-muted">
             <ChevronRight className="h-3.5 w-3.5" />

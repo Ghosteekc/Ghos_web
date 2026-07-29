@@ -208,6 +208,62 @@
     gap: 0.3rem;
   }
 
+  .battle-deck-frame {
+    padding: 0.3rem;
+    border-radius: 0.55rem;
+    border: 1.5px solid transparent;
+  }
+
+  .battle-deck-frame--mine {
+    border-color: rgb(var(--cr-blue) / 0.72);
+    background: rgb(var(--cr-blue) / 0.08);
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--cr-blue) / 0.18),
+      0 0 10px rgb(var(--cr-blue) / 0.12);
+  }
+
+  .battle-deck-frame--enemy {
+    border-color: rgb(var(--cr-loss) / 0.72);
+    background: rgb(var(--cr-loss) / 0.08);
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--cr-loss) / 0.16),
+      0 0 10px rgb(var(--cr-loss) / 0.1);
+  }
+
+  [data-theme="light"] .battle-deck-frame--mine {
+    border-color: rgb(var(--cr-blue) / 0.55);
+    background: rgb(var(--cr-blue) / 0.06);
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--cr-blue) / 0.12),
+      0 1px 4px rgb(var(--cr-blue) / 0.08);
+  }
+
+  [data-theme="light"] .battle-deck-frame--enemy {
+    border-color: rgb(var(--cr-loss) / 0.55);
+    background: rgb(var(--cr-loss) / 0.06);
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--cr-loss) / 0.1),
+      0 1px 4px rgb(var(--cr-loss) / 0.06);
+  }
+
+  .battle-decks-vs {
+    padding-block: 0.15rem;
+  }
+
+  .battle-decks-vs-label {
+    font-family: var(--font-cr, inherit);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    color: rgb(var(--cr-gold));
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  }
+
+  [data-theme="light"] .battle-decks-vs-label {
+    text-shadow: none;
+  }
+
   .battle-light-deck-level {
     min-width: 0.95rem;
     padding: 1px 3px;
