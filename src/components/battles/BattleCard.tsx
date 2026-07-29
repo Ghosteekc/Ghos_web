@@ -25,7 +25,7 @@ function LightBattleDeckStrip({
   const items = useMemo(() => toDeckCards(cards).slice(0, 8), [cards]);
 
   return (
-    <div className="battle-light-deck grid grid-cols-4 gap-0.5">
+    <div className="battle-light-deck grid grid-cols-4 gap-[0.3rem]">
       {items.map((card, index) => {
         const src = card.icon || iconUrl(card.name) || "";
         const evo = (card.evolution_level ?? 0) >= 1 && !card.is_hero;
@@ -138,21 +138,18 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
           </div>
         </div>
 
-        <div className="battle-decks-row flex items-center">
-          <div className="min-w-0 flex-1">
+        <div className="battle-decks-stack relative">
+          <div className="min-w-0 pr-4">
             <LightBattleDeckStripMemo cards={userCards} />
-          </div>
-          <span
-            className="shrink-0 px-px text-3xs font-cr font-extrabold tracking-wide text-cr-gold leading-none"
-            aria-hidden
-          >
-            VS
-          </span>
-          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-center py-1" aria-hidden>
+              <span className="text-3xs font-cr font-extrabold tracking-wide text-cr-gold leading-none">
+                VS
+              </span>
+            </div>
             <LightBattleDeckStripMemo cards={opponentCards} />
           </div>
-          <div className="shrink-0 text-cr-muted self-center pl-0.5">
-            <ChevronRight className="h-3 w-3" />
+          <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-cr-muted">
+            <ChevronRight className="h-3.5 w-3.5" />
           </div>
         </div>
 

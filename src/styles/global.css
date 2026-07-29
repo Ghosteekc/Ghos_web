@@ -199,15 +199,13 @@
     box-shadow: inset 0 0 0 1.5px rgb(251 191 36 / 0.9);
   }
 
-  .battle-decks-row {
-    margin-inline: -0.4rem;
-    padding-block: 0.2rem;
-    gap: 0;
+  .battle-decks-stack {
+    margin-inline: -0.15rem;
   }
 
-  .battle-decks-row .battle-light-deck {
-    /* Slightly larger tiles; stays in one row via flex min-w-0 + zoom layout */
-    zoom: 1.48;
+  .battle-decks-stack .battle-light-deck {
+    width: 100%;
+    gap: 0.3rem;
   }
 
   .battle-light-deck-level {
