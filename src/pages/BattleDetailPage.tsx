@@ -157,7 +157,7 @@ export function BattleDetailPage() {
       </div>
 
       {battle.outcome_summary ? (
-        <Card className="border-cr-gold/30 bg-cr-gold/5">
+        <Card className="tint-glass-card">
           <div className="flex items-start gap-2">
             <Swords className="w-5 h-5 text-cr-gold shrink-0 mt-0.5" />
             <p className="text-base text-cr-text leading-relaxed font-medium">{battle.outcome_summary}</p>

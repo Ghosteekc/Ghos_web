@@ -2,6 +2,11 @@ export type AppTheme = "dark" | "light" | "auto";
 
 const STORAGE_KEY = "ghosteek-theme";
 
+type ApplyThemeOptions = {
+  /** Crossfade root when resolved theme changes. Default true. */
+  animate?: boolean;
+};
+
 export function resolveTheme(theme: AppTheme): "dark" | "light" {
   if (theme === "auto") {
     const tgScheme = window.Telegram?.WebApp?.colorScheme;
@@ -11,11 +16,35 @@ export function resolveTheme(theme: AppTheme): "dark" | "light" {
   return theme;
 }
 
-export function applyTheme(theme: AppTheme) {
-  const resolved = resolveTheme(theme);
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function setThemeAttributes(resolved: "dark" | "light", stored: AppTheme) {
   document.documentElement.dataset.theme = resolved;
   document.documentElement.style.colorScheme = resolved;
-  localStorage.setItem(STORAGE_KEY, theme);
+  localStorage.setItem(STORAGE_KEY, stored);
+}
+
+export function applyTheme(theme: AppTheme, options: ApplyThemeOptions = {}) {
+  const { animate = true } = options;
+  const resolved = resolveTheme(theme);
+  const previous = document.documentElement.dataset.theme;
+  const run = () => setThemeAttributes(resolved, theme);
+
+  const canAnimate =
+    animate &&
+    previous != null &&
+    previous !== resolved &&
+    !prefersReducedMotion() &&
+    typeof document.startViewTransition === "function";
+
+  if (canAnimate) {
+    document.startViewTransition(run);
+    return;
+  }
+
+  run();
 }
 
 export function loadStoredTheme(): AppTheme {
@@ -25,5 +54,5 @@ export function loadStoredTheme(): AppTheme {
 }
 
 export function initTheme() {
-  applyTheme(loadStoredTheme());
+  applyTheme(loadStoredTheme(), { animate: false });
 }

@@ -1,0 +1,295 @@
+/**
+ * Color token architecture (appearance-preserving)
+ *
+ * 1. Palette   — raw primitives (theme-scoped RGB channels / hex)
+ * 2. Semantic  — meaning tokens consumed by Tailwind & content UI (--cr-*)
+ * 3. Component — chrome / glass / panel tokens (--ui-*, glass, chart)
+ *
+ * DockBar keeps its own rules and continues to resolve via --cr-* aliases.
+ * Do not point DockBar styles at --ui-* / --comp-* tokens.
+ */
+
+/* =============================================================================
+ * 1. PALETTE
+ * ============================================================================= */
+
+:root,
+[data-theme="dark"] {
+  /* Surfaces */
+  --palette-canvas: 0 5 26;
+  --palette-surface: 6 14 42;
+  --palette-elevated: 10 22 58;
+  --palette-elevated-hover: 14 28 72;
+  --palette-panel: 14 28 68;
+  --palette-panel-raised: 18 34 78;
+  --palette-panel-sunken: 8 18 48;
+  --palette-btn: 18 32 72;
+  --palette-btn-pressed: 12 24 56;
+  --palette-btn-alt: 20 34 74;
+  --palette-btn-gold-pressed: 175 115 12;
+
+  /* Brand / status (shared across themes) */
+  --palette-gold: 200 148 18;
+  --palette-blue: 61 108 242;
+  --palette-success: 35 165 89;
+  --palette-danger: 214 69 69;
+  --palette-accent: 93 125 232;
+
+  /* Ink */
+  --palette-ink: 255 255 255;
+  --palette-ink-muted: 200 210 240;
+  --palette-line: 255 255 255;
+  --palette-line-alpha: 0.08;
+
+  /* Neutrals */
+  --palette-white: 255 255 255;
+  --palette-black: 0 0 0;
+
+  /* Active / focus (content UI) */
+  --palette-active-ring: 61 108 242;
+  --palette-active-ring-alpha: 0.42;
+  --palette-active-fill: 18 34 78;
+  --palette-ui-line: 93 125 232;
+  --palette-ui-line-alpha: 0.14;
+
+  /* Wallpaper */
+  --palette-wallpaper: #050b23;
+  --palette-wallpaper-pattern: url("/bg-dark.png");
+  --palette-wallpaper-size: min(100vw, 29.5rem) auto;
+
+  /* Accents used by effects (exact legacy values) */
+  --palette-glow-gold: 251 191 36;
+  --palette-glow-blue: 96 165 250;
+  --palette-sky-300: 135 206 250;
+  --palette-sky-400: 100 180 235;
+  --palette-violet-soft: 217 228 255;
+  --palette-violet-fill: 245 248 255;
+  --palette-gold-bright: 255 210 70;
+  --palette-gold-mid: 218 145 18;
+  --palette-gold-active-top: 210 155 35;
+  --palette-gold-active-bottom: 165 95 8;
+  --palette-ink-on-gold: #2a1800;
+  --palette-danger-soft: 254 226 226;
+  --palette-danger-soft-pressed: 239 198 198;
+
+  /* Bevel / glass helper channels */
+  --palette-bevel-light: 140 185 255;
+  --palette-bevel-ring: 140 175 255;
+  --palette-bevel-glow: 88 118 210;
+  --palette-bevel-edge: 100 135 220;
+  --palette-bevel-edge-strong: 120 160 240;
+  --palette-bevel-stroke: 130 165 240;
+}
+
+[data-theme="light"] {
+  --palette-canvas: 212 212 212;
+  --palette-surface: 232 236 243;
+  --palette-elevated: 255 255 255;
+  --palette-elevated-hover: 248 250 253;
+  --palette-panel: 255 255 255;
+  --palette-panel-raised: 248 250 253;
+  --palette-panel-sunken: 232 236 243;
+  --palette-btn: 255 255 255;
+  --palette-btn-pressed: 232 236 243;
+  --palette-btn-alt: 248 250 253;
+  --palette-btn-gold-pressed: 175 115 12;
+
+  --palette-gold: 200 148 18;
+  --palette-blue: 61 108 242;
+  --palette-success: 35 165 89;
+  --palette-danger: 214 69 69;
+  --palette-accent: 93 125 232;
+
+  --palette-ink: 24 35 59;
+  --palette-ink-muted: 102 112 133;
+  --palette-line: 232 236 243;
+  --palette-line-alpha: 0.18;
+
+  --palette-white: 255 255 255;
+  --palette-black: 0 0 0;
+
+  --palette-active-ring: 217 228 255;
+  --palette-active-ring-alpha: 0.28;
+  --palette-active-fill: 245 248 255;
+  --palette-ui-line: 232 236 243;
+  --palette-ui-line-alpha: 0.15;
+
+  --palette-wallpaper: #d4d4d4;
+  --palette-wallpaper-pattern: url("/bg-light.png");
+  --palette-wallpaper-size: min(100vw, 29.5rem) auto;
+
+  --palette-glow-gold: 251 191 36;
+  --palette-glow-blue: 96 165 250;
+  --palette-sky-300: 135 206 250;
+  --palette-sky-400: 100 180 235;
+  --palette-violet-soft: 217 228 255;
+  --palette-violet-fill: 245 248 255;
+  --palette-gold-bright: 255 210 70;
+  --palette-gold-mid: 218 145 18;
+  --palette-gold-active-top: 210 155 35;
+  --palette-gold-active-bottom: 165 95 8;
+  --palette-ink-on-gold: #2a1800;
+  --palette-danger-soft: 254 226 226;
+  --palette-danger-soft-pressed: 239 198 198;
+
+  --palette-bevel-light: 255 255 255;
+  --palette-bevel-ring: 140 175 255;
+  --palette-bevel-glow: 88 118 210;
+  --palette-bevel-edge: 100 135 220;
+  --palette-bevel-edge-strong: 120 160 240;
+  --palette-bevel-stroke: 130 165 240;
+}
+
+/* =============================================================================
+ * 2. SEMANTIC  (public app colors — Tailwind `cr-*` maps here)
+ * ============================================================================= */
+
+:root,
+[data-theme="dark"] {
+  --cr-bg: var(--palette-canvas);
+  --cr-surface: var(--palette-surface);
+  --cr-card: var(--palette-elevated);
+  --cr-card-hover: var(--palette-elevated-hover);
+  --cr-gold: var(--palette-gold);
+  --cr-blue: var(--palette-blue);
+  --cr-win: var(--palette-success);
+  --cr-loss: var(--palette-danger);
+  --cr-text: var(--palette-ink);
+  --cr-muted: var(--palette-ink-muted);
+  --cr-accent: var(--palette-accent);
+  --cr-border: var(--palette-line);
+  --cr-border-alpha: var(--palette-line-alpha);
+  --cr-bg-top: var(--palette-wallpaper);
+  --cr-bg-bottom: var(--palette-wallpaper);
+  --cr-bg-pattern: var(--palette-wallpaper-pattern);
+  --cr-bg-pattern-size: var(--palette-wallpaper-size);
+  --cr-stroke-title: none;
+  --cr-stroke-body: none;
+}
+
+[data-theme="light"] {
+  --cr-bg: var(--palette-canvas);
+  --cr-surface: var(--palette-surface);
+  --cr-card: var(--palette-elevated);
+  --cr-card-hover: var(--palette-elevated-hover);
+  --cr-gold: var(--palette-gold);
+  --cr-blue: var(--palette-blue);
+  --cr-win: var(--palette-success);
+  --cr-loss: var(--palette-danger);
+  --cr-text: var(--palette-ink);
+  --cr-muted: var(--palette-ink-muted);
+  --cr-accent: var(--palette-accent);
+  --cr-border: var(--palette-line);
+  --cr-border-alpha: var(--palette-line-alpha);
+  --cr-bg-top: var(--palette-wallpaper);
+  --cr-bg-bottom: var(--palette-wallpaper);
+  --cr-bg-pattern: var(--palette-wallpaper-pattern);
+  --cr-bg-pattern-size: var(--palette-wallpaper-size);
+  --cr-stroke-title: none;
+  --cr-stroke-body: none;
+}
+
+/* =============================================================================
+ * 3. COMPONENT  (content chrome — not DockBar)
+ * ============================================================================= */
+
+:root,
+[data-theme="dark"] {
+  --ui-panel: var(--palette-panel);
+  --ui-panel-raised: var(--palette-panel-raised);
+  --ui-panel-sunken: var(--palette-panel-sunken);
+  --ui-border: var(--palette-ui-line);
+  --ui-border-alpha: var(--palette-ui-line-alpha);
+  --ui-radius: 1.25rem;
+  --ui-radius-lg: 1.5rem;
+  --ui-shadow:
+    0 1px 0 rgb(var(--palette-white) / 0.04),
+    0 8px 22px rgb(var(--palette-black) / 0.28);
+  --ui-shadow-soft:
+    0 1px 0 rgb(var(--palette-white) / 0.05),
+    0 4px 14px rgb(var(--palette-black) / 0.22);
+  --ui-inset-highlight: inset 0 1px 0 rgb(var(--palette-white) / 0.07);
+  --ui-inset-depth: inset 0 -1px 0 rgb(var(--palette-black) / 0.22);
+  --ui-active-ring: var(--palette-active-ring);
+  --ui-active-ring-alpha: var(--palette-active-ring-alpha);
+  --ui-active-fill: var(--palette-active-fill);
+  --ui-active-glow: 0 0 0 1px rgb(var(--palette-blue) / 0.22);
+
+  --cr-glass-bg: rgb(var(--cr-card) / 0.42);
+  --cr-glass-bg-strong: rgb(var(--cr-card) / 0.55);
+  --cr-glass-blur: blur(18px) saturate(150%);
+  --cr-chart-grid: rgb(var(--palette-white) / 0.08);
+
+  --comp-constructor-seed-bg: rgb(var(--cr-gold) / 0.12);
+  --comp-constructor-seed-border: rgb(var(--cr-gold) / 0.32);
+  --comp-constructor-seed-blur: blur(15px) saturate(140%);
+
+  --comp-glow-gold: 0 0 20px rgb(var(--palette-glow-gold) / 0.15);
+  --comp-glow-blue: 0 0 20px rgb(var(--palette-glow-blue) / 0.15);
+
+  /* Pixel button defaults (dark) — class rules may override */
+  --pb-light: rgb(var(--palette-bevel-light) / 0.35);
+  --pb-dark: rgb(var(--palette-black) / 0.45);
+  --pb-bg: rgb(var(--palette-btn));
+  --pb-bg-pressed: rgb(var(--palette-btn-pressed));
+  --pb-radius: 1rem;
+  --pb-filter-raised:
+    drop-shadow(2px 2px 0 rgb(var(--palette-black) / 0.28))
+    drop-shadow(0 0 0 1px rgb(var(--palette-bevel-edge) / 0.28));
+  --pb-filter-pressed:
+    drop-shadow(0 1px 0 rgb(var(--palette-black) / 0.32))
+    drop-shadow(0 0 0 1px rgb(var(--palette-bevel-edge-strong) / 0.38));
+  --pb-shadow-raised:
+    inset 0 1px 0 rgb(var(--palette-white) / 0.14),
+    inset 0 -1px 0 rgb(var(--palette-black) / 0.38),
+    inset 0 0 0 1px rgb(var(--palette-bevel-stroke) / 0.14);
+  --pb-shadow-pressed:
+    inset 0 3px 7px rgb(var(--palette-black) / 0.55),
+    inset 0 1px 0 rgb(var(--palette-white) / 0.06),
+    inset 0 0 0 1px rgb(var(--palette-black) / 0.35);
+  --pb-glow-active:
+    0 0 0 1px rgb(var(--palette-glow-gold) / 0.28),
+    0 0 10px rgb(var(--palette-glow-gold) / 0.14);
+  --pb-inner-ring:
+    inset 0 0 0 1.5px rgb(var(--palette-bevel-ring) / 0.45),
+    inset 0 0 10px rgb(var(--palette-bevel-glow) / 0.08);
+}
+
+[data-theme="light"] {
+  --ui-panel: var(--palette-panel);
+  --ui-panel-raised: var(--palette-panel-raised);
+  --ui-panel-sunken: var(--palette-panel-sunken);
+  --ui-border: var(--palette-ui-line);
+  --ui-border-alpha: var(--palette-ui-line-alpha);
+  --ui-radius: 1.25rem;
+  --ui-radius-lg: 1.5rem;
+  --ui-shadow:
+    0 1px 2px rgb(var(--palette-ink) / 0.04),
+    0 6px 16px rgb(var(--palette-ink) / 0.05);
+  --ui-shadow-soft:
+    0 1px 2px rgb(var(--palette-ink) / 0.03),
+    0 3px 10px rgb(var(--palette-ink) / 0.04);
+  --ui-inset-highlight: inset 0 1px 0 rgb(var(--palette-white) / 0.85);
+  --ui-inset-depth: inset 0 -1px 0 rgb(var(--palette-ink) / 0.04);
+  --ui-active-ring: var(--palette-active-ring);
+  --ui-active-ring-alpha: var(--palette-active-ring-alpha);
+  --ui-active-fill: var(--palette-active-fill);
+  --ui-active-glow: 0 0 0 1px rgb(var(--palette-violet-soft) / 0.9);
+
+  --cr-glass-bg: rgb(var(--cr-card) / 0.72);
+  --cr-glass-bg-strong: rgb(var(--cr-card) / 0.88);
+  --cr-glass-blur: blur(18px) saturate(140%);
+  --cr-chart-grid: rgb(var(--palette-ink-muted) / 0.28);
+
+  --comp-constructor-seed-bg: rgb(var(--palette-sky-300) / 0.32);
+  --comp-constructor-seed-border: rgb(var(--palette-sky-400) / 0.42);
+  --comp-constructor-seed-blur: blur(15px) saturate(140%);
+
+  --comp-glow-gold: 0 0 20px rgb(var(--palette-glow-gold) / 0.15);
+  --comp-glow-blue: 0 0 20px rgb(var(--palette-glow-blue) / 0.15);
+
+  --pb-light: rgb(var(--palette-white) / 0.7);
+  --pb-dark: rgb(var(--palette-ink-muted) / 0.28);
+  --pb-bg: rgb(var(--ui-panel));
+  --pb-bg-pressed: rgb(var(--ui-panel-sunken));
+}
