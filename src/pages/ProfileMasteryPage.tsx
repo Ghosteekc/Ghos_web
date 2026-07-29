@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { ArrowLeft } from "lucide-react";
 
-import { Card, Button, Loader, LinearProgress } from "@/components/ui";
+import { Card, Button, Loader, LinearProgress, ErrorState, EmptyState } from "@/components/ui";
 
 import { CardTile } from "@/components/cards";
 
@@ -51,25 +51,16 @@ export function ProfileMasteryPage() {
 
 
   if (error || !data) {
-
     return (
-
       <div className="space-y-4">
-
         <PageHeader title="Мастерство карт" onBack={() => navigate("/")} />
-
-        <Card className="text-center space-y-3">
-
-          <p className="text-cr-loss text-sm">{error ?? "Нет данных"}</p>
-
-          <Button onClick={() => void reload()}>Повторить</Button>
-
-        </Card>
-
+        <ErrorState
+          title={error ?? "Нет данных"}
+          button="Повторить"
+          onAction={() => void reload()}
+        />
       </div>
-
     );
-
   }
 
 
@@ -83,9 +74,7 @@ export function ProfileMasteryPage() {
 
 
       {data.masteries.length === 0 ? (
-
-        <Card className="text-center text-cr-muted text-sm">Нет данных о мастерстве</Card>
-
+        <EmptyState title="Нет данных о мастерстве" />
       ) : (
 
         <div className="space-y-3">

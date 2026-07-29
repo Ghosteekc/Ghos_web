@@ -12,7 +12,7 @@ import {
   BarChart3,
   ScanSearch,
 } from "lucide-react";
-import { Card, Button, Loader, ElixirIcon, FeatureNavGrid, ScrollToTopButton } from "@/components/ui";
+import { Card, Button, Loader, ElixirIcon, FeatureNavGrid, ScrollToTopButton, ErrorState, EmptyState } from "@/components/ui";
 import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { ConstructorPanel, ConstructorDeckGrid } from "@/components/decks/ConstructorPanel";
 import { FavoriteDeckButton } from "@/components/decks/FavoriteDeckButton";
@@ -188,9 +188,7 @@ export function DecksPage() {
         <Card className="text-center text-cr-win text-sm">{copyHint}</Card>
       )}
 
-      {error && (
-        <Card className="text-center text-cr-loss text-sm">{error}</Card>
-      )}
+      {error && <ErrorState title={error} />}
 
       {loading &&
       filter !== DECK_HOME &&
@@ -321,13 +319,12 @@ export function DecksPage() {
             );
           })}
           {!error && decks.length === 0 && !loading ? (
-            <Card className="col-span-full text-center">
-              <SlidersHorizontal className="w-12 h-12 text-cr-muted mx-auto mb-3 opacity-50" />
-              <p className="text-cr-muted">Колоды не найдены</p>
-              <p className="text-xs text-cr-muted mt-1">
-                Выберите «Мета» или сыграйте бои для раздела «Мои»
-              </p>
-            </Card>
+            <EmptyState
+              icon={<SlidersHorizontal className="h-12 w-12 opacity-50" />}
+              title="Колоды не найдены"
+              description="Выберите «Мета» или сыграйте бои для раздела «Мои»"
+              className="col-span-full"
+            />
           ) : null}
         </div>
       )}
@@ -401,20 +398,17 @@ function TopPlayersPanel({
 
   if (error) {
     return (
-      <Card className="text-center space-y-3">
-        <p className="text-cr-loss text-sm">{error}</p>
-        <Button onClick={() => void load()}>Попробовать снова</Button>
-      </Card>
+      <ErrorState title={error} button="Попробовать снова" onAction={() => void load()} />
     );
   }
 
   if (!players.length) {
     return (
-      <Card className="text-center">
-        <Users className="w-12 h-12 text-cr-muted mx-auto mb-3 opacity-50" />
-        <p className="text-cr-muted">Рейтинг временно недоступен</p>
-        <p className="text-xs text-cr-muted mt-1">Попробуйте позже</p>
-      </Card>
+      <EmptyState
+        icon={<Users className="h-12 w-12 opacity-50" />}
+        title="Рейтинг временно недоступен"
+        description="Попробуйте позже"
+      />
     );
   }
 
@@ -687,10 +681,11 @@ function RandomDeckPanel({
     return (
       <div className="space-y-3">
         <RoflModeBar rofl={rofl} onRoflChange={setRofl} />
-        <Card className="text-center space-y-3">
-          <p className="text-cr-loss text-sm">{error ?? "Ошибка"}</p>
-          <Button onClick={() => void roll()}>Попробовать снова</Button>
-        </Card>
+        <ErrorState
+          title={error ?? "Ошибка"}
+          button="Попробовать снова"
+          onAction={() => void roll()}
+        />
       </div>
     );
   }

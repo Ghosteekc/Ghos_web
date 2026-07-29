@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MapPin, ChevronRight } from "lucide-react";
 import { api, ApiError } from "@/api/client";
 import { cacheGet, cacheHas } from "@/api/cache";
-import { Card, Button, Loader } from "@/components/ui";
+import { Card, Button, Loader, ErrorState, EmptyState } from "@/components/ui";
 import { usePageRefresh } from "@/hooks";
 import type { ArenaDecksData, PlayerCollectionData, Profile } from "@/types";
 import { cn } from "@/utils";
@@ -14,10 +14,6 @@ import {
   resolvePlayerArenaNumber,
   type ArenaProgressSummary,
 } from "./recommendationEngine";
-
-function ErrorCard({ message }: { message: string }) {
-  return <Card className="text-center text-cr-loss text-sm">{message}</Card>;
-}
 
 function ArenaProgressHeader({ summary }: { summary: ArenaProgressSummary }) {
   return (
@@ -177,16 +173,14 @@ export function RecommendationsPanel() {
   }, [playerArena, scrollToArena]);
 
   if (loading) return <Loader />;
-  if (error) return <ErrorCard message={error} />;
+  if (error) return <ErrorState title={error} />;
   if (!profile?.player_tag) {
     return (
-      <Card className="text-center text-cr-muted text-sm">
-        Привяжите аккаунт Clash Royale в настройках, чтобы получить рекомендации по прокачке.
-      </Card>
+      <EmptyState title="Привяжите аккаунт Clash Royale в настройках, чтобы получить рекомендации по прокачке." />
     );
   }
   if (!collection?.cards?.length) {
-    return <Card className="text-center text-cr-muted text-sm">Коллекция карт недоступна</Card>;
+    return <EmptyState title="Коллекция карт недоступна" />;
   }
 
   return (

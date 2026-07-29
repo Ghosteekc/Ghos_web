@@ -9,7 +9,7 @@ import {
   Swords,
   CheckCircle2,
 } from "lucide-react";
-import { Card, Button, Loader } from "@/components/ui";
+import { Card, Button, Loader, ErrorState } from "@/components/ui";
 import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { MineDeckStats } from "@/types";
@@ -115,10 +115,11 @@ export function MineDeckStatsPage() {
     return (
       <div className="space-y-4">
         <Header onBack={() => navigate("/decks")} title="Статистика колоды" />
-        <Card className="text-center space-y-3">
-          <p className="text-cr-loss text-sm">{error ?? "Нет данных"}</p>
-          <Button onClick={() => navigate("/decks")}>К колодам</Button>
-        </Card>
+        <ErrorState
+          title={error ?? "Нет данных"}
+          button="К колодам"
+          onAction={() => navigate("/decks")}
+        />
       </div>
     );
   }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Star, ExternalLink, Trash2, ScanSearch, Swords } from "lucide-react";
-import { Card, Button, Loader } from "@/components/ui";
+import { Card, Button, Loader, ErrorState, EmptyState } from "@/components/ui";
 import { CardDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { usePageRefresh, useTelegram, useFavoriteDecks } from "@/hooks";
@@ -70,7 +70,7 @@ export function FavoritesPanel({ onAnalyze, onCompare }: FavoritesPanelProps) {
 
   return (
     <div className="space-y-4">
-      {error && <Card className="text-center text-cr-loss text-sm">{error}</Card>}
+      {error && <ErrorState title={error} />}
 
       {entries.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -146,11 +146,11 @@ export function FavoritesPanel({ onAnalyze, onCompare }: FavoritesPanelProps) {
           })}
         </div>
       ) : (
-        <Card className="text-center">
-          <Star className="w-12 h-12 text-cr-muted mx-auto mb-3 opacity-50" />
-          <p className="text-cr-muted">Нет избранных колод</p>
-          <p className="text-xs text-cr-muted mt-1">Добавляйте колоды из других вкладок раздела «Колоды»</p>
-        </Card>
+        <EmptyState
+          icon={<Star className="h-12 w-12 opacity-50" />}
+          title="Нет избранных колод"
+          description="Добавляйте колоды из других вкладок раздела «Колоды»"
+        />
       )}
     </div>
   );

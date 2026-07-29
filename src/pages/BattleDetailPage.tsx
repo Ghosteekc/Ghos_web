@@ -9,7 +9,7 @@ import {
   Swords,
   Target,
 } from "lucide-react";
-import { Card, Button, Loader, LinearProgress } from "@/components/ui";
+import { Card, Button, Loader, LinearProgress, ErrorState } from "@/components/ui";
 import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import { BattleDetail } from "@/types";
@@ -105,10 +105,11 @@ export function BattleDetailPage() {
   if (loading) return <Loader />;
   if (!battle) {
     return (
-      <Card className="text-center space-y-3">
-        <p className="text-cr-loss">{error ?? "Бой не найден"}</p>
-        <Button onClick={() => navigate("/battles")}>К истории</Button>
-      </Card>
+      <ErrorState
+        title={error ?? "Бой не найден"}
+        button="К истории"
+        onAction={() => navigate("/battles")}
+      />
     );
   }
 

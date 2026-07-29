@@ -4,7 +4,7 @@ import {
   Trophy,
   RefreshCw,
 } from "lucide-react";
-import { Card, Button, Loader, ScrollToTopButton } from "@/components/ui";
+import { Card, Button, Loader, ScrollToTopButton, ErrorState, EmptyState } from "@/components/ui";
 import { BattleCardSimple } from "@/components/battles/BattleCard";
 import { api, ApiError } from "@/api/client";
 import { BattleSummary } from "@/types";
@@ -88,9 +88,7 @@ export function BattlesPage() {
         ))}
       </div>
 
-      {error && (
-        <Card className="text-center text-cr-loss text-sm">{error}</Card>
-      )}
+      {error && <ErrorState title={error} />}
 
       {loading ? (
         <Loader />
@@ -104,10 +102,10 @@ export function BattlesPage() {
             />
           ))}
           {filtered.length === 0 && (
-            <Card className="text-center">
-              <Trophy className="w-12 h-12 text-cr-muted mx-auto mb-3 opacity-50" />
-              <p className="text-cr-muted">Бои не найдены</p>
-            </Card>
+            <EmptyState
+              icon={<Trophy className="h-12 w-12 opacity-50" />}
+              title="Бои не найдены"
+            />
           )}
         </div>
       )}

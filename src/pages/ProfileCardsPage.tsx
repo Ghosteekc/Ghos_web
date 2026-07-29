@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowDown, ArrowLeft, ArrowUp } from "lucide-react";
-import { Card, Button, Loader } from "@/components/ui";
+import { Card, Button, Loader, ErrorState } from "@/components/ui";
 import { CardTile } from "@/components/cards";
 import { CollectionStatsGrid, type CollectionRarityFilter } from "@/components/profile/CollectionStatsGrid";
 import { usePlayerCollection } from "@/hooks/usePlayerCollection";
@@ -142,10 +142,11 @@ export function ProfileCardsPage() {
     return (
       <div className="space-y-4">
         <PageHeader title="Коллекция карт" onBack={() => navigate("/")} />
-        <Card className="text-center space-y-3">
-          <p className="text-cr-loss text-sm">{error ?? "Нет данных"}</p>
-          <Button onClick={() => void reload()}>Повторить</Button>
-        </Card>
+        <ErrorState
+          title={error ?? "Нет данных"}
+          button="Повторить"
+          onAction={() => void reload()}
+        />
       </div>
     );
   }

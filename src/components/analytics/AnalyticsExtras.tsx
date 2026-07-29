@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Shield, Swords, Wand2, ChevronDown, ChevronUp, RefreshCw, ExternalLink, Brain, ChevronRight, ScanSearch } from "lucide-react";
 import { api, ApiError } from "@/api/client";
 import { cacheGet, cacheHas, cacheInvalidate } from "@/api/cache";
-import { Card, Button, Loader } from "@/components/ui";
+import { Card, Button, Loader, ErrorState, EmptyState } from "@/components/ui";
 import { CardDeckGrid, CardTile, PlayerDeckGrid } from "@/components/cards";
 import { useCardCatalog, usePageRefresh, useTelegram } from "@/hooks";
 import { battleDetailPath, cn } from "@/utils";
@@ -50,10 +50,6 @@ function DeckImportButton({ deckLink, label }: { deckLink?: string | null; label
   );
 }
 
-function ErrorCard({ message }: { message: string }) {
-  return <Card className="text-center text-cr-loss text-sm">{message}</Card>;
-}
-
 export function DeckWinratesPanel({ onAnalyze }: { onAnalyze?: (deck: Deck) => void }) {
   const { iconUrl } = useCardCatalog();
   const [rows, setRows] = useState<WinrateEntry[]>([]);
@@ -77,9 +73,9 @@ export function DeckWinratesPanel({ onAnalyze }: { onAnalyze?: (deck: Deck) => v
   }, [load]);
 
   if (loading) return <Loader />;
-  if (error) return <ErrorCard message={error} />;
+  if (error) return <ErrorState title={error} />;
   if (!rows.length) {
-    return <Card className="text-center text-cr-muted text-sm">Сыграйте бои — появится статистика по колодам</Card>;
+    return <EmptyState title="Сыграйте бои — появится статистика по колодам" />;
   }
 
   return (
@@ -216,9 +212,9 @@ export function OpponentsPanel() {
   };
 
   if (loading) return <Loader />;
-  if (error) return <ErrorCard message={error} />;
+  if (error) return <ErrorState title={error} />;
   if (!opponents.length) {
-    return <Card className="text-center text-cr-muted text-sm">Нет данных о колодах соперников</Card>;
+    return <EmptyState title="Нет данных о колодах соперников" />;
   }
 
   return (
@@ -340,7 +336,7 @@ export function DeckToolsPanel() {
   );
 
   if (loading) return <Loader />;
-  if (error && !customize) return <ErrorCard message={error} />;
+  if (error && !customize) return <ErrorState title={error} />;
 
   return (
     <div className="space-y-4">
@@ -509,21 +505,13 @@ export function LossAnalysisPanel() {
   );
 
   if (loading) return <Loader />;
-  if (error) return <ErrorCard message={error} />;
+  if (error) return <ErrorState title={error} />;
   if (!insights) {
-    return (
-      <Card className="text-center text-cr-muted text-sm">
-        Сыграйте бои — здесь появится разбор ваших поражений
-      </Card>
-    );
+    return <EmptyState title="Сыграйте бои — здесь появится разбор ваших поражений" />;
   }
 
   if (!insights.patterns.length && !lossInsights.length) {
-    return (
-      <Card className="text-center text-cr-muted text-sm">
-        Сыграйте бои — здесь появится разбор ваших поражений
-      </Card>
-    );
+    return <EmptyState title="Сыграйте бои — здесь появится разбор ваших поражений" />;
   }
 
   return (

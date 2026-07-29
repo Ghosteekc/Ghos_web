@@ -4,7 +4,7 @@ import { api, ApiError } from "@/api/client";
 import { BattleSummary, Profile, StatsOverview } from "@/types";
 import { usePageRefresh } from "@/hooks";
 import { PlayerCard, HomeServicePanel, SupercellDisclaimer } from "@/components/home";
-import { Card, Button, Loader } from "@/components/ui";
+import { Card, Button, Loader, ErrorState } from "@/components/ui";
 import { BattleCardSimple } from "@/components/battles/BattleCard";
 import { battleDetailPath } from "@/utils";
 import { cacheHas } from "@/api/cache";
@@ -44,13 +44,12 @@ export function HomePage() {
 
   if (error || !profile) {
     return (
-      <Card className="text-center">
-        <p className="text-cr-loss mb-2">{error ?? "Ошибка загрузки"}</p>
-        <p className="text-xs text-cr-muted mb-4">
-          Нет связи с сервером. Потяните вниз для обновления.
-        </p>
-        <Button onClick={() => void load()}>Повторить</Button>
-      </Card>
+      <ErrorState
+        title={error ?? "Ошибка загрузки"}
+        description="Нет связи с сервером. Потяните вниз для обновления."
+        button="Повторить"
+        onAction={() => void load()}
+      />
     );
   }
 

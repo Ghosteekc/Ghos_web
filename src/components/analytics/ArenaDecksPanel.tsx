@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, ApiError } from "@/api/client";
 import { cacheGet, cacheHas } from "@/api/cache";
-import { Card, Button, Loader } from "@/components/ui";
+import { Card, Button, Loader, ErrorState, EmptyState } from "@/components/ui";
 import type { ArenaDecksData, Deck } from "@/types";
 import { deckToComparePath } from "@/utils/deckActions";
 
@@ -71,24 +71,18 @@ export function ArenaDecksPanel({ renderDeck }: ArenaDecksPanelProps) {
 
   if (error) {
     return (
-      <Card className="text-center space-y-3">
-        <p className="text-cr-loss text-sm">{error}</p>
-        <Button onClick={() => void load()}>Попробовать снова</Button>
-      </Card>
+      <ErrorState title={error} button="Попробовать снова" onAction={() => void load()} />
     );
   }
 
   if (!decks.length) {
     return (
-      <Card className="text-center">
-        <p className="text-cr-muted">Нет данных по колодам вашей арены</p>
-        <p className="text-xs text-cr-muted mt-1">
-          Сыграйте несколько рейтинговых боёв или обновите страницу через минуту.
-        </p>
-        <Button className="mt-3" onClick={() => void load()}>
-          Обновить
-        </Button>
-      </Card>
+      <EmptyState
+        title="Нет данных по колодам вашей арены"
+        description="Сыграйте несколько рейтинговых боёв или обновите страницу через минуту."
+        button="Обновить"
+        onAction={() => void load()}
+      />
     );
   }
 

@@ -4,7 +4,7 @@ import { Search, X, Sparkles, Wand2 } from "lucide-react";
 
 import { api } from "@/api/client";
 
-import { Card, Button, Loader } from "@/components/ui";
+import { Card, Button, Loader, ErrorState, EmptyState } from "@/components/ui";
 
 import { CardTile } from "@/components/cards";
 
@@ -514,11 +514,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
           </div>
 
-          {filteredCards.length === 0 ? (
-
-            <p className="text-center text-sm text-cr-muted py-6">Карты не найдены</p>
-
-          ) : null}
+          {filteredCards.length === 0 ? <EmptyState title="Карты не найдены" /> : null}
 
 
 
@@ -538,11 +534,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
 
 
-      {error ? (
-
-        <Card className="text-center text-cr-loss text-sm">{error}</Card>
-
-      ) : null}
+      {error ? <ErrorState title={error} /> : null}
 
 
 
@@ -575,13 +567,7 @@ export function ConstructorPanel({ renderDeckCard }: ConstructorPanelProps) {
 
 
       {!loading && filledCount === 4 && !error && decks.length === 0 ? (
-
-        <Card className="text-center text-sm text-cr-muted py-6">
-
-          Не удалось подобрать колоды для этой комбинации
-
-        </Card>
-
+        <EmptyState title="Не удалось подобрать колоды для этой комбинации" className="py-6" />
       ) : null}
 
     </div>

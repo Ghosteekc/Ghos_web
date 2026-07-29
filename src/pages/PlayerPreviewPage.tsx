@@ -14,7 +14,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { api, ApiError } from "@/api/client";
 import { SearchResult } from "@/types";
-import { Button, Card, ElixirIcon, Loader } from "@/components/ui";
+import { Button, Card, ElixirIcon, Loader, ErrorState, EmptyState } from "@/components/ui";
 import { PlayerDeckGrid } from "@/components/cards";
 import { FavoriteDeckButton } from "@/components/decks/FavoriteDeckButton";
 import { LeagueBanner, resolveLeagueInfo } from "@/components/profile/LeagueBanner";
@@ -147,7 +147,7 @@ export function PlayerPreviewPage() {
       {loading ? (
         <Loader />
       ) : error || !player ? (
-        <Card className="text-center text-cr-loss text-sm">{error ?? "Не найден"}</Card>
+        <ErrorState title={error ?? "Не найден"} />
       ) : (
         <>
           <Card className="overflow-hidden relative !p-3">
@@ -287,9 +287,7 @@ export function PlayerPreviewPage() {
                 </div>
               </>
             ) : (
-              <p className="text-sm text-cr-muted text-center py-4">
-                Не удалось загрузить текущую колоду игрока
-              </p>
+              <EmptyState title="Не удалось загрузить текущую колоду игрока" />
             )}
           </Card>
 

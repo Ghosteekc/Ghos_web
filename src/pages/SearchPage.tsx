@@ -9,7 +9,7 @@ import {
   ChevronRight,
   ArrowLeft,
 } from "lucide-react";
-import { Card, Button } from "@/components/ui";
+import { Card, Button, ErrorState, EmptyState } from "@/components/ui";
 import { api, ApiError } from "@/api/client";
 import { SearchResult } from "@/types";
 import { usePageRefresh } from "@/hooks";
@@ -117,9 +117,7 @@ export function SearchPage() {
       </p>
 
       <AnimatePresence>
-        {!loading && error && (
-          <Card className="text-center text-cr-loss text-sm">{error}</Card>
-        )}
+        {!loading && error && <ErrorState title={error} />}
         {!loading && !error && results.length > 0 && (
           <motion.div
             initial={{ y: 8 }}
@@ -160,7 +158,7 @@ export function SearchPage() {
           </motion.div>
         )}
         {!loading && !error && query.trim().length >= 2 && results.length === 0 && (
-          <Card className="text-center text-cr-muted text-sm">Игрок не найден</Card>
+          <EmptyState title="Игрок не найден" />
         )}
       </AnimatePresence>
 

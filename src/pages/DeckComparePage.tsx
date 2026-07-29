@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Swords, TrendingDown, TrendingUp } from "lucide-react";
-import { Card, Button, Loader } from "@/components/ui";
+import { Card, Button, Loader, ErrorState } from "@/components/ui";
 import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import type { DeckCompareCardNote, DeckCompareResult } from "@/types";
@@ -123,10 +123,11 @@ export function DeckComparePage() {
 
   if (error || !data) {
     return (
-      <Card className="text-center space-y-3">
-        <p className="text-cr-loss">{error ?? "Нет данных"}</p>
-        <Button onClick={() => navigate(backPath)}>Назад к колодам</Button>
-      </Card>
+      <ErrorState
+        title={error ?? "Нет данных"}
+        button="Назад к колодам"
+        onAction={() => navigate(backPath)}
+      />
     );
   }
 
