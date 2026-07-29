@@ -574,18 +574,11 @@ function RoflModeBar({
           role="switch"
           aria-checked={rofl}
           aria-label="Режим Рофл"
+          data-checked={rofl}
           onClick={() => onRoflChange(!rofl)}
-          className={
-            "relative w-11 h-6 rounded-full transition-colors shrink-0 " +
-            (rofl ? "bg-cr-gold" : "bg-cr-border")
-          }
+          className="toggle-switch"
         >
-          <span
-            className={
-              "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform " +
-              (rofl ? "translate-x-5" : "")
-            }
-          />
+          <span className="toggle-switch-thumb" />
         </button>
       </div>
       {showHelp ? (
