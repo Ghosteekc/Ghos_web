@@ -15,6 +15,28 @@ interface BattleCardSimpleProps {
   onOpen: () => void;
 }
 
+function deckAvgElixir(
+  cards: Array<DeckCard | string> | null | undefined,
+  resolveElixir: (name: string) => number | null | undefined,
+): number | null {
+  const items = toDeckCards(cards).slice(0, 8);
+  if (!items.length) return null;
+  let sum = 0;
+  let n = 0;
+  for (const card of items) {
+    const fromCard = card.cost > 0 && card.cost < 99 ? card.cost : null;
+    const fromCatalog = resolveElixir(card.name);
+    const cost =
+      fromCard ??
+      (fromCatalog != null && fromCatalog > 0 && fromCatalog < 99 ? fromCatalog : null);
+    if (cost == null) continue;
+    sum += cost;
+    n += 1;
+  }
+  if (!n) return null;
+  return Math.round((sum / n) * 10) / 10;
+}
+
 /** Lightweight 4×2 deck for battle list — plain images, no CardTile tree. */
 function LightBattleDeckStrip({
   cards,
@@ -34,31 +56,33 @@ function LightBattleDeckStrip({
           <div
             key={`${card.id}-${index}`}
             className={cn(
-              "battle-light-deck-slot relative aspect-[4/5] overflow-hidden rounded-[0.25rem] bg-cr-bg/40",
+              "battle-light-deck-slot relative aspect-[4/5] overflow-visible rounded-[0.25rem]",
               evo && "battle-light-deck-slot--evo",
               hero && "battle-light-deck-slot--hero",
             )}
           >
-            {src ? (
-              <img
-                src={src}
-                alt=""
-                width={64}
-                height={80}
-                className="h-full w-full object-contain"
-                loading="lazy"
-                decoding="async"
-                draggable={false}
-              />
-            ) : (
-              <span className="flex h-full items-center justify-center text-3xs font-bold text-cr-muted">
-                {card.name.charAt(0)}
-              </span>
-            )}
+            <div className="absolute inset-0 overflow-hidden rounded-[0.25rem] bg-cr-bg/40">
+              {src ? (
+                <img
+                  src={src}
+                  alt=""
+                  width={64}
+                  height={80}
+                  className="h-full w-full object-contain"
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                />
+              ) : (
+                <span className="flex h-full items-center justify-center text-3xs font-bold text-cr-muted">
+                  {card.name.charAt(0)}
+                </span>
+              )}
+            </div>
             {card.level != null && card.level > 0 ? (
               <span
-                className="battle-light-deck-level card-level-chip pointer-events-none absolute left-0 top-0 z-10"
-                aria-hidden
+                className="cr-level-badge battle-light-deck-level-badge"
+                aria-label={`Уровень ${card.level}`}
               >
                 {card.level}
               </span>
@@ -73,6 +97,7 @@ function LightBattleDeckStrip({
 const LightBattleDeckStripMemo = memo(LightBattleDeckStrip);
 
 function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
+  const { getCard } = useCardCatalog();
   const opponent = useMemo(
     () => formatOpponentHeadline(summary.opponent_name, summary.opponent_tag),
     [summary.opponent_name, summary.opponent_tag],
@@ -87,6 +112,16 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
   const opponentCards = summary.opponent_deck_cards?.length
     ? summary.opponent_deck_cards
     : summary.opponent_deck;
+
+  const myAvg = useMemo(
+    () => deckAvgElixir(userCards, (name) => getCard(name)?.elixir),
+    [userCards, getCard],
+  );
+  const enemyAvg = useMemo(
+    () => deckAvgElixir(opponentCards, (name) => getCard(name)?.elixir),
+    [opponentCards, getCard],
+  );
+  const fallbackAvg = summary.avg_elixir != null && summary.avg_elixir > 0 ? summary.avg_elixir : null;
 
   return (
     <Card
@@ -131,9 +166,15 @@ function BattleCardSimpleInner({ summary, onOpen }: BattleCardSimpleProps) {
             {(summary.duration ?? 0) > 0 ? (
               <p className="text-sm text-cr-muted">{formatTime(summary.duration)}</p>
             ) : null}
-            <p className="text-sm text-cr-muted flex items-center gap-1 justify-end">
+            <p className="text-sm font-semibold flex items-center gap-1 justify-end tabular-nums">
               <ElixirIcon size={12} />
-              {(summary.avg_elixir ?? 0).toFixed(1)}
+              <span className="text-cr-blue">
+                {(myAvg ?? fallbackAvg ?? 0).toFixed(1)}
+              </span>
+              <span className="text-cr-muted font-medium">/</span>
+              <span className="text-cr-loss">
+                {(enemyAvg ?? fallbackAvg ?? 0).toFixed(1)}
+              </span>
             </p>
           </div>
         </div>

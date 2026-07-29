@@ -264,7 +264,21 @@
     text-shadow: none;
   }
 
+  .battle-light-deck-level-badge {
+    right: -2px;
+    bottom: -2px;
+    left: auto;
+    top: auto;
+    min-width: 1.05rem;
+    height: 1.05rem;
+    padding: 0 0.18rem;
+    font-size: 9px;
+    border-width: 1.5px;
+    z-index: 20;
+  }
+
   .battle-light-deck-level {
+    /* legacy chip — unused by battle list; keep for any leftover refs */
     min-width: 0.95rem;
     padding: 1px 3px;
     font-size: 9px;
