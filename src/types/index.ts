@@ -169,6 +169,11 @@ export interface Deck {
   description?: string;
   synergy_score?: number;
   synergy_notes?: string[];
+  archetype?: string;
+  confidence?: number;
+  recommendation?: RecommendationResult | null;
+  game_plan?: DeckGamePlan | null;
+  improvements?: DeckImprovementSuggestion[];
 }
 
 export interface CardInfo {
@@ -269,6 +274,8 @@ export interface DeckCompareResult {
   reference_synergy_score?: number;
   user_synergy_notes?: string[];
   reference_synergy_notes?: string[];
+  user_recommendation?: RecommendationResult | null;
+  reference_recommendation?: RecommendationResult | null;
 }
 
 export interface DeckCardMatchup {
@@ -285,6 +292,116 @@ export interface DeckImprovementSuggestion {
   suggested_cards: string[];
 }
 
+export interface DeckGamePlan {
+  how_to_win: string;
+  primary_threat: string;
+  when_to_attack: string;
+  key_cards: string[];
+  core_combinations: string[];
+  critical_weaknesses: string[];
+}
+
+export interface RecommendationIntent {
+  archetype: string;
+  play_style: string;
+  primary_win: string | null;
+  required_soft_checks: string[];
+  min_air_defense: number;
+  require_building: boolean;
+  min_cycle_cards: number;
+  required_role_ids: string[];
+  attack_bias: number;
+}
+
+export interface RecommendationBalanceIssues {
+  hard: string[];
+  soft: string[];
+  messages: string[];
+}
+
+export interface CandidateRating {
+  card: string;
+  strategy_fit: number;
+  gameplan_fit: number;
+  primary_win_support: number;
+  secondary_combo_support: number;
+  tempo_fit: number;
+  deck_identity: number;
+  existing_synergy: number;
+  future_synergy: number;
+  role_overlap: number;
+  replacement_cost: number;
+  total: number;
+}
+
+export interface RejectedCandidateExplanation {
+  card: string;
+  reasons: string[];
+}
+
+export interface PickExplanation {
+  category: string;
+  pick: string;
+  drop: string | null;
+  reason: string;
+  pros: string[];
+  rejected: RejectedCandidateExplanation[];
+}
+
+export interface RecommendationSwap {
+  drop: string | null;
+  pick: string;
+  reason: string;
+}
+
+export interface DecisionExplanation {
+  archetype: string;
+  primary_win: string | null;
+  why_gaps: string[];
+  why_picks: string[];
+  rejected: string[];
+  pick_explanations: PickExplanation[];
+  swaps?: RecommendationSwap[];
+}
+
+export interface RecommendationImprovementStep {
+  category: string;
+  message: string;
+  drop: string | null;
+  pick: string | null;
+  suggested_cards: string[];
+  tier: string | null;
+  rating: CandidateRating | null;
+  reason?: string | null;
+}
+
+export interface RecommendationResult {
+  intent: RecommendationIntent;
+  game_plan: DeckGamePlan;
+  balance_issues: RecommendationBalanceIssues;
+  improvement_plan: {
+    needed: boolean;
+    steps: RecommendationImprovementStep[];
+    improved_deck: string[];
+    locked: string[];
+  };
+  decision_explanation: DecisionExplanation;
+  candidate_ranking: {
+    by_gap: Record<string, CandidateRating[]>;
+    applied: CandidateRating[];
+  };
+  risk_assessment: {
+    score: number;
+    factors: string[];
+    open_gaps: string[];
+  };
+}
+
+export interface RecommendDeckResponse {
+  recommendation: RecommendationResult;
+  improvements: DeckImprovementSuggestion[];
+}
+
 export interface MineDeckStats {
   name: string;
   cards: DeckCard[];
@@ -299,6 +416,8 @@ export interface MineDeckStats {
   improvements: DeckImprovementSuggestion[];
   balanced: boolean;
   sample_note: string;
+  game_plan?: DeckGamePlan | null;
+  recommendation?: RecommendationResult | null;
 }
 
 export interface RandomDeck {
@@ -464,6 +583,9 @@ export interface ConstructorDeckEntry {
   confidence?: number;
   balanced?: boolean;
   score_breakdown?: ScoreBreakdown;
+  improvements?: DeckImprovementSuggestion[];
+  game_plan?: DeckGamePlan | null;
+  recommendation?: RecommendationResult | null;
 }
 
 export interface ScoreBreakdown {

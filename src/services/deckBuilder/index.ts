@@ -11,14 +11,11 @@ export type {
 export {
   ARCHETYPE_ANCHORS,
   ARCHETYPE_ELIXIR,
-  FILL_PRIORITY,
   KNOWN_SYNERGY,
-  MATCH_CONFIDENCE_THRESHOLD,
-  SYNERGY_MIN_THRESHOLD,
   WIN_CONDITIONS,
 } from "./constants";
 
-export { avgElixir, cardRoles, getAllCards, getAllDecks } from "./database";
+export { avgElixir, cardRoles, cardHasRole, getAllCards, getAllDecks } from "./database";
 export { deckSynergyScore, pairSynergy, synergyNotes } from "./synergy";
 export {
   balanceIssues,
@@ -26,8 +23,11 @@ export {
   buildMultipleDecks,
   detectArchetype,
 } from "./builder";
+export { detectArchetypeFromCards, scoreArchetype } from "./archetypeDetect";
 export {
   computeScoreBreakdown,
   hardConstraintIssues,
   softBalanceIssues,
 } from "./balance";
+export { DeckIntentEngine, inferDeckIntent } from "./deckIntent";
+export type { DeckIntent } from "./deckIntent";

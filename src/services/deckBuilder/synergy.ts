@@ -19,8 +19,12 @@ function isSpiritCard(name: string): boolean {
 }
 
 function isSpellCard(name: string): boolean {
-  const roles = cardRoles(name);
-  return roles.has("spell") || roles.has("small_spell") || roles.has("big_spell");
+  return (
+    getCardMeta(name)?.type === "spell" ||
+    cardRoles(name).has("spell") ||
+    cardRoles(name).has("small_spell") ||
+    cardRoles(name).has("big_spell")
+  );
 }
 
 function isBuildingCard(name: string): boolean {

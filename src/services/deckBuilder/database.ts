@@ -78,3 +78,27 @@ export function avgElixir(cards: string[]): number {
 export function cardRoles(name: string): ReadonlySet<string> {
   return new Set(getCardMeta(name)?.roles ?? []);
 }
+
+/** Проверка по всем roles[], не только «основной». Синонимы air/spell/building. */
+export function cardHasRole(name: string, role: string): boolean {
+  const roles = cardRoles(name);
+  const meta = getCardMeta(name);
+  if (role === "air" || role === "air_defense") {
+    return roles.has("air_defense") || roles.has("air");
+  }
+  if (role === "spell") {
+    return (
+      roles.has("spell") ||
+      roles.has("big_spell") ||
+      roles.has("small_spell") ||
+      meta?.type === "spell"
+    );
+  }
+  if (role === "building") {
+    return roles.has("building") || meta?.type === "building";
+  }
+  if (role === "win_condition") {
+    return roles.has("win_condition");
+  }
+  return roles.has(role);
+}

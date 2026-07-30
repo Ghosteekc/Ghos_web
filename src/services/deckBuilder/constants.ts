@@ -1,5 +1,3 @@
-import type { CardRole } from "./types";
-
 export const MAX_SPELLS = 3;
 export const MAX_WINS = 1;
 
@@ -38,9 +36,6 @@ export const WEIGHT_ELIXIR = 15;
 export const WEIGHT_SYNERGY = 15;
 export const WEIGHT_POPULARITY = 5;
 
-export const MATCH_CONFIDENCE_THRESHOLD = 80;
-export const SYNERGY_MIN_THRESHOLD = 70;
-
 export const DEFAULT_ELIXIR_MIN = 2.6;
 export const DEFAULT_ELIXIR_MAX = 4.6;
 
@@ -55,44 +50,9 @@ export const ARCHETYPE_ELIXIR: Record<string, [number, number]> = {
   Control: [3.0, 4.0],
   Graveyard: [3.2, 4.2],
   "Split Lane": [2.8, 3.6],
+  "Fireball Bait": [2.8, 3.8],
   Meta: [2.8, 4.4],
 };
-
-export const FILL_PRIORITY: CardRole[] = [
-  "win_condition",
-  "big_spell",
-  "small_spell",
-  "air_defense",
-  "mini_tank",
-  "defensive",
-  "anti_tank",
-  "anti_swarm",
-  "building",
-  "dps",
-  "cycle",
-  "counterpush",
-];
-
-/** Мини-тank для отвлечения на дешёвых колодах. */
-export const CHEAP_DECK_ANCHORS = ["Knight", "Valkyrie", "Ice Golem"] as const;
-
-/** Спам / ответ на тяжёлые юниты. */
-export const ANTI_TANK_SWARM_CARDS = [
-  "Skeleton Army",
-  "Guards",
-  "Goblin Gang",
-  "Bats",
-  "Skeletons",
-  "Mini P.E.K.K.A",
-] as const;
-
-/** Критичные роли — добиваем заменой слабого филлера, даже если колода уже из 8 карт. */
-export const CRITICAL_BALANCE_ROLES: CardRole[] = [
-  "mini_tank",
-  "defensive",
-  "anti_tank",
-  "anti_swarm",
-];
 
 export const ARCHETYPE_ANCHORS: Record<string, ReadonlySet<string>> = {
   "Log Bait": new Set(["Goblin Barrel", "Princess", "Goblin Gang"]),

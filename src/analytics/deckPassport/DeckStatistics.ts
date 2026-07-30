@@ -1,4 +1,4 @@
-import { avgElixir, cardRoles, getCardMeta } from "@/services/deckBuilder/database";
+import { avgElixir, cardHasRole, getCardMeta } from "@/services/deckBuilder/database";
 import { isSpellCard, isWinCard } from "@/services/deckBuilder/balance";
 import { CHAMPION_CARDS, LEGENDARY_CARDS } from "./constants/ratings";
 import type { DeckCard } from "@/types";
@@ -15,26 +15,20 @@ export interface DeckBasicInfo {
 }
 
 function isBuilding(name: string): boolean {
-  return getCardMeta(name)?.type === "building" || cardRoles(name).has("building");
+  return cardHasRole(name, "building");
 }
 
 function isAir(name: string): boolean {
-  return (
-    cardRoles(name).has("air_defense") ||
-    [
-      "Minions", "Minion Horde", "Balloon", "Baby Dragon", "Mega Minion", "Bats",
-      "Phoenix", "Electro Dragon", "Flying Machine", "Lava Hound", "Skeleton Barrel",
-    ].includes(name)
-  );
+  return cardHasRole(name, "air_defense");
 }
 
 function isSupport(name: string): boolean {
-  return cardRoles(name).has("support") || cardRoles(name).has("dps");
+  return cardHasRole(name, "support") || cardHasRole(name, "dps");
 }
 
 function isCycle(name: string): boolean {
   const meta = getCardMeta(name);
-  return cardRoles(name).has("cycle") || (meta?.elixir ?? 4) <= 2;
+  return cardHasRole(name, "cycle") || (meta?.elixir ?? 4) <= 2;
 }
 
 export function collectCardNames(cards: DeckCard[]): string[] {
@@ -44,7 +38,7 @@ export function collectCardNames(cards: DeckCard[]): string[] {
 export function computeBasicInfo(cardNames: string[], deckType: string): DeckBasicInfo {
   const wins = cardNames.filter(isWinCard);
   const primaryWin =
-    wins[0] ?? cardNames.find((c) => cardRoles(c).has("win_condition")) ?? "—";
+    wins[0] ?? cardNames.find((c) => cardHasRole(c, "win_condition")) ?? "—";
 
   return {
     avgElixir: avgElixir(cardNames),

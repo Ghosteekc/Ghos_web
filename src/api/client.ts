@@ -30,6 +30,7 @@ import {
 
   DeckCompareResult,
   MineDeckStats,
+  RecommendDeckResponse,
   InsightsData,
   WinrateEntry,
   OpponentEntry,
@@ -476,6 +477,18 @@ export const api = {
       TTL.battles,
 
     ),
+
+
+
+  recommendDeck: (cards: string[], applySwaps = false) =>
+
+    request<RecommendDeckResponse>("/api/decks/recommend", {
+
+      method: "POST",
+
+      body: JSON.stringify({ cards, apply_swaps: applySwaps }),
+
+    }),
 
 
 

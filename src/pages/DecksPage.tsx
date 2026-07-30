@@ -24,6 +24,7 @@ import { ArenaDecksPanel } from "@/components/analytics/ArenaDecksPanel";
 import type { Deck, DeckCard as DeckCardData, RandomDeck, TopPlayer, TopPlayersData } from "@/types";
 import { usePageRefresh, useTelegram } from "@/hooks";
 import { deckFromCardNames, deckToComparePath } from "@/utils/deckActions";
+import { DecisionExplanationView } from "@/components/recommendations/DecisionExplanationView";
 
 import { DECK_CATEGORY_LABELS, DECK_FILTER_LABELS, UI } from "@/constants/labels";
 
@@ -912,6 +913,11 @@ export function DeckCard({
                 ))}
               </ul>
             ) : null}
+            <DecisionExplanationView
+              explanation={deck.recommendation?.decision_explanation}
+              title=""
+              className="mb-3"
+            />
           </>
         )}
 

@@ -1,6 +1,7 @@
 import { ROLE_BALANCE_CHECKS } from "./constants/roles";
-import { cardRoles } from "@/services/deckBuilder/database";
+import { cardHasRole } from "@/services/deckBuilder/database";
 import { isWinCard } from "@/services/deckBuilder/balance";
+import type { DeckIntent } from "./DeckIntent";
 
 export interface RoleBalanceEntry {
   id: string;
@@ -8,14 +9,25 @@ export interface RoleBalanceEntry {
   present: boolean;
 }
 
-export function evaluateRoleBalance(cardNames: string[]): RoleBalanceEntry[] {
+/**
+ * Баланс ролей относительно DeckIntent.requiredRoleIds.
+ * Каждая карта проверяется по всем roles[] (не только primary).
+ */
+export function evaluateRoleBalance(
+  cardNames: string[],
+  intent?: DeckIntent,
+): RoleBalanceEntry[] {
   const nameSet = new Set(cardNames);
+  const required = intent?.requiredRoleIds;
 
-  return ROLE_BALANCE_CHECKS.map((check) => {
-    let present = cardNames.some((name) => {
-      const roles = cardRoles(name);
-      return check.roles.some((r) => roles.has(r));
-    });
+  const checks = required
+    ? ROLE_BALANCE_CHECKS.filter((check) => required.has(check.id))
+    : ROLE_BALANCE_CHECKS;
+
+  return checks.map((check) => {
+    let present = cardNames.some((name) =>
+      check.roles.some((r) => cardHasRole(name, r)),
+    );
 
     if (!present && check.id === "win_condition") {
       present = cardNames.some(isWinCard);

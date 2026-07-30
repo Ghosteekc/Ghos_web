@@ -9,13 +9,13 @@ import {
   MAX_WINS,
   WIN_CONDITIONS,
 } from "./constants";
-import { avgElixir, cardRoles } from "./database";
+import { avgElixir, cardHasRole, getCardMeta } from "./database";
+import { DeckIntentEngine } from "./deckIntent";
 import { deckSynergyScore, pairSynergy } from "./synergy";
 import type { DeckRecord, ScoreBreakdown } from "./types";
 
 export function isSpellCard(name: string): boolean {
-  const roles = cardRoles(name);
-  return roles.has("spell") || roles.has("small_spell") || roles.has("big_spell");
+  return cardHasRole(name, "spell");
 }
 
 /** Primary tower-push attackers (Hog, Giant…) — Bandit/support push does not count. */
@@ -24,7 +24,7 @@ export function isAttackWin(name: string): boolean {
 }
 
 export function isWinCard(name: string): boolean {
-  return isAttackWin(name) || cardRoles(name).has("win_condition");
+  return isAttackWin(name) || cardHasRole(name, "win_condition");
 }
 
 export function countSpells(deck: string[]): number {
@@ -68,11 +68,11 @@ function elixirBounds(archetype: string): [number, number] {
 }
 
 function hasRole(deck: string[], role: string): boolean {
-  return deck.some((c) => cardRoles(c).has(role));
+  return deck.some((c) => cardHasRole(c, role));
 }
 
 function countRole(deck: string[], role: string): number {
-  return deck.filter((c) => cardRoles(c).has(role)).length;
+  return deck.filter((c) => cardHasRole(c, role)).length;
 }
 
 const SOFT_ROLE_BONUS: Record<string, number> = {
@@ -86,6 +86,7 @@ const SOFT_ROLE_BONUS: Record<string, number> = {
   building: 4,
   dps: 3,
   counterpush: 3,
+  cycle: 5,
 };
 
 const SCORE_WEIGHTS: Record<string, number> = {
@@ -111,16 +112,33 @@ export function hardConstraintIssues(deck: string[], core: string[] = []): strin
 }
 
 export function softBalanceIssues(deck: string[], archetype: string): string[] {
+  /** Soft-пробелы относительно DeckIntent (не универсальный чек-лист). */
+  const intent = DeckIntentEngine.infer(deck, archetype);
+  const required = intent.requiredSoftChecks;
   const [lo, hi] = elixirBounds(archetype);
   const issues: string[] = [];
   const avg = avgElixir(deck);
 
-  if (!hasRole(deck, "big_spell")) issues.push("big_spell");
-  if (!hasRole(deck, "small_spell")) issues.push("small_spell");
-  if (countRole(deck, "air_defense") < 2) issues.push("air_defense");
-  if (!hasRole(deck, "anti_tank")) issues.push("anti_tank");
-  if (!hasRole(deck, "defensive")) issues.push("defensive");
-  if (!hasRole(deck, "anti_swarm")) issues.push("anti_swarm");
+  if (required.has("big_spell") && !hasRole(deck, "big_spell")) issues.push("big_spell");
+  if (required.has("small_spell") && !hasRole(deck, "small_spell")) issues.push("small_spell");
+  if (required.has("air_defense")) {
+    const airN = countRole(deck, "air_defense");
+    if (airN < Math.max(1, intent.minAirDefense)) issues.push("air_defense");
+  }
+  if (required.has("anti_tank") && !hasRole(deck, "anti_tank")) issues.push("anti_tank");
+  if (
+    required.has("anti_swarm") &&
+    !hasRole(deck, "anti_swarm") &&
+    !hasRole(deck, "splash")
+  ) {
+    issues.push("anti_swarm");
+  }
+  if (required.has("building") && !hasRole(deck, "building")) issues.push("building");
+  if (required.has("cycle")) {
+    const cycleN = countRole(deck, "cycle");
+    const cheap = deck.filter((c) => (getCardMeta(c)?.elixir ?? 4) <= 2).length;
+    if (Math.max(cycleN, cheap) < intent.minCycleCards) issues.push("cycle");
+  }
   if (avg < lo - 0.4 || avg > hi + 0.4) issues.push("elixir");
 
   return issues;
@@ -269,18 +287,24 @@ function issueToRole(issue: string): string | undefined {
     small_spell: "small_spell",
     air_defense: "air_defense",
     anti_tank: "anti_tank",
-    defensive: "defensive",
     anti_swarm: "anti_swarm",
+    building: "building",
+    cycle: "cycle",
   };
   return map[issue];
 }
 
 function softRoleBonusForCard(card: string, missingIssues: Set<string>): number {
-  const roles = cardRoles(card);
   let bonus = 0;
   for (const issue of missingIssues) {
+    if (issue === "anti_swarm") {
+      if (cardHasRole(card, "anti_swarm") || cardHasRole(card, "splash")) {
+        bonus += SOFT_ROLE_BONUS.anti_swarm ?? 4;
+      }
+      continue;
+    }
     const role = issueToRole(issue);
-    if (role && roles.has(role as never)) bonus += SOFT_ROLE_BONUS[role] ?? 4;
+    if (role && cardHasRole(card, role)) bonus += SOFT_ROLE_BONUS[role] ?? 4;
   }
   return bonus;
 }
@@ -380,13 +404,13 @@ function trimExcessSpells(deck: string[], core: string[]): string[] {
   while (countSpells(out) > MAX_SPELLS) {
     const removable = out.filter((c) => isSpellCard(c) && !coreSet.has(c));
     if (!removable.length) break;
-    const hasBig = out.some((c) => cardRoles(c).has("big_spell"));
-    const hasSmall = out.some((c) => cardRoles(c).has("small_spell"));
+    const hasBig = out.some((c) => cardHasRole(c, "big_spell"));
+    const hasSmall = out.some((c) => cardHasRole(c, "small_spell"));
     const sorted = removable.sort((a, b) => {
-      const aBig = cardRoles(a).has("big_spell") ? 1 : 0;
-      const bBig = cardRoles(b).has("big_spell") ? 1 : 0;
-      const aSmall = cardRoles(a).has("small_spell") ? 1 : 0;
-      const bSmall = cardRoles(b).has("small_spell") ? 1 : 0;
+      const aBig = cardHasRole(a, "big_spell") ? 1 : 0;
+      const bBig = cardHasRole(b, "big_spell") ? 1 : 0;
+      const aSmall = cardHasRole(a, "small_spell") ? 1 : 0;
+      const bSmall = cardHasRole(b, "small_spell") ? 1 : 0;
       if (hasBig && hasSmall) {
         return (
           out.reduce((s, x) => s + pairSynergy(a, x), 0) -

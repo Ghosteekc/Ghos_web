@@ -1,10 +1,10 @@
 import { balanceIssues } from "@/services/deckBuilder/builder";
-import { avgElixir, cardRoles } from "@/services/deckBuilder/database";
+import { avgElixir, cardHasRole, getCardMeta } from "@/services/deckBuilder/database";
 import { deckSynergyScore } from "@/services/deckBuilder/synergy";
 import { isSpellCard, isWinCard } from "@/services/deckBuilder/balance";
 import { clampMetric, METRIC_WEIGHTS, scoreToStars } from "./constants/ratings";
+import { DeckIntentEngine } from "./DeckIntent";
 import { evaluateRoleBalance } from "./DeckRoles";
-import { getCardMeta } from "@/services/deckBuilder/database";
 
 export interface DeckMetrics {
   attack: number;
@@ -21,7 +21,7 @@ export interface DeckMetrics {
 }
 
 function countRole(cardNames: string[], role: string): number {
-  return cardNames.filter((c) => cardRoles(c).has(role)).length;
+  return cardNames.filter((c) => cardHasRole(c, role)).length;
 }
 
 function metricFromRatio(ratio: number, scale = 10): number {
@@ -40,11 +40,14 @@ export function computeDeckMetrics(cardNames: string[], archetype: string): Deck
   const counterpush =
     countRole(cardNames, "counterpush") + countRole(cardNames, "mini_tank");
   const cycleCards = cardNames.filter(
-    (c) => cardRoles(c).has("cycle") || (getCardMeta(c)?.elixir ?? 4) <= 2,
+    (c) => cardHasRole(c, "cycle") || (getCardMeta(c)?.elixir ?? 4) <= 2,
   ).length;
   const issues = balanceIssues(cardNames, archetype);
-  const roles = evaluateRoleBalance(cardNames);
-  const roleCoverage = roles.filter((r) => r.present).length / roles.length;
+  const intent = DeckIntentEngine.infer(cardNames, archetype);
+  const roles = evaluateRoleBalance(cardNames, intent);
+  const roleCoverage = roles.length
+    ? roles.filter((r) => r.present).length / roles.length
+    : 0;
 
   const attackBase =
     (wins > 0 ? 4 : 0) +

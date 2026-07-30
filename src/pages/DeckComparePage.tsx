@@ -6,6 +6,7 @@ import { CardTile, PlayerDeckGrid } from "@/components/cards";
 import { api, ApiError } from "@/api/client";
 import type { DeckCompareCardNote, DeckCompareResult } from "@/types";
 import { usePageRefresh } from "@/hooks";
+import { DecisionExplanationView } from "@/components/recommendations/DecisionExplanationView";
 
 type TabId = "overview" | "user" | "reference";
 
@@ -237,24 +238,32 @@ export function DeckComparePage() {
       )}
 
       {tab === "user" && (
-        <Card className="!p-4">
-          <p className="text-base font-semibold text-cr-text mb-3">Ваша колода — карта за картой</p>
+        <Card className="!p-4 space-y-4">
+          <p className="text-base font-semibold text-cr-text">Ваша колода — карта за картой</p>
           <ul className="space-y-2">
             {(data.user_card_notes ?? []).map((note) => (
               <CompareNoteRow key={note.card} note={note} icon={userIcons.get(note.card)} />
             ))}
           </ul>
+          <DecisionExplanationView
+            explanation={data.user_recommendation?.decision_explanation}
+            title="Рекомендации по вашей колоде"
+          />
         </Card>
       )}
 
       {tab === "reference" && (
-        <Card className="!p-4">
-          <p className="text-base font-semibold text-cr-text mb-3">{refLabel} — карта за картой</p>
+        <Card className="!p-4 space-y-4">
+          <p className="text-base font-semibold text-cr-text">{refLabel} — карта за картой</p>
           <ul className="space-y-2">
             {(data.reference_card_notes ?? []).map((note) => (
               <CompareNoteRow key={note.card} note={note} icon={refIcons.get(note.card)} />
             ))}
           </ul>
+          <DecisionExplanationView
+            explanation={data.reference_recommendation?.decision_explanation}
+            title={`Рекомендации: ${refLabel}`}
+          />
         </Card>
       )}
     </div>

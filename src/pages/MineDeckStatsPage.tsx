@@ -15,6 +15,7 @@ import { api, ApiError } from "@/api/client";
 import { MineDeckStats } from "@/types";
 import { usePageRefresh, useCardCatalog } from "@/hooks";
 import { UI } from "@/constants/labels";
+import { DecisionExplanationView } from "@/components/recommendations/DecisionExplanationView";
 
 function MatchupList({
   title,
@@ -220,6 +221,11 @@ export function MineDeckStatsPage() {
           </div>
         )}
       </Card>
+
+      <DecisionExplanationView
+        explanation={data.recommendation?.decision_explanation}
+        className="rounded-2xl border border-cr-border bg-cr-card p-4"
+      />
 
       <Button variant="secondary" className="w-full" onClick={() => navigate("/decks")}>
         <Swords className="w-4 h-4 shrink-0" />

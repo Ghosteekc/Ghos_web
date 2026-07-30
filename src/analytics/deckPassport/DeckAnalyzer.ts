@@ -1,6 +1,4 @@
-import type { Deck } from "@/types";
-import { balanceIssues } from "@/services/deckBuilder/builder";
-import { avgElixir, cardRoles } from "@/services/deckBuilder/database";
+import type { Deck, RecommendationResult } from "@/types";
 import {
   detectDeckArchetype,
   detectPlayStyle,
@@ -19,6 +17,7 @@ import {
 import { evaluateRoleBalance, type RoleBalanceEntry } from "./DeckRoles";
 import { starsDisplay } from "./constants/ratings";
 import { collectCardNames, computeBasicInfo, type DeckBasicInfo } from "./DeckStatistics";
+import type { DeckGamePlan } from "./DeckGamePlan";
 
 export interface DeckPassportResult {
   score: number;
@@ -47,6 +46,11 @@ export interface DeckPassportResult {
   weaknesses: string[];
   matchups: { strong: string[]; weak: string[] };
   summary: string;
+  /** Из RecommendationEngine (BE) */
+  gamePlan: DeckGamePlan;
+  improvements: { category: string; message: string; suggested_cards: string[] }[];
+  riskScore: number;
+  decisionExplanation: RecommendationResult["decision_explanation"] | null;
 }
 
 const METRIC_LABELS: { key: keyof DeckMetrics; label: string }[] = [
@@ -72,34 +76,37 @@ function buildStrengths(metrics: DeckMetrics, roleBalance: RoleBalanceEntry[]): 
   if (metrics.defense >= 7.5) out.push("крепкая оборона");
   if (metrics.control >= 7) out.push("хороший контроль поля");
   if (metrics.antiAir >= 7) out.push("уверенная защита воздуха");
-  if (roleBalance.filter((r) => r.present).length >= 7) out.push("полный набор ролей");
+  if (roleBalance.length > 0 && roleBalance.every((r) => r.present)) {
+    out.push("полный набор ролей");
+  }
   return out.slice(0, 5);
 }
 
-function buildWeaknesses(
-  metrics: DeckMetrics,
-  cardNames: string[],
-  archetype: string,
-): string[] {
+/** Слабости / улучшения — только из RecommendationEngine (BE). */
+function weaknessesFromRecommendation(rec: RecommendationResult): string[] {
   const out: string[] = [];
-  const issues = balanceIssues(cardNames, archetype);
-  const airDefenseCount = cardNames.filter((c) => cardRoles(c).has("air_defense")).length;
-
-  // Keep consistent with role balance: "анти-воздух есть" must not contradict weaknesses.
-  if (airDefenseCount === 0) {
-    out.push("слабая защита воздуха");
-  } else if (airDefenseCount === 1 && metrics.antiAir < 5) {
-    out.push("мало анти-воздуха");
+  for (const msg of rec.balance_issues.messages) {
+    if (!out.includes(msg)) out.push(msg);
   }
-
-  if (!cardNames.some((c) => cardRoles(c).has("building"))) out.push("нет здания");
-  if (avgElixir(cardNames) >= 4.1) out.push("дорогая ротация");
-  if (issues.includes("small_spell") || issues.includes("big_spell")) {
-    out.push("отсутствует второе заклинание");
+  for (const step of rec.improvement_plan.steps) {
+    if (!out.includes(step.message)) out.push(step.message);
   }
-  if (metrics.swarmDefense < 5) out.push("плохо играет против спама");
-  if (metrics.antiTank < 5) out.push("слабый ответ на тяжёлые юниты");
-  return out.slice(0, 5);
+  for (const f of rec.risk_assessment.factors) {
+    if (!out.includes(f)) out.push(f);
+  }
+  return out.slice(0, 6);
+}
+
+function gamePlanFromRecommendation(rec: RecommendationResult): DeckGamePlan {
+  const gp = rec.game_plan;
+  return {
+    howToWin: gp.how_to_win,
+    primaryThreat: gp.primary_threat,
+    whenToAttack: gp.when_to_attack,
+    keyCards: gp.key_cards,
+    coreCombinations: gp.core_combinations,
+    criticalWeaknesses: gp.critical_weaknesses,
+  };
 }
 
 function buildSummary(
@@ -147,13 +154,20 @@ function buildSummary(
   return parts.join(" ");
 }
 
-export function analyzeDeckPassport(deck: Deck): DeckPassportResult | null {
+/**
+ * Presentation-метрики локально; рекомендации состава — только из BE RecommendationEngine.
+ */
+export function analyzeDeckPassport(
+  deck: Deck,
+  recommendation: RecommendationResult | null,
+): DeckPassportResult | null {
   const cards = deck.cards ?? [];
   if (cards.length !== 8) return null;
+  if (!recommendation) return null;
 
   const cardNames = collectCardNames(cards);
-  const archetype = detectDeckArchetype(cardNames);
-  const playStyle = detectPlayStyle(cardNames, archetype);
+  const archetype = recommendation.intent.archetype || detectDeckArchetype(cardNames);
+  const playStyle = (recommendation.intent.play_style || detectPlayStyle(cardNames, archetype)) as PlayStyle;
   const metrics = computeDeckMetrics(cardNames, archetype);
   const score = computeGhosteekScore(metrics);
   const stars = computeStars(score);
@@ -165,10 +179,21 @@ export function analyzeDeckPassport(deck: Deck): DeckPassportResult | null {
     metrics,
     difficulty,
   );
-  const roleBalance = evaluateRoleBalance(cardNames);
+  // Role checklist фильтруем required_role_ids из Engine Intent
+  const roleBalance = evaluateRoleBalance(cardNames, {
+    archetype: recommendation.intent.archetype,
+    playStyle: recommendation.intent.play_style,
+    primaryWin: recommendation.intent.primary_win,
+    requiredSoftChecks: new Set(recommendation.intent.required_soft_checks),
+    minAirDefense: recommendation.intent.min_air_defense,
+    requireBuilding: recommendation.intent.require_building,
+    minCycleCards: recommendation.intent.min_cycle_cards,
+    requiredRoleIds: new Set(recommendation.intent.required_role_ids),
+    attackBias: recommendation.intent.attack_bias,
+  });
   const matchupsRaw = getArchetypeMatchups(archetype);
   const strengths = buildStrengths(metrics, roleBalance);
-  const weaknesses = buildWeaknesses(metrics, cardNames, archetype);
+  const weaknesses = weaknessesFromRecommendation(recommendation);
   const summary = buildSummary(
     score,
     archetype,
@@ -177,6 +202,7 @@ export function analyzeDeckPassport(deck: Deck): DeckPassportResult | null {
     { strong: matchupsRaw.strongAgainst, weak: matchupsRaw.weakAgainst },
     metrics,
   );
+  const gamePlan = gamePlanFromRecommendation(recommendation);
 
   return {
     score,
@@ -211,6 +237,14 @@ export function analyzeDeckPassport(deck: Deck): DeckPassportResult | null {
       weak: matchupsRaw.weakAgainst,
     },
     summary,
+    gamePlan,
+    improvements: recommendation.improvement_plan.steps.map((s) => ({
+      category: s.category,
+      message: s.message,
+      suggested_cards: s.suggested_cards,
+    })),
+    riskScore: recommendation.risk_assessment.score,
+    decisionExplanation: recommendation.decision_explanation ?? null,
   };
 }
 
@@ -222,4 +256,4 @@ export function getMetricDisplayList(metrics: DeckMetrics) {
   }));
 }
 
-export type { DeckMetrics, RoleBalanceEntry, DeckBasicInfo, PlayStyle, DifficultyLevel };
+export type { DeckMetrics, RoleBalanceEntry, DeckBasicInfo, PlayStyle, DifficultyLevel, DeckGamePlan };

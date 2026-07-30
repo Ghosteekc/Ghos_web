@@ -1,7 +1,5 @@
 import {
-  ARCHETYPE_ANCHORS,
   GENERIC_CARDS,
-  MATCH_CONFIDENCE_THRESHOLD,
   WEIGHT_ARCHETYPE,
   WEIGHT_CARD_MATCH,
   WEIGHT_ELIXIR,
@@ -22,46 +20,22 @@ import {
 import {
   avgElixir,
   candidateDeckIndices,
-  cardRoles,
   getAllCards,
   getAllDecks,
 } from "./database";
+import { detectArchetypeFromCards } from "./archetypeDetect";
+import {
+  prepareConstructorDecision,
+  resultDecisionBonus,
+  templateDecisionBonus,
+  type ConstructorDecision,
+} from "./constructorDecision";
 import { deckSynergyScore, pairSynergy } from "./synergy";
 import type { BuildResult, DeckRecord, ScoredDeck } from "./types";
 
 function detectArchetype(core: string[]): string {
-  const coreWins = core.filter((c) => WIN_CONDITIONS.has(c));
-  for (const win of coreWins) {
-    if (win === "Wall Breakers") return "Split Lane";
-    if (["Lava Hound", "Balloon"].includes(win)) return "Lava";
-    if (["Golem", "Giant", "Electro Giant"].includes(win)) return "Beatdown";
-    if (win === "Royal Giant") return "Royal Giant";
-    if (["Hog Rider", "Battle Ram"].includes(win)) return "Cycle";
-    if (win === "Goblin Barrel") return "Log Bait";
-    if (win === "Graveyard") return "Graveyard";
-    if (["X-Bow", "Mortar"].includes(win)) return "Siege";
-    if (["P.E.K.K.A", "Mega Knight", "Royal Ghost", "Bandit"].includes(win)) return "Bridge Spam";
-    if (win === "Miner") return "Control";
-  }
-
-  const coreSet = new Set(core);
-  let best = "Meta";
-  let bestHits = 0;
-  for (const [archetype, anchors] of Object.entries(ARCHETYPE_ANCHORS)) {
-    let hits = 0;
-    for (const a of anchors) if (coreSet.has(a)) hits++;
-    if (hits > bestHits) {
-      bestHits = hits;
-      best = archetype;
-    }
-  }
-  if (bestHits > 0) return best;
-
-  if (core.some((c) => ["X-Bow", "Mortar"].includes(c))) return "Siege";
-  const avg = avgElixir(core);
-  if (avg <= 3.3) return "Cycle";
-  if (avg >= 4.0) return "Beatdown";
-  return best;
+  /** Публичный API без смены сигнатуры — мультифакторный скоринг. */
+  return detectArchetypeFromCards(core);
 }
 
 function overlapScore(core: string[], templateCards: string[]): number {
@@ -111,19 +85,36 @@ function scoreDeckMatch(core: string[], archetype: string, record: DeckRecord): 
   return { record, score: raw, confidence, overlap };
 }
 
-function rankSimilar(core: string[], archetype: string, limit: number): ScoredDeck[] {
+function rankSimilar(
+  core: string[],
+  archetype: string,
+  limit: number,
+  decision?: ConstructorDecision,
+): ScoredDeck[] {
   const decks = getAllDecks();
   const indices = candidateDeckIndices(core);
   const scored: ScoredDeck[] = [];
 
+  const push = (sd: ScoredDeck | null) => {
+    if (!sd) return;
+    if (decision) {
+      const extra = templateDecisionBonus(sd.record, decision);
+      scored.push({
+        ...sd,
+        score: sd.score + extra,
+        confidence: Math.min(100, sd.confidence + extra * 0.35),
+      });
+    } else {
+      scored.push(sd);
+    }
+  };
+
   for (const idx of indices) {
-    const sd = scoreDeckMatch(core, archetype, decks[idx]);
-    if (sd) scored.push(sd);
+    push(scoreDeckMatch(core, archetype, decks[idx]));
   }
   if (!scored.length) {
     for (const d of decks) {
-      const sd = scoreDeckMatch(core, archetype, d);
-      if (sd) scored.push(sd);
+      push(scoreDeckMatch(core, archetype, d));
     }
   }
   scored.sort((a, b) => b.score - a.score || b.confidence - a.confidence || b.overlap - a.overlap);
@@ -149,9 +140,10 @@ function coreSynergyAvg(deck: string[], core: string[]): number {
   return n ? total / n : 0;
 }
 
-function rankScore(r: BuildResult): number {
+function rankScore(r: BuildResult, decision?: ConstructorDecision): number {
   const total = r.scoreBreakdown?.total ?? 0;
-  return total * 0.5 + r.synergyScore * 0.3 + r.confidence * 0.2;
+  const fit = decision ? resultDecisionBonus(r.deck, decision) : 0;
+  return total * 0.45 + r.synergyScore * 0.25 + r.confidence * 0.15 + fit * 0.15;
 }
 
 function buildOneVariant(
@@ -172,6 +164,10 @@ function buildOneVariant(
 }
 
 export function buildDeckFromCore(core: string[], pool?: Set<string>): BuildResult {
+  /**
+   * Порядок: 1 Intent → 2 GamePlan → 3 шаблон → 4–6 кандидаты / оценка / finalize.
+   * Существующий finalize сохранён.
+   */
   if (core.length !== 4 || new Set(core).size !== 4) {
     throw new Error("Нужно ровно 4 уникальные карты");
   }
@@ -180,19 +176,24 @@ export function buildDeckFromCore(core: string[], pool?: Set<string>): BuildResu
   const cardPool = pool ?? new Set(Object.keys(allCards));
   for (const c of core) cardPool.add(c);
 
-  const archetype = detectArchetype(core);
-  const ranked = rankSimilar(core, archetype, 6);
+  const decision = prepareConstructorDecision(core, detectArchetype);
+  const archetype = decision.archetype;
+  const ranked = rankSimilar(core, archetype, 6, decision);
   const best = ranked[0];
 
   const deck = buildOneVariant(core, cardPool, archetype, best?.record);
   const breakdown = computeScoreBreakdown(deck, core, archetype);
+  const conf = Math.min(
+    100,
+    (best?.confidence ?? 40) + resultDecisionBonus(deck, decision) * 0.4,
+  );
 
   return {
     deck,
     archetype,
     averageElixir: avgElixir(deck),
     synergyScore: deckSynergyScore(deck),
-    confidence: Math.round((best?.confidence ?? 40) * 10) / 10,
+    confidence: Math.round(conf * 10) / 10,
     sourceDeckId: best?.record.id,
     sourceDeckName: undefined,
     balanced: resultBalanced(deck, core, archetype),
@@ -217,8 +218,9 @@ function dedupeBuildResults(results: BuildResult[]): BuildResult[] {
 }
 
 export function buildMultipleDecks(core: string[], limit = 6): BuildResult[] {
-  const archetype = detectArchetype(core);
-  const ranked = rankSimilar(core, archetype, limit * 5);
+  const decision = prepareConstructorDecision(core, detectArchetype);
+  const archetype = decision.archetype;
+  const ranked = rankSimilar(core, archetype, limit * 5, decision);
   const allCards = getAllCards();
   const pool = new Set(Object.keys(allCards));
   for (const c of core) pool.add(c);
@@ -230,7 +232,7 @@ export function buildMultipleDecks(core: string[], limit = 6): BuildResult[] {
     if (results.length >= limit) break;
     for (const fillerSkip of [0, 1, 2]) {
       const deck = buildOneVariant(core, pool, archetype, sd.record, fillerSkip);
-      const arch = sd.record.archetype;
+      const arch = sd.record.archetype || archetype;
       if (deck.length !== 8 || hardConstraintIssues(deck, core).length) {
         continue;
       }
@@ -238,13 +240,17 @@ export function buildMultipleDecks(core: string[], limit = 6): BuildResult[] {
       if (seen.has(key)) continue;
       seen.add(key);
       const breakdown = computeScoreBreakdown(deck, core, arch);
+      const conf = Math.min(
+        100,
+        sd.confidence + resultDecisionBonus(deck, decision) * 0.4,
+      );
 
       results.push({
         deck,
         archetype: arch,
         averageElixir: avgElixir(deck),
         synergyScore: deckSynergyScore(deck),
-        confidence: Math.round(sd.confidence * 10) / 10,
+        confidence: Math.round(conf * 10) / 10,
         sourceDeckId: sd.record.id,
         sourceDeckName: undefined,
         balanced: resultBalanced(deck, core, arch),
@@ -258,12 +264,13 @@ export function buildMultipleDecks(core: string[], limit = 6): BuildResult[] {
     const fallback = buildOneVariant(core, pool, archetype);
     seen.add(deckKey(fallback));
     const breakdown = computeScoreBreakdown(fallback, core, archetype);
+    const conf = Math.min(100, 35 + resultDecisionBonus(fallback, decision) * 0.4);
     results.push({
       deck: fallback,
       archetype,
       averageElixir: avgElixir(fallback),
       synergyScore: deckSynergyScore(fallback),
-      confidence: 35,
+      confidence: Math.round(conf * 10) / 10,
       balanced: resultBalanced(fallback, core, archetype),
       scoreBreakdown: breakdown,
     });
@@ -273,19 +280,23 @@ export function buildMultipleDecks(core: string[], limit = 6): BuildResult[] {
   const gKey = deckKey(genericFallback);
   if (!seen.has(gKey) && results.length < limit) {
     const breakdown = computeScoreBreakdown(genericFallback, core, archetype);
+    const conf = Math.min(
+      100,
+      30 + resultDecisionBonus(genericFallback, decision) * 0.4,
+    );
     results.push({
       deck: genericFallback,
       archetype,
       averageElixir: avgElixir(genericFallback),
       synergyScore: deckSynergyScore(genericFallback),
-      confidence: 30,
+      confidence: Math.round(conf * 10) / 10,
       balanced: resultBalanced(genericFallback, core, archetype),
       scoreBreakdown: breakdown,
     });
   }
 
-  results.sort((a, b) => rankScore(b) - rankScore(a));
+  results.sort((a, b) => rankScore(b, decision) - rankScore(a, decision));
   return dedupeBuildResults(results).slice(0, limit);
 }
 
-export { detectArchetype, rankSimilar, balanceIssues };
+export { detectArchetype, balanceIssues };
